@@ -1,17 +1,20 @@
 import { Schema, model } from 'mongoose'
+import { z } from 'zod'
 
-export type Client = {
-  name: string
-  email?: string
-  address?: string
-}
+export const zodClientSchema = z.object({
+  name: z.string(),
+  email: z.string().email().optional(),
+  address: z.string().optional()
+})
 
-export const ClientSchema = new Schema<Client>({
+export type ClientType = z.infer<typeof zodClientSchema>
+
+export const mongooseClientSchema = new Schema<ClientType>({
   name: { type: String, required: true },
   email: { type: String, required: false },
   address: { type: String, required: false }
 })
 
-const ClientModel = model<Client>('Client', ClientSchema)
+const ClientModel = model<ClientType>('Client', mongooseClientSchema)
 
 export default ClientModel
