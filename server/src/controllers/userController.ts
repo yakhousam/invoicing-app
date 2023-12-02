@@ -1,10 +1,24 @@
 import { type Request, type Response } from 'express'
-import UserModel from '../model/user'
+import UserModel, { type UserType, zodUserShema } from '../model/user'
 
-export const register = (req: Request, res: Response): void => {
-  const { name, email, password } = req.body
-  const user = new UserModel({ name, email, password })
-  user.save()
-    .then(user => res.status(201).json(user))
-    .catch(() => res.sendStatus(409))
+type CreateUserRequest = Request<Record<string, unknown>, Record<string, unknown>, UserType>
+
+const create = (req: CreateUserRequest, res: Response): void => {
+  try {
+    zodUserShema.parse(req.body)
+    const { name, email, password } = req.body
+    const user = new UserModel({ name, email, password })
+    user.save()
+      .then(user => res.status(201).json(user))
+      .catch(() => res.sendStatus(409))
+  } catch (error) {
+    console.error(error)
+    res.sendStatus(400)
+  }
 }
+
+const User = {
+  create
+}
+
+export default User
