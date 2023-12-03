@@ -10,7 +10,7 @@ const create = (req: CreateUserRequest, res: Response): void => {
     const user = new UserModel({ name, email, password })
     user.save()
       .then(user => res.status(201).json(user))
-      .catch(() => res.sendStatus(409))
+      .catch((e) => res.status(409).json(e))
   } catch (error) {
     console.error(error)
     res.sendStatus(400)
