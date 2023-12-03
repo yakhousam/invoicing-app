@@ -1,3 +1,4 @@
+import bcrypt from 'bcrypt'
 import { Schema, model } from 'mongoose'
 import { z } from 'zod'
 
@@ -21,12 +22,15 @@ export const mongooseUserSchema = new Schema<UserType>({
 
 mongooseUserSchema.pre('save', function (next) {
   if (this.isModified('password')) {
-    console.log('calling next!')
-    // `return next();` will make sure the rest of this function doesn't run
-    /* return */ next()
+    bcrypt.hash(this.password, 12, (err, hashedPassword) => {
+      if (err !== undefined) {
+        next(err)
+      } else {
+        this.password = hashedPassword
+        next()
+      }
+    })
   }
-  // Unless you comment out the `return` above, 'after next' will print
-  console.log('after next')
 }
 )
 
