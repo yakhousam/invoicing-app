@@ -1,35 +1,43 @@
 import { Schema, model } from 'mongoose'
-import { zodClientSchema, mongooseClientSchema } from './client'
-import { zodUserShema, mongooseUserSchema } from './user'
 import { z } from 'zod'
 
-const zodInvoiceSchema = z.object({
-  invoiceNo: z.string(),
-  invoiceDate: z.date(),
-  user: zodUserShema,
-  client: zodClientSchema,
+export const zodInvoiceSchema = z.object({
+  invoiceDate: z.coerce.date(),
+  userId: z.string(),
+  clientId: z.string(),
   items: z.array(
     z.object({
       itemName: z.string(),
-      itemPrice: z.number()
+      itemPrice: z.coerce.number()
     })
-  ),
-  totalAmount: z.number()
+  )
 })
 
-type InvoiceType = z.infer<typeof zodInvoiceSchema>
+export type InvoiceType = z.infer<typeof zodInvoiceSchema>
 
-const mongooseInvoiceSchema = new Schema<InvoiceType>({
+type SchemaType = InvoiceType & {
+  invoiceNo: string
+  totalAmount: number
+}
+
+const mongooseInvoiceSchema = new Schema<SchemaType>({
   invoiceNo: {
-    type: String,
-    required: true
+    type: String
   },
   invoiceDate: {
     type: Date,
-    required: true
+    default: Date.now
   },
-  user: mongooseUserSchema,
-  client: mongooseClientSchema,
+  userId: {
+    type: String,
+    required: true,
+    ref: 'User'
+  },
+  clientId: {
+    type: String,
+    required: true,
+    ref: 'Client'
+  },
   items: [
     {
       itemName: String,
@@ -37,11 +45,27 @@ const mongooseInvoiceSchema = new Schema<InvoiceType>({
     }
   ],
   totalAmount: {
-    type: Number,
-    required: true
+    type: Number
   }
 })
 
-const InvoiceModel = model<InvoiceType>('Invoice', mongooseInvoiceSchema)
+mongooseInvoiceSchema.pre('save', async function (next) {
+  const Model = this.constructor as typeof InvoiceModel
+  const currentYear = new Date().getFullYear()
+  const invoiceNo = await Model.find({
+    invoiceDate: {
+      $gte: new Date(currentYear, 0, 1), // Start of the current year
+      $lte: new Date(currentYear, 11, 31) // End of the current year
+    }
+  }).countDocuments() + 1
+  this.invoiceNo = `${invoiceNo}`
+
+  const totalAmount = this.items.reduce((acc, item) => acc + item.itemPrice, 0)
+  this.totalAmount = totalAmount
+  next()
+}
+)
+
+const InvoiceModel = model<SchemaType>('Invoice', mongooseInvoiceSchema)
 
 export default InvoiceModel
