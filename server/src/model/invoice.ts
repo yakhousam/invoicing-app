@@ -58,6 +58,7 @@ mongooseInvoiceSchema.pre('save', async function (next) {
       $lte: new Date(currentYear, 11, 31) // End of the current year
     }
   }).countDocuments() + 1
+
   this.invoiceNo = `${invoiceNo}`
 
   const totalAmount = this.items.reduce((acc, item) => acc + item.itemPrice, 0)

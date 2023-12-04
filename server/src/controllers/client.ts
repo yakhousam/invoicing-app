@@ -1,19 +1,26 @@
 import { type Request, type Response } from 'express'
 import ClientModel, { type ClientType, zodClientSchema } from '../model/client'
+import { ZodError } from 'zod'
 
-type CreateClientRequest = Request<Record<string, unknown>, Record<string, unknown>, ClientType>
+export type CreateClientRequest = Request<Record<string, unknown>, Record<string, unknown>, ClientType>
 
-const create = (req: CreateClientRequest, res: Response): void => {
+const create = async (req: CreateClientRequest, res: Response): Promise<void> => {
   try {
-    zodClientSchema.parse(req.body)
     const { name, email, address } = req.body
+
+    zodClientSchema.parse({ name, email, address })
+
     const client = new ClientModel({ name, email, address })
-    client.save()
-      .then(client => res.status(201).json(client))
-      .catch((e) => res.status(409).json(e))
-  } catch (error) {
-    console.error(error)
-    res.sendStatus(400)
+
+    const newClient = await client.save()
+
+    res.status(201).json(newClient)
+  } catch (error: unknown) {
+    if (error instanceof (ZodError)) {
+      res.status(400).json({ errors: error.flatten().fieldErrors, message: 'Missing Fields. Failed to Create Invoice.' })
+    } else {
+      res.sendStatus(500)
+    }
   }
 }
 
