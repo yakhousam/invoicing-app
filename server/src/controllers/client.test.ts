@@ -27,6 +27,10 @@ const getNewClient = (): ClientType => ({
 })
 
 describe('Client Controller', () => {
+  beforeEach(async () => {
+    await ClientModel.deleteMany()
+  })
+
   describe('Create', () => {
     it('should create a new client', async () => {
       const mockClient = getNewClient()
@@ -86,17 +90,18 @@ describe('Client Controller', () => {
   })
 
   describe('Find', () => {
-    it.only('should return status 200, find all clients', async () => {
-      const mockClients: ClientType[] = Array(10).fill(null).map(() => (getNewClient()))
+    it('should return status 200, find all clients', async () => {
+      const mockClients = Array(10).fill(null).map(() => (getNewClient()))
 
-      ClientModel.find = jest.fn().mockResolvedValueOnce(mockClients)
+      await ClientModel.create(mockClients)
 
       const res = buildRes()
 
       await ClientController.find(null, res)
 
       expect(res.status).toHaveBeenCalledWith(200)
-      expect(res.json).toHaveBeenCalledWith(mockClients)
+      expect(res.json).toHaveBeenCalledWith(expect.arrayContaining([expect.objectContaining(mockClients[0])]))
+      expect((res.json as jest.Mock).mock.calls[0][0]).toHaveLength(mockClients.length)
     }
     )
   })

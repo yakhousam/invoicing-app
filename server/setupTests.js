@@ -1,9 +1,10 @@
-import { connect, connection } from 'mongoose'
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const { connect, connection } = require('mongoose')
 
-jest.beforeAll(async () => {
+beforeAll(async () => {
   await connect(globalThis.__MONGO_URI__)
 })
 
-jest.afterAll(async () => {
+afterAll(async () => {
   await connection.close()
 })
