@@ -24,8 +24,18 @@ const create = async (req: CreateClientRequest, res: Response): Promise<void> =>
   }
 }
 
+const find = async (req: unknown, res: Response): Promise<void> => {
+  try {
+    const clients = await ClientModel.find()
+    res.status(200).json(clients)
+  } catch (error: unknown) {
+    res.sendStatus(500)
+  }
+}
+
 const Client = {
-  create
+  create,
+  find
 }
 
 export default Client

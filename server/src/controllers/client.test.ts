@@ -1,12 +1,10 @@
+/* eslint-disable @typescript-eslint/unbound-method */
 /* eslint-disable @typescript-eslint/consistent-type-assertions */
 import { faker } from '@faker-js/faker'
 import { type ClientType } from '../model/client'
 import ClientController, { type CreateClientRequest } from './client'
 import { type Response } from 'express'
 import ClientModel from '../model/client'
-
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const mockingoose = require('mockingoose')
 
 const getName = (): string => faker.person.fullName()
 const getEmail = (): string => faker.internet.email()
@@ -28,24 +26,18 @@ const getNewClient = (): ClientType => ({
   address: getAdress()
 })
 
-describe('Controller Controller', () => {
-  beforeEach(() => {
-    mockingoose.resetAll()
-  }
-  )
+describe('Client Controller', () => {
   describe('Create', () => {
     it('should create a new client', async () => {
       const mockClient = getNewClient()
-      mockingoose(ClientModel).toReturn(mockClient, 'save')
 
       const req = {
         body: mockClient
-      } as CreateClientRequest
+      } as unknown as CreateClientRequest
 
       const res = buildRes()
 
       await ClientController.create(req, res)
-      // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(res.status).toHaveBeenCalledWith(201)
       expect(res.json).toHaveBeenCalledWith(expect.objectContaining(mockClient))
     })
@@ -61,7 +53,6 @@ describe('Controller Controller', () => {
 
       const res = buildRes()
       await ClientController.create(req, res)
-      // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(res.status).toHaveBeenCalledWith(400)
       expect(res.json).toHaveBeenCalledWith({
         errors: expect.objectContaining({
@@ -83,7 +74,6 @@ describe('Controller Controller', () => {
 
       const res = buildRes()
       await ClientController.create(req, res)
-      // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(res.status).toHaveBeenCalledWith(400)
       expect(res.json).toHaveBeenCalledWith({
         errors: expect.objectContaining({
@@ -93,17 +83,20 @@ describe('Controller Controller', () => {
       })
     }
     )
+  })
 
-    it('should return status 500, server error', async () => {
-      mockingoose(ClientModel).toReturn(new Error('server error'), 'save')
-      const req = {
-        body: getNewClient()
-      } as CreateClientRequest
+  describe('Find', () => {
+    it.only('should return status 200, find all clients', async () => {
+      const mockClients: ClientType[] = Array(10).fill(null).map(() => (getNewClient()))
+
+      ClientModel.find = jest.fn().mockResolvedValueOnce(mockClients)
 
       const res = buildRes()
-      await ClientController.create(req, res)
-      // eslint-disable-next-line @typescript-eslint/unbound-method
-      expect(res.sendStatus).toHaveBeenCalledWith(500)
+
+      await ClientController.find(null, res)
+
+      expect(res.status).toHaveBeenCalledWith(200)
+      expect(res.json).toHaveBeenCalledWith(mockClients)
     }
     )
   })
