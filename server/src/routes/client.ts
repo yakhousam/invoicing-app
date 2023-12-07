@@ -15,4 +15,12 @@ clientRoute.post('/clients/create', (req, res) => {
   void ClientController.create(req, res)
 })
 
+clientRoute.put('/clients/update/:id', (req, res) => {
+  void ClientController.update(req, res)
+})
+
+clientRoute.delete('/clients/delete/:id', (req, res) => {
+  void ClientController.delete(req, res)
+})
+
 export default clientRoute
