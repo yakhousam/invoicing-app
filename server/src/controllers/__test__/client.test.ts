@@ -239,4 +239,61 @@ describe('Client Controller', () => {
     }
     )
   })
+
+  describe('delete', () => {
+    it('should delete client', async () => {
+      const mockClient = getNewClient()
+
+      const { _id } = await ClientModel.create(mockClient)
+
+      const res = buildRes()
+
+      const req = {
+        params: {
+          id: _id.toString()
+        }
+      } as unknown as ClientFindByIdType
+
+      await ClientController.delete(req, res)
+
+      expect(res.status).toHaveBeenCalledWith(204)
+    })
+
+    it('should return status 404, client not found', async () => {
+      const res = buildRes()
+      const req = {
+        params: {
+          id: faker.database.mongodbObjectId()
+        }
+      } as unknown as ClientFindByIdType
+
+      await ClientController.delete(req, res)
+
+      expect(res.status).toHaveBeenCalledWith(404)
+      expect(res.json).toHaveBeenCalledWith({
+        error: expect.any(String),
+        message: expect.any(String)
+      })
+    }
+    )
+
+    it('should return status 400, invalid id', async () => {
+      const res = buildRes()
+      const req = {
+        params: {
+          id: 'invalid id'
+        }
+      } as unknown as ClientFindByIdType
+
+      await ClientController.delete(req, res)
+
+      expect(res.status).toHaveBeenCalledWith(400)
+      expect(res.json).toHaveBeenCalledWith({
+        error: expect.any(String),
+        message: expect.any(String)
+      })
+    }
+    )
+  }
+  )
 })

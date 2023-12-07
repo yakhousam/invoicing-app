@@ -22,7 +22,7 @@ const create = async (req: CreateClientRequest, res: Response): Promise<void> =>
     if (error instanceof (ZodError)) {
       res.status(400).json({ errors: error.flatten().fieldErrors, message: 'Missing Fields. Failed to Create Client.' })
     } else {
-      res.sendStatus(500)
+      res.status(500).end()
     }
   }
 }
@@ -32,7 +32,7 @@ const find = async (req: unknown, res: Response): Promise<void> => {
     const clients = await ClientModel.find()
     res.status(200).json(clients)
   } catch (error: unknown) {
-    res.sendStatus(500)
+    res.status(500).end()
   }
 }
 
@@ -49,7 +49,7 @@ const findById = async (req: ClientFindByIdType, res: Response): Promise<void> =
     if (error instanceof MongooseError.CastError) {
       res.status(400).json({ error: 'Invalid Id', message: `${error.value} : is not a valid id` })
     } else {
-      res.sendStatus(500)
+      res.status(500).end()
     }
   }
 }
@@ -79,7 +79,25 @@ const update = async (req: ClientUpdateType, res: Response): Promise<void> => {
     } else if (error instanceof MongooseError.CastError) {
       res.status(400).json({ error: 'Invalid Id', message: `${error.value} : is not a valid id` })
     } else {
-      res.sendStatus(500)
+      res.status(500).end()
+    }
+  }
+}
+
+const deleteClient = async (req: ClientFindByIdType, res: Response): Promise<void> => {
+  try {
+    const { id } = req.params
+    const client = await ClientModel.findByIdAndDelete(id)
+    if (client !== null) {
+      res.status(204).json(client)
+    } else {
+      res.status(404).json({ error: 'Not found', message: `Client with id: ${id} doesn't exist` })
+    }
+  } catch (error: unknown) {
+    if (error instanceof MongooseError.CastError) {
+      res.status(400).json({ error: 'Invalid Id', message: `${error.value} : is not a valid id` })
+    } else {
+      res.status(500).end()
     }
   }
 }
@@ -88,7 +106,8 @@ const Client = {
   create,
   find,
   findById,
-  update
+  update,
+  delete: deleteClient
 }
 
 export default Client
