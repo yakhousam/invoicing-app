@@ -7,6 +7,10 @@ clientRoute.get('/clients', (req, res) => {
   void ClientController.find(req, res)
 })
 
+clientRoute.get('/clients/:id', (req, res) => {
+  void ClientController.findById(req, res)
+})
+
 clientRoute.post('/clients/create', (req, res) => {
   void ClientController.create(req, res)
 })

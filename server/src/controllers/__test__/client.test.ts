@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/consistent-type-assertions */
 import { faker } from '@faker-js/faker'
 import ClientModel, { type ClientType } from '@/model/client'
-import ClientController, { type CreateClientRequest } from '@/controllers/client'
+import ClientController, { type ClientUpdateType, type ClientFindByIdType, type CreateClientRequest } from '@/controllers/client'
 import { type Response } from 'express'
 
 const getName = (): string => faker.person.fullName()
@@ -89,7 +89,7 @@ describe('Client Controller', () => {
   })
 
   describe('Find', () => {
-    it('should return status 200, find all clients', async () => {
+    it('should find all clients', async () => {
       const mockClients = Array(10).fill(null).map(() => (getNewClient()))
 
       await ClientModel.create(mockClients)
@@ -101,6 +101,61 @@ describe('Client Controller', () => {
       expect(res.status).toHaveBeenCalledWith(200)
       expect(res.json).toHaveBeenCalledWith(expect.arrayContaining([expect.objectContaining(mockClients[0])]))
       expect((res.json as jest.Mock).mock.calls[0][0]).toHaveLength(mockClients.length)
+    }
+    )
+
+    it('should find client by id', async () => {
+      const mockClient = getNewClient()
+
+      const { _id } = await ClientModel.create(mockClient)
+
+      const res = buildRes()
+      const req = {
+        params: {
+          id: _id.toString()
+        }
+      } as unknown as ClientFindByIdType
+
+      await ClientController.findById(req, res)
+
+      expect(res.status).toHaveBeenCalledWith(200)
+      expect(res.json).toHaveBeenCalledWith(expect.objectContaining(mockClient))
+    }
+    )
+
+    it('should return status 404, client not found', async () => {
+      const res = buildRes()
+      const req = {
+        params: {
+          id: faker.database.mongodbObjectId()
+        }
+      } as unknown as ClientFindByIdType
+
+      await ClientController.findById(req, res)
+
+      expect(res.status).toHaveBeenCalledWith(404)
+      expect(res.json).toHaveBeenCalledWith({
+        error: expect.any(String),
+        message: expect.any(String)
+      })
+    }
+    )
+
+    it('should return status 400, ivalid id', async () => {
+      const res = buildRes()
+      const req = {
+        params: {
+          id: 'invalid id'
+        }
+      } as unknown as ClientFindByIdType
+
+      await ClientController.findById(req, res)
+
+      expect(res.status).toHaveBeenCalledWith(400)
+      expect(res.json).toHaveBeenCalledWith({
+        error: expect.any(String),
+        message: expect.any(String)
+      })
     }
     )
   })
