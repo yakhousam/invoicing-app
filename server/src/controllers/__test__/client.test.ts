@@ -159,4 +159,84 @@ describe('Client Controller', () => {
     }
     )
   })
+
+  describe('update', () => {
+    it('should update client', async () => {
+      const mockClient = getNewClient()
+
+      const { _id } = await ClientModel.create(mockClient)
+
+      const res = buildRes()
+
+      const updatedClient = getNewClient()
+      const req = {
+        params: {
+          id: _id.toString()
+        },
+        body: updatedClient
+
+      } as unknown as ClientUpdateType
+
+      await ClientController.update(req, res)
+
+      expect(res.status).toHaveBeenCalledWith(200)
+      expect(res.json).toHaveBeenCalledWith(expect.objectContaining(updatedClient))
+    })
+    it('should return status 404, client not found', async () => {
+      const res = buildRes()
+      const req = {
+        params: {
+          id: faker.database.mongodbObjectId()
+        },
+        body: getNewClient()
+      } as unknown as ClientUpdateType
+
+      await ClientController.update(req, res)
+
+      expect(res.status).toHaveBeenCalledWith(404)
+      expect(res.json).toHaveBeenCalledWith({
+        error: expect.any(String),
+        message: expect.any(String)
+      })
+    }
+    )
+
+    it('should return status 400, invalid id', async () => {
+      const res = buildRes()
+      const req = {
+        params: {
+          id: 'invalid id'
+        },
+        body: getNewClient()
+      } as unknown as ClientUpdateType
+
+      await ClientController.update(req, res)
+
+      expect(res.status).toHaveBeenCalledWith(400)
+      expect(res.json).toHaveBeenCalledWith({
+        error: expect.any(String),
+        message: expect.any(String)
+      })
+    }
+    )
+
+    it('should return status 400, invalid data', async () => {
+      const req = {
+        body: {
+          name: undefined,
+          email: 'invalid email',
+          address: getAdress()
+        }
+      } as unknown as CreateClientRequest
+
+      const res = buildRes()
+      await ClientController.create(req, res)
+      expect(res.status).toHaveBeenCalledWith(400)
+      expect(res.json).toHaveBeenCalledWith({
+        errors: expect.anything(),
+        message: expect.any(String)
+      })
+    }
+    )
+  })
 })

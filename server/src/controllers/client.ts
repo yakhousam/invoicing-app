@@ -20,7 +20,7 @@ const create = async (req: CreateClientRequest, res: Response): Promise<void> =>
     res.status(201).json(newClient)
   } catch (error: unknown) {
     if (error instanceof (ZodError)) {
-      res.status(400).json({ errors: error.flatten().fieldErrors, message: 'Missing Fields. Failed to Create Invoice.' })
+      res.status(400).json({ errors: error.flatten().fieldErrors, message: 'Missing Fields. Failed to Create Client.' })
     } else {
       res.sendStatus(500)
     }
@@ -54,10 +54,41 @@ const findById = async (req: ClientFindByIdType, res: Response): Promise<void> =
   }
 }
 
+const update = async (req: ClientUpdateType, res: Response): Promise<void> => {
+  try {
+    const { id } = req.params
+    const { name, email, address } = req.body
+
+    const client = await ClientModel.findById(id)
+
+    if (client !== null) {
+      zodClientSchema.parse({ name, email, address })
+      client.name = name
+      client.email = email
+      client.address = address
+
+      const updatedClient = await client.save()
+
+      res.status(200).json(updatedClient)
+    } else {
+      res.status(404).json({ error: 'Not found', message: `Client with id: ${id} doesn't exist` })
+    }
+  } catch (error: unknown) {
+    if (error instanceof (ZodError)) {
+      res.status(400).json({ errors: error.flatten().fieldErrors, message: 'Missing Fields. Failed to Create Client.' })
+    } else if (error instanceof MongooseError.CastError) {
+      res.status(400).json({ error: 'Invalid Id', message: `${error.value} : is not a valid id` })
+    } else {
+      res.sendStatus(500)
+    }
+  }
+}
+
 const Client = {
   create,
   find,
-  findById
+  findById,
+  update
 }
 
 export default Client
