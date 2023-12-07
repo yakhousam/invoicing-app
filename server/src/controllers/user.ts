@@ -1,5 +1,5 @@
 import { type Request, type Response } from 'express'
-import UserModel, { type UserType, zodUserShema } from '../model/user'
+import UserModel, { type UserType, zodUserShema } from '@/model/user'
 
 type CreateUserRequest = Request<Record<string, unknown>, Record<string, unknown>, UserType>
 

@@ -1,10 +1,9 @@
 /* eslint-disable @typescript-eslint/unbound-method */
 /* eslint-disable @typescript-eslint/consistent-type-assertions */
 import { faker } from '@faker-js/faker'
-import { type ClientType } from '../model/client'
-import ClientController, { type CreateClientRequest } from './client'
+import ClientModel, { type ClientType } from '@/model/client'
+import ClientController, { type CreateClientRequest } from '@/controllers/client'
 import { type Response } from 'express'
-import ClientModel from '../model/client'
 
 const getName = (): string => faker.person.fullName()
 const getEmail = (): string => faker.internet.email()

@@ -1,5 +1,5 @@
 import { type Request, type Response } from 'express'
-import ClientModel, { type ClientType, zodClientSchema } from '../model/client'
+import ClientModel, { type ClientType, zodClientSchema } from '@/model/client'
 import { ZodError } from 'zod'
 
 export type CreateClientRequest = Request<Record<string, unknown>, Record<string, unknown>, ClientType>

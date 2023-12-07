@@ -1,8 +1,8 @@
 import { Router } from 'express'
-import Invoice from '../controllers/invoice'
+import invoiceController from '@/controllers/invoice'
 
 const invoiceRoute = Router()
 
-invoiceRoute.post('/invoices/create', Invoice.create)
+invoiceRoute.post('/invoices/create', invoiceController.create)
 
 export default invoiceRoute

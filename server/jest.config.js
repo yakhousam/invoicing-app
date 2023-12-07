@@ -5,5 +5,8 @@ const { defaults: tsjPreset } = require('ts-jest/presets')
 module.exports = {
   preset: '@shelf/jest-mongodb',
   transform: tsjPreset.transform,
-  setupFilesAfterEnv: ['./setupTests.js']
+  setupFilesAfterEnv: ['./setupTests.js'],
+  moduleNameMapper: {
+    '^@/(.*)$': '<rootDir>/src/$1'
+  }
 }
