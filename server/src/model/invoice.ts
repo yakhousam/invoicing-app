@@ -1,10 +1,10 @@
-import { Schema, model } from 'mongoose'
+import { Schema, model, Types } from 'mongoose'
 import { z } from 'zod'
 
 export const zodInvoiceSchema = z.object({
   invoiceDate: z.coerce.date(),
-  userId: z.string(),
-  clientId: z.string(),
+  userId: z.string().min(24).max(24).transform((value) => new Types.ObjectId(value)),
+  clientId: z.string().min(24).max(24).transform((value) => new Types.ObjectId(value)),
   items: z.array(
     z.object({
       itemName: z.string(),
@@ -29,12 +29,12 @@ const mongooseInvoiceSchema = new Schema<SchemaType>({
     default: Date.now
   },
   userId: {
-    type: String,
+    type: Schema.Types.ObjectId,
     required: true,
     ref: 'User'
   },
   clientId: {
-    type: String,
+    type: Schema.Types.ObjectId,
     required: true,
     ref: 'Client'
   },
@@ -48,6 +48,16 @@ const mongooseInvoiceSchema = new Schema<SchemaType>({
     type: Number
   }
 })
+
+mongooseInvoiceSchema.path('userId').validate(async (value) => {
+  const user = await model('User').findById(value)
+  return user !== null
+}, 'Invalid User Id')
+
+mongooseInvoiceSchema.path('clientId').validate(async (value) => {
+  const client = await model('Client').findById(value)
+  return client !== null
+}, 'Invalid Client Id')
 
 mongooseInvoiceSchema.pre('save', async function (next) {
   const Model = this.constructor as typeof InvoiceModel

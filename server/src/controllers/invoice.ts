@@ -11,7 +11,7 @@ const create = (req: CreateInvoiceRequest, res: Response): void => {
       .then(invoice => res.status(201).json(invoice))
       .catch((e) => res.status(409).json(e))
   } catch (error) {
-    res.sendStatus(400)
+    res.status(400).send(error)
   }
 }
 
