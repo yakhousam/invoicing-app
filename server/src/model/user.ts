@@ -20,6 +20,11 @@ export const mongooseUserSchema = new Schema<UserType>({
   password: { type: String, required: true }
 })
 
+mongooseUserSchema.path('email').validate(async (value) => {
+  const user = await model<UserType>('User').findOne({ email: value })
+  return user === null
+}, 'Duplicated email')
+
 mongooseUserSchema.pre('save', function (next) {
   if (this.isModified('password')) {
     bcrypt.hash(this.password, 12, (err, hashedPassword) => {
