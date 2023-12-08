@@ -1,29 +1,9 @@
 /* eslint-disable @typescript-eslint/unbound-method */
-/* eslint-disable @typescript-eslint/consistent-type-assertions */
-import { faker } from '@faker-js/faker'
-import ClientModel, { type ClientType } from '@/model/client'
-import ClientController, { type ClientUpdateType, type ClientFindByIdType, type CreateClientRequest } from '@/controllers/client'
-import { type Response } from 'express'
-
-const getName = (): string => faker.person.fullName()
-const getEmail = (): string => faker.internet.email()
-const getAdress = (): string => faker.location.streetAddress()
-
-function buildRes (overrides = {}): Response {
-  const res = {
-    json: jest.fn(() => res).mockName('json'),
-    status: jest.fn(() => res).mockName('status'),
-    sendStatus: jest.fn(() => res).mockName('sendStatus'),
-    ...overrides
-  } as unknown as Response
-  return res
-}
-
-const getNewClient = (): ClientType => ({
-  name: getName(),
-  email: getEmail(),
-  address: getAdress()
-})
+import ClientModel from '@/model/client'
+import clientController, { type ClientUpdateType, type ClientFindByIdType, type CreateClientRequest } from '@/controllers/client'
+import { ZodError } from 'zod'
+import { Error as MongooseError } from 'mongoose'
+import { buildNext, buildRes, getNewClient, getObjectId } from '@/utils/generate'
 
 describe('Client Controller', () => {
   beforeEach(async () => {
@@ -39,68 +19,69 @@ describe('Client Controller', () => {
       } as unknown as CreateClientRequest
 
       const res = buildRes()
+      const next = buildNext()
 
-      await ClientController.create(req, res)
+      await clientController.create(req, res, next)
       expect(res.status).toHaveBeenCalledWith(201)
       expect(res.json).toHaveBeenCalledWith(expect.objectContaining(mockClient))
+      expect(next).not.toHaveBeenCalled()
     })
 
-    it('should return status 400, required name', async () => {
+    it('should call next with ZodError error, required name', async () => {
       const req = {
         body: {
-          name: undefined,
-          email: getEmail(),
-          address: getAdress()
+          ...getNewClient(),
+          name: undefined
         }
       } as unknown as CreateClientRequest
 
       const res = buildRes()
-      await ClientController.create(req, res)
-      expect(res.status).toHaveBeenCalledWith(400)
-      expect(res.json).toHaveBeenCalledWith({
-        errors: expect.objectContaining({
-          name: expect.anything()
-        }),
-        message: expect.any(String)
-      })
+      const next = buildNext()
+
+      await clientController.create(req, res, next)
+
+      expect(next).toHaveBeenCalledTimes(1)
+      expect(next).toHaveBeenCalledWith(expect.any(ZodError))
     }
     )
 
     it('should return status 400, invalid email', async () => {
       const req = {
         body: {
-          name: getName(),
-          email: 'invalid email',
-          address: getAdress()
+          ...getNewClient(),
+          email: 'invalid email'
         }
-      } as CreateClientRequest
+      } as unknown as CreateClientRequest
 
       const res = buildRes()
-      await ClientController.create(req, res)
-      expect(res.status).toHaveBeenCalledWith(400)
-      expect(res.json).toHaveBeenCalledWith({
-        errors: expect.objectContaining({
-          email: expect.anything()
-        }),
-        message: expect.any(String)
-      })
+      const next = buildNext()
+
+      await clientController.create(req, res, next)
+
+      expect(next).toHaveBeenCalledTimes(1)
+      expect(next).toHaveBeenCalledWith(expect.any(ZodError))
     }
     )
   })
 
   describe('Find', () => {
     it('should find all clients', async () => {
-      const mockClients = Array(10).fill(null).map(() => (getNewClient()))
-
-      await ClientModel.create(mockClients)
-
+      const mockClients = Array(2).fill(null).map(() => (getNewClient()))
+      const expectedClient = await ClientModel.create(mockClients)
       const res = buildRes()
+      const next = buildNext()
 
-      await ClientController.find(null, res)
+      await clientController.find(null, res, next)
 
       expect(res.status).toHaveBeenCalledWith(200)
-      expect(res.json).toHaveBeenCalledWith(expect.arrayContaining([expect.objectContaining(mockClients[0])]))
-      expect((res.json as jest.Mock).mock.calls[0][0]).toHaveLength(mockClients.length)
+
+      expect(res.json).toHaveBeenCalledWith(
+        expect.arrayContaining(
+          expectedClient.map((client) => expect.objectContaining(client.toJSON()))
+        )
+      )
+
+      expect(next).not.toHaveBeenCalled()
     }
     )
 
@@ -110,13 +91,14 @@ describe('Client Controller', () => {
       const { _id } = await ClientModel.create(mockClient)
 
       const res = buildRes()
+      const next = buildNext()
       const req = {
         params: {
           id: _id.toString()
         }
       } as unknown as ClientFindByIdType
 
-      await ClientController.findById(req, res)
+      await clientController.findById(req, res, next)
 
       expect(res.status).toHaveBeenCalledWith(200)
       expect(res.json).toHaveBeenCalledWith(expect.objectContaining(mockClient))
@@ -125,13 +107,14 @@ describe('Client Controller', () => {
 
     it('should return status 404, client not found', async () => {
       const res = buildRes()
+      const next = buildNext()
       const req = {
         params: {
-          id: faker.database.mongodbObjectId()
+          id: getObjectId()
         }
       } as unknown as ClientFindByIdType
 
-      await ClientController.findById(req, res)
+      await clientController.findById(req, res, next)
 
       expect(res.status).toHaveBeenCalledWith(404)
       expect(res.json).toHaveBeenCalledWith({
@@ -141,21 +124,19 @@ describe('Client Controller', () => {
     }
     )
 
-    it('should return status 400, ivalid id', async () => {
+    it('should call next with mongoose error, ivalid id', async () => {
       const res = buildRes()
+      const next = buildNext()
       const req = {
         params: {
           id: 'invalid id'
         }
       } as unknown as ClientFindByIdType
 
-      await ClientController.findById(req, res)
+      await clientController.findById(req, res, next)
 
-      expect(res.status).toHaveBeenCalledWith(400)
-      expect(res.json).toHaveBeenCalledWith({
-        error: expect.any(String),
-        message: expect.any(String)
-      })
+      expect(next).toHaveBeenCalledTimes(1)
+      expect(next).toHaveBeenCalledWith(expect.any(MongooseError))
     }
     )
   })
@@ -167,6 +148,7 @@ describe('Client Controller', () => {
       const { _id } = await ClientModel.create(mockClient)
 
       const res = buildRes()
+      const next = buildNext()
 
       const updatedClient = getNewClient()
       const req = {
@@ -177,21 +159,23 @@ describe('Client Controller', () => {
 
       } as unknown as ClientUpdateType
 
-      await ClientController.update(req, res)
+      await clientController.update(req, res, next)
 
       expect(res.status).toHaveBeenCalledWith(200)
       expect(res.json).toHaveBeenCalledWith(expect.objectContaining(updatedClient))
     })
+
     it('should return status 404, client not found', async () => {
       const res = buildRes()
+      const next = buildNext()
       const req = {
         params: {
-          id: faker.database.mongodbObjectId()
+          id: getObjectId()
         },
         body: getNewClient()
       } as unknown as ClientUpdateType
 
-      await ClientController.update(req, res)
+      await clientController.update(req, res, next)
 
       expect(res.status).toHaveBeenCalledWith(404)
       expect(res.json).toHaveBeenCalledWith({
@@ -201,8 +185,9 @@ describe('Client Controller', () => {
     }
     )
 
-    it('should return status 400, invalid id', async () => {
+    it('should call next with mongoose error, invalid id', async () => {
       const res = buildRes()
+      const next = buildNext()
       const req = {
         params: {
           id: 'invalid id'
@@ -210,32 +195,29 @@ describe('Client Controller', () => {
         body: getNewClient()
       } as unknown as ClientUpdateType
 
-      await ClientController.update(req, res)
+      await clientController.update(req, res, next)
 
-      expect(res.status).toHaveBeenCalledWith(400)
-      expect(res.json).toHaveBeenCalledWith({
-        error: expect.any(String),
-        message: expect.any(String)
-      })
+      expect(next).toHaveBeenCalledTimes(1)
+      expect(next).toHaveBeenCalledWith(expect.any(MongooseError))
     }
     )
 
-    it('should return status 400, invalid data', async () => {
+    it('should call next with ZodError error, invalid data', async () => {
       const req = {
         body: {
           name: undefined,
           email: 'invalid email',
-          address: getAdress()
+          address: 'anything'
         }
       } as unknown as CreateClientRequest
 
       const res = buildRes()
-      await ClientController.create(req, res)
-      expect(res.status).toHaveBeenCalledWith(400)
-      expect(res.json).toHaveBeenCalledWith({
-        errors: expect.anything(),
-        message: expect.any(String)
-      })
+      const next = buildNext()
+
+      await clientController.create(req, res, next)
+
+      expect(next).toHaveBeenCalledTimes(1)
+      expect(next).toHaveBeenCalledWith(expect.any(ZodError))
     }
     )
   })
@@ -247,6 +229,7 @@ describe('Client Controller', () => {
       const { _id } = await ClientModel.create(mockClient)
 
       const res = buildRes()
+      const next = buildNext()
 
       const req = {
         params: {
@@ -254,20 +237,21 @@ describe('Client Controller', () => {
         }
       } as unknown as ClientFindByIdType
 
-      await ClientController.delete(req, res)
+      await clientController.deleteById(req, res, next)
 
       expect(res.status).toHaveBeenCalledWith(204)
     })
 
     it('should return status 404, client not found', async () => {
       const res = buildRes()
+      const next = buildNext()
       const req = {
         params: {
-          id: faker.database.mongodbObjectId()
+          id: getObjectId()
         }
       } as unknown as ClientFindByIdType
 
-      await ClientController.delete(req, res)
+      await clientController.deleteById(req, res, next)
 
       expect(res.status).toHaveBeenCalledWith(404)
       expect(res.json).toHaveBeenCalledWith({
@@ -277,21 +261,19 @@ describe('Client Controller', () => {
     }
     )
 
-    it('should return status 400, invalid id', async () => {
+    it('should call next with mongoose error, invalid id', async () => {
       const res = buildRes()
+      const next = buildNext()
       const req = {
         params: {
           id: 'invalid id'
         }
       } as unknown as ClientFindByIdType
 
-      await ClientController.delete(req, res)
+      await clientController.deleteById(req, res, next)
 
-      expect(res.status).toHaveBeenCalledWith(400)
-      expect(res.json).toHaveBeenCalledWith({
-        error: expect.any(String),
-        message: expect.any(String)
-      })
+      expect(next).toHaveBeenCalledTimes(1)
+      expect(next).toHaveBeenCalledWith(expect.any(MongooseError))
     }
     )
   }
