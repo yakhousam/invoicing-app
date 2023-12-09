@@ -40,28 +40,29 @@ const findById = async (req: UserFindByIdType, res: Response, next: NextFunction
   }
 }
 
-const update = async (req: UserUpdateType, res: Response, next: NextFunction): Promise<void> => {
-  try {
-    const { id } = req.params
-    const { name, email, password } = req.body
+// const update = async (req: UserUpdateType, res: Response, next: NextFunction): Promise<void> => {
+//   try {
+//     const { id } = req.params
+//     const { name, email, password } = req.body
 
-    const user = await UserModel.findById(id)
+//     const user = await UserModel.findById(id)
 
-    if (user !== null) {
-      zodUserShema.parse({ name, email, password })
-      user.name = name
-      user.email = email
-      user.password = password
+//     if (user !== null) {
+//       zodUserShema.parse({ name, email, password })
+//       user.name = name
+//       user.email = email
+//       user.password = password
 
-      const updatedUser = await user.save()
-      res.status(200).json(updatedUser)
-    } else {
-      res.status(404).json({ error: 'Not found', message: `User with id: ${id} doesn't exist` })
-    }
-  } catch (error: unknown) {
-    next(error)
-  }
-}
+//       const updatedUser = await user.save()
+//       res.status(200).json(updatedUser)
+//     } else {
+//       res.status(404).json({ error: 'Not found', message: `User with id: ${id} doesn't exist` })
+//     }
+//   } catch (error: unknown) {
+//     console.error(error)
+//     next(error)
+//   }
+// }
 
 const deleteById = async (req: UserFindByIdType, res: Response, next: NextFunction): Promise<void> => {
   try {
@@ -81,7 +82,6 @@ const userController = {
   create,
   find,
   findById,
-  update,
   deleteById
 }
 
