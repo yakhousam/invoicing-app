@@ -17,7 +17,7 @@ export const mongooseUserSchema = new Schema<UserType>({
     required: true,
     unique: true
   },
-  password: { type: String, required: true }
+  password: { type: String, required: true, select: false }
 })
 
 mongooseUserSchema.path('email').validate(async (value) => {
