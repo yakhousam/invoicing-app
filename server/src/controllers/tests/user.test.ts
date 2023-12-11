@@ -1,6 +1,9 @@
 /* eslint-disable @typescript-eslint/unbound-method */
 import UserModel, { type UserType } from '@/model/user'
-import userController, { type UserUpdateType, type CreateUserRequest, type UserFindByIdType } from '@/controllers/user'
+import userController, {
+  type CreateUserRequest,
+  type UserFindByIdType
+} from '@/controllers/user'
 import { ZodError } from 'zod'
 import { Error as MongooseError } from 'mongoose'
 import { buildNext, buildRes, getNewUser, getObjectId } from '@/utils/generate'
@@ -30,7 +33,9 @@ describe('User Controller', () => {
       expect(jsonResponse.name).toBe(mockUser.name)
       expect(jsonResponse.email).toBe(mockUser.email)
       // test if user password is encrypted
-      expect(bcrypt.compare(mockUser.password, jsonResponse.password)).toBeTruthy()
+      expect(
+        bcrypt.compare(mockUser.password, jsonResponse.password)
+      ).toBeTruthy()
 
       expect(next).not.toHaveBeenCalled()
     })
@@ -50,8 +55,7 @@ describe('User Controller', () => {
 
       expect(next).toHaveBeenCalledTimes(1)
       expect(next).toHaveBeenCalledWith(expect.any(ZodError))
-    }
-    )
+    })
 
     it('should return status 400, invalid email', async () => {
       const req = {
@@ -68,8 +72,7 @@ describe('User Controller', () => {
 
       expect(next).toHaveBeenCalledTimes(1)
       expect(next).toHaveBeenCalledWith(expect.any(ZodError))
-    }
-    )
+    })
 
     it('should return status 400, email already exists', async () => {
       const mockUser = getNewUser()
@@ -88,8 +91,7 @@ describe('User Controller', () => {
 
       expect(next).toHaveBeenCalledTimes(1)
       expect(next).toHaveBeenCalledWith(expect.any(MongooseError))
-    }
-    )
+    })
   })
 
   describe('Find', () => {
@@ -106,7 +108,7 @@ describe('User Controller', () => {
 
       expect(res.json).toHaveBeenCalledWith(
         expect.arrayContaining(
-          expectedUsers.map(user => {
+          expectedUsers.map((user) => {
             const { password, ...userWithoutPassword } = user.toJSON()
             return expect.objectContaining(userWithoutPassword)
           })
@@ -114,8 +116,7 @@ describe('User Controller', () => {
       )
 
       expect(next).not.toHaveBeenCalled()
-    }
-    )
+    })
 
     it('should find user by id', async () => {
       const mockUser = getNewUser()
@@ -141,8 +142,7 @@ describe('User Controller', () => {
       )
 
       expect(next).not.toHaveBeenCalled()
-    }
-    )
+    })
 
     it('should return status 404, user not found', async () => {
       const req = {
@@ -163,8 +163,7 @@ describe('User Controller', () => {
           message: expect.any(String)
         })
       )
-    }
-    )
+    })
 
     it('should call next with mongoose error, ivalid id', async () => {
       const req = {
@@ -180,80 +179,79 @@ describe('User Controller', () => {
 
       expect(next).toHaveBeenCalledTimes(1)
       expect(next).toHaveBeenCalledWith(expect.any(MongooseError))
-    }
-    )
+    })
   })
 
-  describe.skip('Update', () => {
-    it('should update user', async () => {
-      const mockUser = getNewUser()
+  // describe.skip('Update', () => {
+  //   it('should update user', async () => {
+  //     const mockUser = getNewUser()
 
-      const { _id } = await UserModel.create(mockUser)
+  //     const { _id } = await UserModel.create(mockUser)
 
-      const req = {
-        params: {
-          id: _id
-        },
-        body: {
-          ...mockUser,
-          name: 'new name'
-        }
-      } as unknown as UserUpdateType
+  //     const req = {
+  //       params: {
+  //         id: _id
+  //       },
+  //       body: {
+  //         ...mockUser,
+  //         name: 'new name'
+  //       }
+  //     } as unknown as UserUpdateType
 
-      const res = buildRes()
-      const next = buildNext()
+  //     const res = buildRes()
+  //     const next = buildNext()
 
-      await userController.update(req, res, next)
+  //     await userController.update(req, res, next)
 
-      expect(res.status).toHaveBeenCalledWith(200)
+  //     expect(res.status).toHaveBeenCalledWith(200)
 
-      expect(res.json).toHaveBeenCalledWith(
-        expect.objectContaining(
-          expect.objectContaining({
-            ...mockUser,
-            name: 'new name'
-          })
-        )
-      )
+  //     expect(res.json).toHaveBeenCalledWith(
+  //       expect.objectContaining(
+  //         expect.objectContaining({
+  //           ...mockUser,
+  //           name: 'new name'
+  //         })
+  //       )
+  //     )
 
-      expect(next).not.toHaveBeenCalled()
-    }
-    )
+  //     expect(next).not.toHaveBeenCalled()
+  //   }
+  //   )
 
-    it('should return status 404, user not found', async () => {
-      const req = {
-        params: {
-          id: 'invalid id'
-        }
-      } as unknown as UserUpdateType
+  //   it('should return status 404, user not found', async () => {
+  //     const req = {
+  //       params: {
+  //         id: 'invalid id'
+  //       }
+  //     } as unknown as UserUpdateType
 
-      const res = buildRes()
-      const next = buildNext()
+  //     const res = buildRes()
+  //     const next = buildNext()
 
-      await userController.update(req, res, next)
+  //     await userController.update(req, res, next)
 
-      expect(next).toHaveBeenCalledTimes(1)
-      expect(next).toHaveBeenCalledWith(expect.any(MongooseError))
-    }
-    )
+  //     expect(next).toHaveBeenCalledTimes(1)
+  //     expect(next).toHaveBeenCalledWith(expect.any(MongooseError))
+  //   }
+  //   )
 
-    it('should call next with mongoose error, ivalid id', async () => {
-      const req = {
-        params: {
-          id: 'invalid id'
-        }
-      } as unknown as UserUpdateType
+  //   it('should call next with mongoose error, ivalid id', async () => {
+  //     const req = {
+  //       params: {
+  //         id: 'invalid id'
+  //       }
+  //     } as unknown as UserUpdateType
 
-      const res = buildRes()
-      const next = buildNext()
+  //     const res = buildRes()
+  //     const next = buildNext()
 
-      await userController.update(req, res, next)
+  //     await userController.update(req, res, next)
 
-      expect(next).toHaveBeenCalledTimes(1)
-      expect(next).toHaveBeenCalledWith(expect.any(MongooseError))
-    }
-    )
-  })
+  //     expect(next).toHaveBeenCalledTimes(1)
+  //     expect(next).toHaveBeenCalledWith(expect.any(MongooseError))
+  //   }
+  //   )
+  // })
 
   describe('Delete', () => {
     it('should delete user', async () => {
@@ -280,8 +278,7 @@ describe('User Controller', () => {
       )
 
       expect(next).not.toHaveBeenCalled()
-    }
-    )
+    })
 
     it('should return status 404, user not found', async () => {
       const req = {
@@ -302,8 +299,7 @@ describe('User Controller', () => {
           message: expect.any(String)
         })
       )
-    }
-    )
+    })
 
     it('should call next with mongoose error, ivalid id', async () => {
       const req = {
@@ -319,9 +315,6 @@ describe('User Controller', () => {
 
       expect(next).toHaveBeenCalledTimes(1)
       expect(next).toHaveBeenCalledWith(expect.any(MongooseError))
-    }
-    )
-  }
-  )
-}
-)
+    })
+  })
+})

@@ -3,8 +3,16 @@ import { z } from 'zod'
 
 export const zodInvoiceSchema = z.object({
   invoiceDate: z.coerce.date(),
-  userId: z.string().min(24).max(24).transform((value) => new Types.ObjectId(value)),
-  clientId: z.string().min(24).max(24).transform((value) => new Types.ObjectId(value)),
+  userId: z
+    .string()
+    .min(24)
+    .max(24)
+    .transform((value) => new Types.ObjectId(value)),
+  clientId: z
+    .string()
+    .min(24)
+    .max(24)
+    .transform((value) => new Types.ObjectId(value)),
   items: z.array(
     z.object({
       itemName: z.string(),
@@ -62,20 +70,20 @@ mongooseInvoiceSchema.path('clientId').validate(async (value) => {
 mongooseInvoiceSchema.pre('save', async function (next) {
   const Model = this.constructor as typeof InvoiceModel
   const currentYear = new Date().getFullYear()
-  const invoiceNo = await Model.find({
-    invoiceDate: {
-      $gte: new Date(currentYear, 0, 1), // Start of the current year
-      $lte: new Date(currentYear, 11, 31) // End of the current year
-    }
-  }).countDocuments() + 1
+  const invoiceNo =
+    (await Model.find({
+      invoiceDate: {
+        $gte: new Date(currentYear, 0, 1), // Start of the current year
+        $lte: new Date(currentYear, 11, 31) // End of the current year
+      }
+    }).countDocuments()) + 1
 
   this.invoiceNo = `${invoiceNo}`
 
   const totalAmount = this.items.reduce((acc, item) => acc + item.itemPrice, 0)
   this.totalAmount = totalAmount
   next()
-}
-)
+})
 
 const InvoiceModel = model<SchemaType>('Invoice', mongooseInvoiceSchema)
 

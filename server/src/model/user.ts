@@ -36,8 +36,7 @@ mongooseUserSchema.pre('save', function (next) {
       }
     })
   }
-}
-)
+})
 
 const UserModel = model<UserType>('User', mongooseUserSchema)
 
