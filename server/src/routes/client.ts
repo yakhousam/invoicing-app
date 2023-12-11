@@ -20,7 +20,7 @@ clientRoute.put('/clients/update/:id', (req, res, next) => {
 })
 
 clientRoute.delete('/clients/delete/:id', (req, res, next) => {
-  void ClientController.delete(req, res, next)
+  void ClientController.deleteById(req, res, next)
 })
 
 export default clientRoute

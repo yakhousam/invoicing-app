@@ -9,7 +9,7 @@ export const getAdress = (): string => faker.location.streetAddress()
 export const getObjectId = (): string => faker.database.mongodbObjectId()
 export const getPassword = (): string => faker.internet.password()
 
-export function buildRes(overrides = {}): Response {
+export function buildRes (overrides = {}): Response {
   const res = {
     json: jest.fn(() => res).mockName('json'),
     status: jest.fn(() => res).mockName('status'),
@@ -19,7 +19,7 @@ export function buildRes(overrides = {}): Response {
   return res
 }
 
-export function buildNext(): NextFunction {
+export function buildNext (): NextFunction {
   return jest.fn().mockName('next') as unknown as NextFunction
 }
 

@@ -3,7 +3,7 @@ import { Error as MongooseError } from 'mongoose'
 
 import { type Request, type Response } from 'express'
 
-function errorMiddleware(error: Error, req: Request, res: Response): void {
+function errorMiddleware (error: Error, req: Request, res: Response): void {
   if (error instanceof ZodError) {
     res
       .status(400)
