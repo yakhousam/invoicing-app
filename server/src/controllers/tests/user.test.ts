@@ -1,13 +1,21 @@
 /* eslint-disable @typescript-eslint/unbound-method */
 import UserModel, { type UserType } from '@/model/user'
-import userController, {
-  type CreateUserRequest,
-  type UserFindByIdType
-} from '@/controllers/user'
+import InvoiceModel, { type InvoiceType } from '@/model/invoice'
+import ClientModel from '@/model/client'
+import userController, { type CreateUserRequest } from '@/controllers/user'
+import { type CreateInvoiceRequest } from '@/controllers/invoice'
 import { ZodError } from 'zod'
 import { Error as MongooseError } from 'mongoose'
-import { buildNext, buildRes, getNewUser, getObjectId } from '@/utils/generate'
+import {
+  buildNext,
+  buildRes,
+  getNewUser,
+  getObjectId,
+  getProductName,
+  getProductPrice
+} from '@/utils/generate'
 import bcrypt from 'bcrypt'
+import { type Request } from 'express'
 
 describe('User Controller', () => {
   beforeEach(async () => {
@@ -99,7 +107,7 @@ describe('User Controller', () => {
       const mockUsers = Array(10).fill(null).map(getNewUser)
       const expectedUsers = await UserModel.create(mockUsers)
 
-      const req = {} as unknown as UserFindByIdType
+      const req = {} as unknown as Request
       const res = buildRes()
       const next = buildNext()
 
@@ -127,7 +135,7 @@ describe('User Controller', () => {
         params: {
           id: expectedUser._id
         }
-      } as unknown as UserFindByIdType
+      } as unknown as Request
 
       const res = buildRes()
       const next = buildNext()
@@ -149,7 +157,7 @@ describe('User Controller', () => {
         params: {
           id: getObjectId()
         }
-      } as unknown as UserFindByIdType
+      } as unknown as Request
 
       const res = buildRes()
       const next = buildNext()
@@ -170,7 +178,7 @@ describe('User Controller', () => {
         params: {
           id: 'invalid id'
         }
-      } as unknown as UserFindByIdType
+      } as unknown as Request
 
       const res = buildRes()
       const next = buildNext()
@@ -179,6 +187,68 @@ describe('User Controller', () => {
 
       expect(next).toHaveBeenCalledTimes(1)
       expect(next).toHaveBeenCalledWith(expect.any(MongooseError))
+    })
+
+    it('should find invoices by user id', async () => {
+      const expectedUser = await UserModel.create(getNewUser())
+      const expectedClient = await ClientModel.create(getNewUser())
+
+      const notExpectedUser = await UserModel.create(getNewUser())
+
+      const notExpectedUserInvoices: Array<CreateInvoiceRequest['body']> =
+        Array(10)
+          .fill(null)
+          .map(() => ({
+            user: notExpectedUser._id.toString(),
+            client: expectedClient._id.toString(),
+            items: Array(10)
+              .fill(null)
+              .map(() => ({
+                itemName: getProductName(),
+                itemPrice: getProductPrice()
+              }))
+          }))
+
+      await InvoiceModel.create(notExpectedUserInvoices)
+
+      const expectedUserInvoices: Array<CreateInvoiceRequest['body']> = Array(
+        10
+      )
+        .fill(null)
+        .map(() => ({
+          user: expectedUser._id.toString(),
+          client: expectedClient._id.toString(),
+          items: Array(10)
+            .fill(null)
+            .map(() => ({
+              itemName: getProductName(),
+              itemPrice: getProductPrice()
+            }))
+        }))
+
+      const expectedInvoices = await InvoiceModel.create(expectedUserInvoices)
+
+      const req = {
+        params: {
+          id: expectedUser._id.toString()
+        }
+      } as unknown as Request
+
+      const res = buildRes()
+      const next = buildNext()
+
+      await userController.findInvoices(req, res, next)
+
+      expect(res.status).toHaveBeenCalledWith(200)
+
+      const jsonResponse = (res.json as jest.Mock).mock.calls[0][0] as Array<
+        InvoiceType & { _id: string }
+      >
+      expect(jsonResponse.length).toBe(expectedInvoices.length)
+      jsonResponse.forEach((invoice) => {
+        expect(invoice.user._id.toString()).toBe(expectedUser._id.toString())
+      })
+      expect(next).not.toHaveBeenCalled()
     })
   })
 
@@ -263,7 +333,7 @@ describe('User Controller', () => {
         params: {
           id: expectedUser._id
         }
-      } as unknown as UserFindByIdType
+      } as unknown as Request
 
       const res = buildRes()
       const next = buildNext()
@@ -285,7 +355,7 @@ describe('User Controller', () => {
         params: {
           id: getObjectId()
         }
-      } as unknown as UserFindByIdType
+      } as unknown as Request
 
       const res = buildRes()
       const next = buildNext()
@@ -306,7 +376,7 @@ describe('User Controller', () => {
         params: {
           id: 'invalid id'
         }
-      } as unknown as UserFindByIdType
+      } as unknown as Request
 
       const res = buildRes()
       const next = buildNext()

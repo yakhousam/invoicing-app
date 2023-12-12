@@ -1,17 +1,18 @@
 import { type Request, type Response, type NextFunction } from 'express'
 import UserModel, { type UserType, zodUserShema } from '@/model/user'
+import InvoiceModel from '@/model/invoice'
 
 export type CreateUserRequest = Request<
   Record<string, unknown>,
   Record<string, unknown>,
   UserType
 >
-export type UserFindByIdType = Request<
+
+export type UserUpdateType = Request<
   { id: string },
   Record<string, unknown>,
-  Record<string, unknown>
+  UserType
 >
-export type UserUpdateType = UserFindByIdType & CreateUserRequest
 
 const create = async (
   req: CreateUserRequest,
@@ -43,7 +44,7 @@ const find = async (
 }
 
 const findById = async (
-  req: UserFindByIdType,
+  req: Request,
   res: Response,
   next: NextFunction
 ): Promise<void> => {
@@ -59,6 +60,30 @@ const findById = async (
       })
     }
   } catch (error: unknown) {
+    next(error)
+  }
+}
+
+const findInvoices = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const { id } = req.params
+    const invoices = await InvoiceModel.find({ user: id })
+      .populate('user')
+      .populate('client')
+    if (invoices !== null) {
+      res.status(200).json(invoices)
+    } else {
+      res.status(404).json({
+        error: 'Not found',
+        message: `No invoices for user with id: ${id}`
+      })
+    }
+  } catch (error: unknown) {
+    console.error(error)
     next(error)
   }
 }
@@ -88,7 +113,7 @@ const findById = async (
 // }
 
 const deleteById = async (
-  req: UserFindByIdType,
+  req: Request,
   res: Response,
   next: NextFunction
 ): Promise<void> => {
@@ -112,6 +137,7 @@ const userController = {
   create,
   find,
   findById,
+  findInvoices,
   deleteById
 }
 
