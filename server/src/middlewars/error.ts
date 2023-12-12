@@ -1,9 +1,14 @@
 import { ZodError } from 'zod'
 import { Error as MongooseError } from 'mongoose'
 
-import { type Request, type Response } from 'express'
+import { type NextFunction, type Request, type Response } from 'express'
 
-function errorMiddleware(error: Error, req: Request, res: Response): void {
+function errorMiddleware(
+  error: Error,
+  req: Request,
+  res: Response,
+  next: NextFunction
+): void {
   if (error instanceof ZodError) {
     res
       .status(400)
@@ -14,7 +19,7 @@ function errorMiddleware(error: Error, req: Request, res: Response): void {
       message: `${error.value} : is not a valid id`
     })
   } else {
-    res.status(500).end()
+    next(error)
   }
 }
 
