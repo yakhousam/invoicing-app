@@ -8,6 +8,8 @@ export const getEmail = (): string => faker.internet.email()
 export const getAdress = (): string => faker.location.streetAddress()
 export const getObjectId = (): string => faker.database.mongodbObjectId()
 export const getPassword = (): string => faker.internet.password()
+export const getProductName = (): string => faker.commerce.productName()
+export const getProductPrice = (): number => Number(faker.commerce.price())
 
 export function buildRes(overrides = {}): Response {
   const res = {
