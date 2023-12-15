@@ -18,8 +18,13 @@ function errorMiddleware(
       error: `${error.path}`,
       message: `${error.value} : is not a valid id`
     })
+  } else if (error instanceof MongooseError.ValidationError) {
+    res.status(400).json({
+      error: error.name,
+      message: error.message
+    })
   } else {
-    next(error)
+    res.sendStatus(500)
   }
 }
 
