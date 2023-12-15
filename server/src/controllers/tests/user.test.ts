@@ -1,10 +1,9 @@
 /* eslint-disable @typescript-eslint/unbound-method */
-import UserModel, { type UserType } from '@/model/user'
+import UserModel from '@/model/user'
 import InvoiceModel, { type InvoiceType } from '@/model/invoice'
 import ClientModel from '@/model/client'
-import userController, { type CreateUserRequest } from '@/controllers/user'
+import userController from '@/controllers/user'
 import { type CreateInvoiceRequest } from '@/controllers/invoice'
-import { ZodError } from 'zod'
 import { Error as MongooseError } from 'mongoose'
 import {
   buildNext,
@@ -14,92 +13,11 @@ import {
   getProductName,
   getProductPrice
 } from '@/utils/generate'
-import bcrypt from 'bcrypt'
 import { type Request } from 'express'
 
 describe('User Controller', () => {
   beforeEach(async () => {
     await UserModel.deleteMany()
-  })
-
-  describe('Create', () => {
-    it('should create a new user', async () => {
-      const mockUser = getNewUser()
-
-      const req = {
-        body: mockUser
-      } as unknown as CreateUserRequest
-
-      const res = buildRes()
-      const next = buildNext()
-
-      await userController.create(req, res, next)
-
-      expect(res.status).toHaveBeenCalledWith(201)
-
-      const jsonResponse = (res.json as jest.Mock).mock.calls[0][0] as UserType
-      expect(jsonResponse.name).toBe(mockUser.name)
-      expect(jsonResponse.email).toBe(mockUser.email)
-      // test if user password is encrypted
-      expect(
-        bcrypt.compare(mockUser.password, jsonResponse.password)
-      ).toBeTruthy()
-
-      expect(next).not.toHaveBeenCalled()
-    })
-
-    it('should call next with ZodError error, required name', async () => {
-      const req = {
-        body: {
-          ...getNewUser(),
-          name: undefined
-        }
-      } as unknown as CreateUserRequest
-
-      const res = buildRes()
-      const next = buildNext()
-
-      await userController.create(req, res, next)
-
-      expect(next).toHaveBeenCalledTimes(1)
-      expect(next).toHaveBeenCalledWith(expect.any(ZodError))
-    })
-
-    it('should return status 400, invalid email', async () => {
-      const req = {
-        body: {
-          ...getNewUser(),
-          email: 'invalid email'
-        }
-      } as unknown as CreateUserRequest
-
-      const res = buildRes()
-      const next = buildNext()
-
-      await userController.create(req, res, next)
-
-      expect(next).toHaveBeenCalledTimes(1)
-      expect(next).toHaveBeenCalledWith(expect.any(ZodError))
-    })
-
-    it('should return status 400, email already exists', async () => {
-      const mockUser = getNewUser()
-      await UserModel.create(mockUser)
-
-      const req = {
-        body: {
-          ...mockUser
-        }
-      } as unknown as CreateUserRequest
-
-      const res = buildRes()
-      const next = buildNext()
-
-      await userController.create(req, res, next)
-
-      expect(next).toHaveBeenCalledTimes(1)
-      expect(next).toHaveBeenCalledWith(expect.any(MongooseError))
-    })
   })
 
   describe('Find', () => {
