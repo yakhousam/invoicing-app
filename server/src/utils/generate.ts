@@ -34,5 +34,6 @@ export const getNewClient = (): ClientType => ({
 export const getNewUser = (): UserType => ({
   name: faker.person.fullName(),
   email: faker.internet.email(),
-  password: faker.internet.password()
+  password: faker.internet.password(),
+  isValidPassword: async () => true
 })

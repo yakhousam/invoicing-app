@@ -8,17 +8,24 @@ export const zodUserShema = z.object({
   password: z.string().min(6)
 })
 
-export type UserType = z.infer<typeof zodUserShema>
+export type UserType = z.infer<typeof zodUserShema> & {
+  isValidPassword: (password: string) => Promise<boolean>
+}
 
 export const mongooseUserSchema = new Schema<UserType>({
-  name: { type: String, required: true },
+  name: { type: String, required: true, unique: true },
   email: {
     type: String,
     required: true,
     unique: true
   },
-  password: { type: String, required: true, select: false }
+  password: { type: String, required: true }
 })
+
+mongooseUserSchema.path('name').validate(async (value) => {
+  const user = await model<UserType>('User').findOne({ name: value })
+  return user === null
+}, 'Duplicated name')
 
 mongooseUserSchema.path('email').validate(async (value) => {
   const user = await model<UserType>('User').findOne({ email: value })
@@ -37,6 +44,11 @@ mongooseUserSchema.pre('save', function (next) {
     })
   }
 })
+
+mongooseUserSchema.methods.isValidPassword = async function (password: string) {
+  const compare = await bcrypt.compare(password, this.password)
+  return compare
+}
 
 const UserModel = model<UserType>('User', mongooseUserSchema)
 

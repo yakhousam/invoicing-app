@@ -11,7 +11,7 @@ export type ClientType = z.infer<typeof zodClientSchema>
 
 export const mongooseClientSchema = new Schema<ClientType>({
   name: { type: String, required: true, unique: true },
-  email: { type: String, required: false, unique: true },
+  email: { type: String, required: false, unique: true, sparse: true },
   address: { type: String, required: false }
 })
 

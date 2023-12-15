@@ -1,10 +1,17 @@
 import { Router } from 'express'
-import userContorller from '@/controllers/user'
+import authController from '@/controllers/auth'
+import passport from 'passport'
 
-const userRoute = Router()
+const authRoute = Router()
 
-userRoute.post('/auth/signup', (req, res, next) => {
-  void userContorller.create(req, res, next)
+authRoute.post('/auth/signup', (req, res, next) => {
+  void authController.signup(req, res, next)
 })
 
-export default userRoute
+authRoute.post(
+  '/auth/signin',
+  passport.authenticate('local', { session: false }),
+  authController.signin
+)
+
+export default authRoute

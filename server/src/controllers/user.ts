@@ -1,34 +1,12 @@
 import { type Request, type Response, type NextFunction } from 'express'
-import UserModel, { type UserType, zodUserShema } from '@/model/user'
+import UserModel, { type UserType } from '@/model/user'
 import InvoiceModel from '@/model/invoice'
-
-export type CreateUserRequest = Request<
-  Record<string, unknown>,
-  Record<string, unknown>,
-  UserType
->
 
 export type UserUpdateType = Request<
   { id: string },
   Record<string, unknown>,
   UserType
 >
-
-const create = async (
-  req: CreateUserRequest,
-  res: Response,
-  next: NextFunction
-): Promise<void> => {
-  try {
-    zodUserShema.parse(req.body)
-    const { name, email, password } = req.body
-    const user = new UserModel({ name, email, password })
-    const newUser = await user.save()
-    res.status(201).json(newUser)
-  } catch (error) {
-    next(error)
-  }
-}
 
 const find = async (
   req: Request,
@@ -134,7 +112,6 @@ const deleteById = async (
 }
 
 const userController = {
-  create,
   find,
   findById,
   findInvoices,
