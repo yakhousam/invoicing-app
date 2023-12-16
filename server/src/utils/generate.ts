@@ -16,6 +16,7 @@ export function buildRes(overrides = {}): Response {
     json: jest.fn(() => res).mockName('json'),
     status: jest.fn(() => res).mockName('status'),
     sendStatus: jest.fn(() => res).mockName('sendStatus'),
+    cookie: jest.fn(() => res).mockName('cookie'),
     ...overrides
   } as unknown as Response
   return res

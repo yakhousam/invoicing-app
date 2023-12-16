@@ -1,12 +1,14 @@
-import './db'
+import cookieParser from 'cookie-parser'
 import express, { type Application } from 'express'
-import rootRouter from './routes'
+import './db'
 import errorMiddleware from './middlewars/error'
+import rootRouter from './routes'
 
 const PORT = process.env.PORT ?? 3000
 
 const app: Application = express()
 
+app.use(cookieParser())
 app.use(express.json())
 app.use(rootRouter)
 

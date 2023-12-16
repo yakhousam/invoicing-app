@@ -19,15 +19,18 @@ describe('Signup', () => {
     await authController.signup(req, res, next)
 
     expect(res.status).toHaveBeenCalledWith(201)
+    expect(res.cookie).toHaveBeenCalledWith('token', expect.any(String), {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'none'
+    })
 
-    const { user, token } = (res.json as jest.Mock).mock.calls[0][0] as {
+    const { user } = (res.json as jest.Mock).mock.calls[0][0] as {
       user: UserType
-      token: string
     }
     expect(user.name).toBe(mockUser.name)
     expect(user.email).toBe(mockUser.email)
     expect(user).not.toHaveProperty('password')
-    expect(token).toBeTruthy()
 
     expect(next).not.toHaveBeenCalled()
   })

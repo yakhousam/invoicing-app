@@ -1,13 +1,9 @@
-import UserModel, { type UserType, zodUserShema } from '@/model/user'
-import { type Request, type Response, type NextFunction } from 'express'
+import UserModel, { zodUserShema, type UserType } from '@/model/user'
+import { type NextFunction, type Request, type Response } from 'express'
 import jwt from 'jsonwebtoken'
 import passport from 'passport'
-import { type IVerifyOptions, Strategy as LocalStrategy } from 'passport-local'
-import {
-  ExtractJwt,
-  Strategy as JwtStrategy,
-  type VerifiedCallback
-} from 'passport-jwt'
+import { Strategy as JwtStrategy, type VerifiedCallback } from 'passport-jwt'
+import { Strategy as LocalStrategy, type IVerifyOptions } from 'passport-local'
 
 const JWT_SECRET =
   process.env.JWT_SECRET ?? 'rNgc3v7NxYenUVFoI1AbqH82AIDItLpSPWcmXeC4qPo='
@@ -16,6 +12,15 @@ function generateToken(payload: string | Record<string, unknown>): string {
   return jwt.sign(payload, JWT_SECRET, {
     expiresIn: '1y'
   })
+}
+const cookieExtractor = (req: {
+  cookies: { token?: string }
+}): string | null => {
+  let token = null
+  if (req?.cookies?.token !== undefined) {
+    token = req.cookies.token
+  }
+  return token
 }
 
 export type AuthSignupRequest = Request<
@@ -36,7 +41,12 @@ const signup = async (
     const newUser = await user.save()
     const { password: pwd, ...userWithoutPassword } = newUser.toJSON()
     const token = generateToken({ sub: newUser._id })
-    res.status(201).json({ user: userWithoutPassword, token })
+    res.cookie('token', token, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'none'
+    })
+    res.status(201).json({ user: userWithoutPassword })
   } catch (error) {
     next(error)
   }
@@ -46,7 +56,12 @@ const signin = (req: Request, res: Response, next: NextFunction): void => {
   try {
     const user = req.user as UserType & { _id: string }
     const token = generateToken({ sub: user._id })
-    res.status(201).json({ user, token })
+    res.cookie('token', token, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'none'
+    })
+    res.status(200).json({ user })
   } catch (error) {
     next(error)
   }
@@ -69,7 +84,7 @@ passport.use(
 passport.use(
   new JwtStrategy(
     {
-      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+      jwtFromRequest: cookieExtractor,
       secretOrKey: JWT_SECRET
     },
     function (jwtPayload, done) {
