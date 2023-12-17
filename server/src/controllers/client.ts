@@ -1,10 +1,10 @@
 import { type Request, type Response, type NextFunction } from 'express'
-import ClientModel, { type ClientType, zodClientSchema } from '@/model/client'
+import ClientModel, { type Client, zodClientSchema } from '@/model/client'
 
 export type CreateClientRequest = Request<
   Record<string, unknown>,
   Record<string, unknown>,
-  ClientType
+  Client
 >
 export type ClientFindByIdType = Request<
   { id: string },
@@ -119,7 +119,7 @@ const deleteById = async (
   }
 }
 
-const Client = {
+const clientController = {
   create,
   find,
   findById,
@@ -127,4 +127,4 @@ const Client = {
   deleteById
 }
 
-export default Client
+export default clientController

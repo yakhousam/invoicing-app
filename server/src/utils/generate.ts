@@ -1,5 +1,5 @@
-import { type ClientType } from '@/model/client'
-import { type UserType } from '@/model/user'
+import { type Client } from '@/model/client'
+import { type User } from '@/model/user'
 import { faker } from '@faker-js/faker'
 import { type NextFunction, type Response } from 'express'
 
@@ -26,13 +26,13 @@ export function buildNext(): NextFunction {
   return jest.fn().mockName('next') as unknown as NextFunction
 }
 
-export const getNewClient = (): ClientType => ({
+export const getNewClient = (): Client => ({
   name: faker.person.fullName(),
   email: faker.internet.email(),
   address: faker.location.streetAddress()
 })
 
-export const getNewUser = (): UserType => ({
+export const getNewUser = (): User => ({
   name: faker.person.fullName(),
   email: faker.internet.email(),
   password: faker.internet.password(),

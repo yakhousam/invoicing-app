@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/unbound-method */
 import authController, { type AuthSignupRequest } from '@/controllers/auth'
-import UserModel, { type UserType } from '@/model/user'
+import UserModel, { type User } from '@/model/user'
 import { buildNext, buildRes, getNewUser } from '@/utils/generate'
 import { Error as MongooseError } from 'mongoose'
 import { ZodError } from 'zod'
@@ -26,7 +26,7 @@ describe('Signup', () => {
     })
 
     const { user } = (res.json as jest.Mock).mock.calls[0][0] as {
-      user: UserType
+      user: User
     }
     expect(user.name).toBe(mockUser.name)
     expect(user.email).toBe(mockUser.email)

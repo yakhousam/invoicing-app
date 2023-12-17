@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/unbound-method */
 import UserModel from '@/model/user'
-import InvoiceModel, { type InvoiceType } from '@/model/invoice'
+import InvoiceModel, { type Invoice } from '@/model/invoice'
 import ClientModel from '@/model/client'
 import userController from '@/controllers/user'
 import { type CreateInvoiceRequest } from '@/controllers/invoice'
@@ -160,7 +160,7 @@ describe('User Controller', () => {
       expect(res.status).toHaveBeenCalledWith(200)
 
       const jsonResponse = (res.json as jest.Mock).mock.calls[0][0] as Array<
-        InvoiceType & { _id: string }
+        Invoice & { _id: string }
       >
       expect(jsonResponse.length).toBe(expectedInvoices.length)
       jsonResponse.forEach((invoice) => {

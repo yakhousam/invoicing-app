@@ -7,14 +7,14 @@ export const zodClientSchema = z.object({
   address: z.string().optional()
 })
 
-export type ClientType = z.infer<typeof zodClientSchema>
+export type Client = z.infer<typeof zodClientSchema>
 
-export const mongooseClientSchema = new Schema<ClientType>({
+export const mongooseClientSchema = new Schema<Client>({
   name: { type: String, required: true, unique: true },
   email: { type: String, required: false, unique: true, sparse: true },
   address: { type: String, required: false }
 })
 
-const ClientModel = model<ClientType>('Client', mongooseClientSchema)
+const ClientModel = model<Client>('Client', mongooseClientSchema)
 
 export default ClientModel

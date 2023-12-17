@@ -8,11 +8,11 @@ export const zodUserShema = z.object({
   password: z.string().min(6)
 })
 
-export type UserType = z.infer<typeof zodUserShema> & {
+export type User = z.infer<typeof zodUserShema> & {
   isValidPassword: (password: string) => Promise<boolean>
 }
 
-export const mongooseUserSchema = new Schema<UserType>({
+export const mongooseUserSchema = new Schema<User>({
   name: { type: String, required: true, unique: true },
   email: {
     type: String,
@@ -23,12 +23,12 @@ export const mongooseUserSchema = new Schema<UserType>({
 })
 
 mongooseUserSchema.path('name').validate(async (value) => {
-  const user = await model<UserType>('User').findOne({ name: value })
+  const user = await model<User>('User').findOne({ name: value })
   return user === null
 }, 'Duplicated name')
 
 mongooseUserSchema.path('email').validate(async (value) => {
-  const user = await model<UserType>('User').findOne({ email: value })
+  const user = await model<User>('User').findOne({ email: value })
   return user === null
 }, 'Duplicated email')
 
@@ -50,6 +50,6 @@ mongooseUserSchema.methods.isValidPassword = async function (password: string) {
   return compare
 }
 
-const UserModel = model<UserType>('User', mongooseUserSchema)
+const UserModel = model<User>('User', mongooseUserSchema)
 
 export default UserModel

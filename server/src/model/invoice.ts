@@ -21,12 +21,12 @@ export const zodInvoiceSchema = z.object({
   )
 })
 
-export type InvoiceType = z.infer<typeof zodInvoiceSchema> & {
+export type Invoice = z.infer<typeof zodInvoiceSchema> & {
   invoiceNo: string
   totalAmount: number
 }
 
-const mongooseInvoiceSchema = new Schema<InvoiceType>({
+const mongooseInvoiceSchema = new Schema<Invoice>({
   invoiceNo: {
     type: String
   },
@@ -82,6 +82,6 @@ mongooseInvoiceSchema.pre('save', async function (next) {
   next()
 })
 
-const InvoiceModel = model<InvoiceType>('Invoice', mongooseInvoiceSchema)
+const InvoiceModel = model<Invoice>('Invoice', mongooseInvoiceSchema)
 
 export default InvoiceModel

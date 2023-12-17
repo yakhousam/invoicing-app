@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/unbound-method */
-import InvoiceModel, { type InvoiceType } from '@/model/invoice'
+import InvoiceModel, { type Invoice } from '@/model/invoice'
 import invoiceController, {
   type findInvoiceByIdRequest,
   type CreateInvoiceRequest
@@ -49,8 +49,7 @@ describe('Invoice Controller', () => {
       await invoiceController.create(req, res, next)
       expect(res.status).toHaveBeenCalledWith(201)
 
-      const jsonResponse = (res.json as jest.Mock).mock
-        .calls[0][0] as InvoiceType
+      const jsonResponse = (res.json as jest.Mock).mock.calls[0][0] as Invoice
       // expect(jsonResponse.clientId.toString()).toBe(mockInvoice.clientId)
       // expect(jsonResponse.userId.toString()).toBe(mockInvoice.userId)
       expect(jsonResponse.items.length).toBe(mockInvoice.items.length)
@@ -141,15 +140,13 @@ describe('Invoice Controller', () => {
       await invoiceController.create(req, res, next)
       expect(res.status).toHaveBeenCalledWith(201)
 
-      const jsonResponse = (res.json as jest.Mock).mock
-        .calls[0][0] as InvoiceType
+      const jsonResponse = (res.json as jest.Mock).mock.calls[0][0] as Invoice
       expect(jsonResponse.invoiceNo).toBe('1')
 
       await invoiceController.create(req, res, next)
       expect(res.status).toHaveBeenCalledWith(201)
 
-      const jsonResponse2 = (res.json as jest.Mock).mock
-        .calls[1][0] as InvoiceType
+      const jsonResponse2 = (res.json as jest.Mock).mock.calls[1][0] as Invoice
       expect(jsonResponse2.invoiceNo).toBe('2')
     })
 
@@ -179,8 +176,7 @@ describe('Invoice Controller', () => {
       await invoiceController.create(req, res, next)
       expect(res.status).toHaveBeenCalledWith(201)
 
-      const jsonResponse = (res.json as jest.Mock).mock
-        .calls[0][0] as InvoiceType
+      const jsonResponse = (res.json as jest.Mock).mock.calls[0][0] as Invoice
       expect(jsonResponse.invoiceNo).toBe('1')
 
       await InvoiceModel.deleteMany()
@@ -188,8 +184,7 @@ describe('Invoice Controller', () => {
       await invoiceController.create(req, res, next)
       expect(res.status).toHaveBeenCalledWith(201)
 
-      const jsonResponse2 = (res.json as jest.Mock).mock
-        .calls[1][0] as InvoiceType
+      const jsonResponse2 = (res.json as jest.Mock).mock.calls[1][0] as Invoice
       expect(jsonResponse2.invoiceNo).toBe('1')
     })
   })
@@ -221,8 +216,7 @@ describe('Invoice Controller', () => {
 
       await invoiceController.find(req, res, next)
       expect(res.status).toHaveBeenCalledWith(200)
-      const jsonResponse = (res.json as jest.Mock).mock
-        .calls[0][0] as InvoiceType[]
+      const jsonResponse = (res.json as jest.Mock).mock.calls[0][0] as Invoice[]
       expect(jsonResponse.length).toBe(expectedInvoices.length)
     })
 
@@ -255,7 +249,7 @@ describe('Invoice Controller', () => {
       await invoiceController.findById(req, res, next)
       expect(res.status).toHaveBeenCalledWith(200)
       const jsonResponse = (res.json as jest.Mock).mock
-        .calls[0][0] as InvoiceType & { _id: string }
+        .calls[0][0] as Invoice & { _id: string }
       expect(jsonResponse._id.toString()).toBe(expectedInvoice._id.toString())
     })
   })

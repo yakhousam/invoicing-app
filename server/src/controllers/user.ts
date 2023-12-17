@@ -1,11 +1,11 @@
 import { type Request, type Response, type NextFunction } from 'express'
-import UserModel, { type UserType } from '@/model/user'
+import UserModel, { type User } from '@/model/user'
 import InvoiceModel from '@/model/invoice'
 
 export type UserUpdateType = Request<
   { id: string },
   Record<string, unknown>,
-  UserType
+  User
 >
 
 const find = async (

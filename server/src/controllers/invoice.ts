@@ -1,13 +1,10 @@
 import { type NextFunction, type Request, type Response } from 'express'
-import InvoiceModel, {
-  type InvoiceType,
-  zodInvoiceSchema
-} from '@/model/invoice'
+import InvoiceModel, { type Invoice, zodInvoiceSchema } from '@/model/invoice'
 
 export type CreateInvoiceRequest = Request<
   Record<string, unknown>,
   Record<string, unknown>,
-  Pick<InvoiceType, 'items'> & {
+  Pick<Invoice, 'items'> & {
     user: string
     client: string
     invoiceDate?: string
@@ -93,11 +90,11 @@ const updateById = async (
   }
 }
 
-const Invoice = {
+const invoiceController = {
   create,
   find,
   findById,
   updateById
 }
 
-export default Invoice
+export default invoiceController

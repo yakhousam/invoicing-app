@@ -1,4 +1,4 @@
-import UserModel, { zodUserShema, type UserType } from '@/model/user'
+import UserModel, { zodUserShema, type User } from '@/model/user'
 import { type NextFunction, type Request, type Response } from 'express'
 import jwt from 'jsonwebtoken'
 import passport from 'passport'
@@ -26,7 +26,7 @@ const cookieExtractor = (req: {
 export type AuthSignupRequest = Request<
   Record<string, unknown>,
   Record<string, unknown>,
-  UserType
+  User
 >
 
 const signup = async (
@@ -54,7 +54,7 @@ const signup = async (
 
 const signin = (req: Request, res: Response, next: NextFunction): void => {
   try {
-    const user = req.user as UserType & { _id: string }
+    const user = req.user as User & { _id: string }
     const token = generateToken({ sub: user._id })
     res.cookie('token', token, {
       httpOnly: true,
