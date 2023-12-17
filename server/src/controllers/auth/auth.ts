@@ -46,7 +46,7 @@ const signup = async (
       secure: true,
       sameSite: 'none'
     })
-    res.status(201).json({ user: userWithoutPassword })
+    res.status(201).json(userWithoutPassword)
   } catch (error) {
     next(error)
   }
@@ -61,7 +61,7 @@ const signin = (req: Request, res: Response, next: NextFunction): void => {
       secure: true,
       sameSite: 'none'
     })
-    res.status(200).json({ user })
+    res.status(200).json(user)
   } catch (error) {
     next(error)
   }

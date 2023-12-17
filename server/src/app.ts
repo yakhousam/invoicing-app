@@ -1,10 +1,8 @@
+import errorMiddleware from '@/middlewars/error'
+import rootRouter from '@/routes'
 import cookieParser from 'cookie-parser'
 import express, { type Application } from 'express'
-import './db'
-import errorMiddleware from './middlewars/error'
-import rootRouter from './routes'
-
-const PORT = process.env.PORT ?? 3000
+import http from 'http'
 
 const app: Application = express()
 
@@ -14,6 +12,6 @@ app.use(rootRouter)
 
 app.use(errorMiddleware)
 
-app.listen(PORT, () => {
-  console.log(`Server is running in http://localhost:${PORT}`)
-})
+const server = http.createServer(app)
+
+export default server

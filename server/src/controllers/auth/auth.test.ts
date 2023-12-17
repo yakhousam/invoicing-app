@@ -27,9 +27,7 @@ describe('Auth Controller', () => {
         sameSite: 'none'
       })
 
-      const { user } = (res.json as jest.Mock).mock.calls[0][0] as {
-        user: User
-      }
+      const user = (res.json as jest.Mock).mock.calls[0][0] as User
       expect(user.name).toBe(mockUser.name)
       expect(user.email).toBe(mockUser.email)
       expect(user).not.toHaveProperty('password')
@@ -116,9 +114,8 @@ describe('Auth Controller', () => {
         sameSite: 'none'
       })
 
-      const { user } = (res.json as jest.Mock).mock.calls[0][0] as {
-        user: User
-      }
+      const user = (res.json as jest.Mock).mock.calls[0][0] as User
+
       expect(user.name).toBe(mockUser.name)
       expect(user.email).toBe(mockUser.email)
       expect(user).not.toHaveProperty('password')
