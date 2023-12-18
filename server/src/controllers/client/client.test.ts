@@ -1,22 +1,22 @@
 /* eslint-disable @typescript-eslint/unbound-method */
-import ClientModel from '@/model/client'
 import clientController, {
-  type ClientUpdateType,
   type ClientFindByIdType,
+  type ClientUpdateType,
   type CreateClientRequest
 } from '@/controllers/client'
-import { ZodError } from 'zod'
-import { Error as MongooseError } from 'mongoose'
+import ClientModel from '@/model/client'
 import {
   buildNext,
   buildRes,
   getNewClient,
   getObjectId
 } from '@/utils/generate'
+import { Error as MongooseError } from 'mongoose'
+import { ZodError } from 'zod'
 
 describe('Client Controller', () => {
   beforeEach(async () => {
-    await ClientModel.deleteMany()
+    await ClientModel.deleteMany({})
   })
 
   describe('Create', () => {
@@ -244,7 +244,7 @@ describe('Client Controller', () => {
 
       await clientController.deleteById(req, res, next)
 
-      expect(res.status).toHaveBeenCalledWith(204)
+      expect(res.status).toHaveBeenCalledWith(200)
     })
 
     it('should return status 404, client not found', async () => {

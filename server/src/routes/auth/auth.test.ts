@@ -3,7 +3,9 @@ import { getNewUser } from '@/utils/generate'
 import startServer, { type Server } from '@/utils/server'
 import axios from 'axios'
 
-const PORT = 3008
+type ReturnedUser = User & { _id: string }
+
+const PORT = 3000
 
 describe('auth', () => {
   let server: Server
@@ -25,9 +27,9 @@ describe('auth', () => {
   describe('signup', () => {
     it('should signup a new user and return the user object', async () => {
       const user = getNewUser()
-      const response = await api.post('/auth/signup', user)
+      const response = await api.post<ReturnedUser>('/auth/signup', user)
       expect(response.status).toBe(201)
-      const returnedUser = response.data as User
+      const returnedUser = response.data
       expect(returnedUser).toHaveProperty('_id')
       expect(returnedUser.name).toBe(user.name)
       expect(returnedUser.email).toBe(user.email)
@@ -44,23 +46,23 @@ describe('auth', () => {
     })
   })
 
-  describe('login', () => {
-    it('should login a user and return the user object', async () => {
+  describe('Signin', () => {
+    it('should signin a user and return the user object', async () => {
       const user = getNewUser()
       await api.post('/auth/signup', user)
-      const response = await api.post('/auth/signin', {
+      const response = await api.post<ReturnedUser>('/auth/signin', {
         name: user.name,
         password: user.password
       })
       expect(response.status).toBe(200)
-      const returnedUser = response.data as User
+      const returnedUser = response.data
       expect(returnedUser).toHaveProperty('_id')
       expect(returnedUser.name).toBe(user.name)
       expect(returnedUser.email).toBe(user.email)
       expect(returnedUser).not.toHaveProperty('password')
     })
 
-    it('should login a user and return a cookie with a token', async () => {
+    it('should signin a user and return a cookie with a token', async () => {
       const user = getNewUser()
       await api.post('/auth/signup', user)
       const response = await api.post('/auth/signin', {

@@ -1,5 +1,5 @@
-import { type Request, type Response, type NextFunction } from 'express'
-import ClientModel, { type Client, zodClientSchema } from '@/model/client'
+import ClientModel, { zodClientSchema, type Client } from '@/model/client'
+import { type NextFunction, type Request, type Response } from 'express'
 
 export type CreateClientRequest = Request<
   Record<string, unknown>,
@@ -107,7 +107,7 @@ const deleteById = async (
     const { id } = req.params
     const client = await ClientModel.findByIdAndDelete(id)
     if (client !== null) {
-      res.status(204).json(client)
+      res.status(200).json(client)
     } else {
       res.status(404).json({
         error: 'Not found',
