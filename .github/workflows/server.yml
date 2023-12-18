@@ -15,12 +15,21 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
+      - name: Cache MongoDB binaries
+        uses: actions/cache@v2
+        with:
+          path: |
+            server/node_modules/.cache/mongodb-memory-server/mongodb-binaries
+          key: ${{ runner.os }}-mongodb-binaries-${{ hashFiles('server/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-mongodb-binaries-
+
       - name: Set up Node.js
         uses: actions/setup-node@v2
         with:
           node-version: 20.10.0
 
-      - name: Change Directory and Install Dependencies
+      - name: Install Dependencies
         run: |
           cd server
           npm ci

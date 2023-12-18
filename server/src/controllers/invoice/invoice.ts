@@ -1,5 +1,5 @@
+import InvoiceModel, { zodInvoiceSchema, type Invoice } from '@/model/invoice'
 import { type NextFunction, type Request, type Response } from 'express'
-import InvoiceModel, { type Invoice, zodInvoiceSchema } from '@/model/invoice'
 
 export type CreateInvoiceRequest = Request<
   Record<string, unknown>,

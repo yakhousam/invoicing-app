@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/unbound-method */
-import InvoiceModel, { type Invoice } from '@/model/invoice'
 import invoiceController, {
-  type findInvoiceByIdRequest,
-  type CreateInvoiceRequest
+  type CreateInvoiceRequest,
+  type findInvoiceByIdRequest
 } from '@/controllers/invoice'
-import { ZodError } from 'zod'
-import { Error as MongooseError } from 'mongoose'
+import ClientModel from '@/model/client'
+import InvoiceModel, { type Invoice } from '@/model/invoice'
+import UserModel from '@/model/user'
 import {
   buildNext,
   buildRes,
@@ -15,8 +15,8 @@ import {
   getProductName,
   getProductPrice
 } from '@/utils/generate'
-import ClientModel from '@/model/client'
-import UserModel from '@/model/user'
+import { Error as MongooseError } from 'mongoose'
+import { ZodError } from 'zod'
 
 describe('Invoice Controller', () => {
   beforeEach(async () => {

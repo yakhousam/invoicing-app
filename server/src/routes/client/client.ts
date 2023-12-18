@@ -1,5 +1,5 @@
-import { Router } from 'express'
 import ClientController from '@/controllers/client'
+import { Router } from 'express'
 
 const clientRoute = Router()
 

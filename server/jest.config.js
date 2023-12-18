@@ -8,5 +8,6 @@ module.exports = {
   setupFilesAfterEnv: ['./setupTests.js'],
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1'
-  }
+  },
+  watchPathIgnorePatterns: ['globalConfig'],
 }
