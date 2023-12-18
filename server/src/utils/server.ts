@@ -10,7 +10,7 @@ const testServer = server as unknown as Server
 
 // Making the server start and close asynchronously allows us to wait for it in our tests.
 // Inspired by the approach used by Kent C. Dodds: https://github.com/kentcdodds/testing-node-apps/blob/bd4708e926e83571d070d84f25b49ab6ca10d00a/src/start.js#L22
-const startServer = (port: string | number): Promise<Server> => {
+const startServer = (port: number): Promise<Server> => {
   return new Promise<Server>((resolve) => {
     testServer.listen(port, () => {
       console.log(`Test Server is running on port ${port}`)

@@ -1,49 +1,76 @@
 import userModel, { type User } from '@/model/user'
 import { getNewUser } from '@/utils/generate'
 import startServer, { type Server } from '@/utils/server'
+import axios from 'axios'
+
+const PORT = 3008
 
 describe('auth', () => {
-  let myServer: Server
+  let server: Server
   beforeAll(async () => {
-    myServer = await startServer(3008)
+    server = await startServer(PORT)
   })
 
   afterAll(async () => {
-    await myServer.close()
+    await server.close()
   })
 
   beforeEach(async () => {
     await userModel.deleteMany({})
   })
 
-  it('should signup a new user, return json user object', async () => {
-    const mockUser = getNewUser()
-    const response = await fetch('http://localhost:3008/auth/signup', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(mockUser)
+  const baseURL = `http://localhost:${PORT}/api/v1`
+  const api = axios.create({ baseURL })
+
+  describe('signup', () => {
+    it('should signup a new user and return the user object', async () => {
+      const user = getNewUser()
+      const response = await api.post('/auth/signup', user)
+      expect(response.status).toBe(201)
+      const returnedUser = response.data as User
+      expect(returnedUser).toHaveProperty('_id')
+      expect(returnedUser.name).toBe(user.name)
+      expect(returnedUser.email).toBe(user.email)
+      expect(returnedUser).not.toHaveProperty('password')
     })
-    const user = (await response.json()) as User
-    expect(response.status).toBe(201)
-    expect(user).toHaveProperty('_id')
-    expect(user.name).toBe(mockUser.name)
-    expect(user.email).toBe(mockUser.email)
-    expect(user).not.toHaveProperty('password')
+
+    it('should signup a new user and return a cookie with a token', async () => {
+      const user = getNewUser()
+      const response = await api.post('/auth/signup', user)
+      expect(response.status).toBe(201)
+      const cookies = response.headers['set-cookie']
+      const containsToken = cookies?.some((cookie) => cookie.includes('token'))
+      expect(containsToken).toBe(true)
+    })
   })
 
-  it('should signup a new user, return cookie with token', async () => {
-    const mockUser = getNewUser()
-    const response = await fetch('http://localhost:3008/auth/signup', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(mockUser)
+  describe('login', () => {
+    it('should login a user and return the user object', async () => {
+      const user = getNewUser()
+      await api.post('/auth/signup', user)
+      const response = await api.post('/auth/signin', {
+        name: user.name,
+        password: user.password
+      })
+      expect(response.status).toBe(200)
+      const returnedUser = response.data as User
+      expect(returnedUser).toHaveProperty('_id')
+      expect(returnedUser.name).toBe(user.name)
+      expect(returnedUser.email).toBe(user.email)
+      expect(returnedUser).not.toHaveProperty('password')
     })
-    expect(response.status).toBe(201)
-    const cookies = response.headers.get('set-cookie')
-    expect(cookies).toContain('token=')
+
+    it('should login a user and return a cookie with a token', async () => {
+      const user = getNewUser()
+      await api.post('/auth/signup', user)
+      const response = await api.post('/auth/signin', {
+        name: user.name,
+        password: user.password
+      })
+      expect(response.status).toBe(200)
+      const cookies = response.headers['set-cookie']
+      const containsToken = cookies?.some((cookie) => cookie.includes('token'))
+      expect(containsToken).toBe(true)
+    })
   })
 })
