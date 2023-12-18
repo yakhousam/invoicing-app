@@ -5,8 +5,9 @@
   "main": "src/app.js",
   "scripts": {
     "dev": "ts-node-dev --env-file=.env -r tsconfig-paths/register src/index.ts",
-    "test": "jest --watchAll --detectOpenHandles",
-    "lint": "eslint --ext .ts src"
+    "test-watch": "jest --watchAll --detectOpenHandles",
+    "lint": "eslint --ext .ts src",
+    "test": "jest"
   },
   "keywords": [],
   "author": "",
