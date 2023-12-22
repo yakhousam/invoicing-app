@@ -18,7 +18,9 @@ jobs:
       - name: Cache MongoDB binaries
         uses: actions/cache@v2
         with:
-          path: ~/.cache/mongodb-memory-server/mongodb-binaries
+          path: |
+            ~/.cache/mongodb-memory-server/mongodb-binaries
+            server/node_modules/.cache/mongodb-memory-server-core/mongodb-binaries
           key: ${{ runner.os }}-mongodb-binaries-${{ hashFiles('server/package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-mongodb-binaries-
