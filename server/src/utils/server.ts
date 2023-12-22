@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/promise-function-async */
 import server from '@/app'
+import logger from '@/utils/logger'
 import { type Server as HttpServer } from 'http'
 
 export type Server = Omit<HttpServer, 'close'> & {
@@ -13,11 +14,11 @@ const testServer = server as unknown as Server
 const startServer = (port: number): Promise<Server> => {
   return new Promise<Server>((resolve) => {
     testServer.listen(port, () => {
-      console.log(`Test Server is running on port ${port}`)
+      logger.info(`Test Server is running on port ${port}`)
       const originalClose = server.close.bind(testServer)
       testServer.close = (): Promise<void> => {
         return new Promise((resolve) => {
-          console.log('Test Server closed')
+          logger.info('Test Server closed')
           originalClose(resolve as () => void)
         })
       }

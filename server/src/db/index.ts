@@ -1,22 +1,23 @@
+import logger from '@/utils/logger'
 import { connect, connection } from 'mongoose'
 
 const dbUri =
   process.env.MONGODB_URI ?? 'mongodb://127.0.0.1:27017/invoicing-app'
 
 connection.on('connected', () => {
-  console.log('Mongoose is connected to ', dbUri)
+  logger.info('Mongoose is connected to ', dbUri)
 })
 
 connection.on('error', (err) => {
-  console.log(err)
+  logger.error(err)
 })
 
 connection.on('disconnected', () => {
-  console.log('Mongoose is disconnected')
+  logger.info('Mongoose is disconnected')
 })
 
 process.on('SIGINT', () => {
-  console.log('Mongoose disconnected on exit process')
+  logger.info('Mongoose disconnected on exit process')
   process.exit(0)
 })
 

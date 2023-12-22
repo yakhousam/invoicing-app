@@ -5,7 +5,7 @@ import axios from 'axios'
 
 type ReturnedUser = User & { _id: string }
 
-const PORT = 3000
+const PORT = 3010
 
 describe('auth', () => {
   let server: Server

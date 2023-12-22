@@ -1,6 +1,6 @@
-import { type Request, type Response, type NextFunction } from 'express'
-import UserModel, { type User } from '@/model/user'
 import InvoiceModel from '@/model/invoice'
+import UserModel, { type User } from '@/model/user'
+import { type NextFunction, type Request, type Response } from 'express'
 
 export type UserUpdateType = Request<
   { id: string },
@@ -61,7 +61,6 @@ const findInvoices = async (
       })
     }
   } catch (error: unknown) {
-    console.error(error)
     next(error)
   }
 }
@@ -85,7 +84,6 @@ const findInvoices = async (
 //       res.status(404).json({ error: 'Not found', message: `User with id: ${id} doesn't exist` })
 //     }
 //   } catch (error: unknown) {
-//     console.error(error)
 //     next(error)
 //   }
 // }

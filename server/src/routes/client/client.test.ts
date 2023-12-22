@@ -5,7 +5,7 @@ import axios from 'axios'
 
 type ReturnedClient = Client & { _id: string }
 
-const PORT = 3001
+const PORT = 3011
 
 describe('client', () => {
   let server: Server
