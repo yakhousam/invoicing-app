@@ -1,6 +1,8 @@
 import { type Client } from '@/model/client'
 import { type User } from '@/model/user'
+import { type ReturnedUser } from '@/routes/auth/auth.test'
 import { faker } from '@faker-js/faker'
+import axios from 'axios'
 import { type NextFunction, type Response } from 'express'
 
 export const getName = (): string => faker.person.fullName()
@@ -38,3 +40,17 @@ export const getNewUser = (): User => ({
   password: faker.internet.password(),
   isValidPassword: async () => true
 })
+
+export const getCredentials = async (
+  port: number
+): Promise<{ cookie: string; user: ReturnedUser }> => {
+  const api = axios.create({ baseURL: `http://localhost:${port}/api/v1` })
+  const user = getNewUser()
+  const response = await api.post<ReturnedUser>('/auth/signup', user)
+  const cookies = response.headers['set-cookie']
+  const token = cookies
+    ?.find((cookie) => cookie.includes('token'))
+    ?.split(';')[0]
+    .split('=')[1]
+  return { cookie: `token=${token}`, user: response.data }
+}
