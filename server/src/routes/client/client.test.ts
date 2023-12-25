@@ -1,9 +1,9 @@
 import ClientModel, { type Client } from '@/model/client'
-import { getNewClient, getNewUser } from '@/utils/generate'
+import { getCredentials, getNewClient } from '@/utils/generate'
 import startServer, { type Server } from '@/utils/server'
 import axios from 'axios'
 
-type ReturnedClient = Client & { _id: string }
+export type ReturnedClient = Client & { _id: string }
 
 const PORT = 3011
 
@@ -14,15 +14,8 @@ describe('client', () => {
 
   beforeAll(async () => {
     server = await startServer(PORT)
-
-    const user = getNewUser()
-    const response = await api.post('/auth/signup', user)
-    const cookies = response.headers['set-cookie']
-    const token = cookies
-      ?.find((cookie) => cookie.includes('token'))
-      ?.split(';')[0]
-      .split('=')[1]
-    api.defaults.headers.Cookie = `token=${token}`
+    const { cookie } = await getCredentials(PORT)
+    api.defaults.headers.Cookie = cookie
   })
 
   afterAll(async () => {
