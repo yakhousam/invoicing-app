@@ -3,7 +3,7 @@ import { getNewUser } from '@/utils/generate'
 import startServer, { type Server } from '@/utils/server'
 import axios from 'axios'
 
-type ReturnedUser = User & { _id: string }
+export type ReturnedUser = User & { _id: string }
 
 const PORT = 3010
 
