@@ -31,20 +31,20 @@ export type AuthSignupRequest = Request<
 
 const signup = async (
   req: AuthSignupRequest,
-  res: Response,
+  res: Response<Omit<User, 'password'>>,
   next: NextFunction
 ): Promise<void> => {
   try {
     zodUserShema.parse(req.body)
     const user = new UserModel(req.body)
     const newUser = await user.save()
-    const { password: pwd, ...userWithoutPassword } = newUser.toJSON()
     const token = generateToken({ sub: newUser._id })
     res.cookie('token', token, {
       httpOnly: true,
       secure: true,
       sameSite: 'none'
     })
+    const { password, ...userWithoutPassword } = newUser.toJSON()
     res.status(201).json(userWithoutPassword)
   } catch (error) {
     next(error)
@@ -53,7 +53,7 @@ const signup = async (
 
 const signin = (req: Request, res: Response, next: NextFunction): void => {
   try {
-    const user = req.user as User & { _id: string }
+    const user = req.user as User
     const token = generateToken({ sub: user._id })
     res.cookie('token', token, {
       httpOnly: true,
@@ -113,7 +113,7 @@ async function localStrategyVerifyFunction(
   password: string,
   done: (
     error: any,
-    user?: false | Express.User | undefined,
+    user?: false | Omit<User, 'password'> | undefined,
     options?: IVerifyOptions | undefined
   ) => void
 ): Promise<void> {

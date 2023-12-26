@@ -35,12 +35,11 @@ export const getNewClient = (): Client => ({
   address: faker.location.streetAddress()
 })
 
-export const getNewUser = (role?: Role): User => ({
+export const getNewUser = (role?: Role): Omit<User, '_id'> => ({
   name: faker.person.fullName(),
   email: faker.internet.email(),
   password: faker.internet.password(),
-  role: role ?? 'user',
-  isValidPassword: async () => true
+  role: role ?? 'user'
 })
 
 export const getCredentials = async (

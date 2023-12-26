@@ -1,5 +1,5 @@
 import bcrypt from 'bcrypt'
-import { Schema, model } from 'mongoose'
+import { Schema, model, type Model } from 'mongoose'
 import { z } from 'zod'
 
 export const zodUserShema = z.object({
@@ -13,7 +13,7 @@ export const zodUserShema = z.object({
 })
 
 export type User = z.infer<typeof zodUserShema> & {
-  isValidPassword: (password: string) => Promise<boolean>
+  _id: string
 }
 
 export const mongooseUserSchema = new Schema<User>({
@@ -55,6 +55,12 @@ mongooseUserSchema.methods.isValidPassword = async function (password: string) {
   return compare
 }
 
-const UserModel = model<User>('User', mongooseUserSchema)
+type UserMethods = {
+  isValidPassword: (password: string) => Promise<boolean>
+}
 
-export default UserModel
+type UserModel = Model<User, Record<string, unknown>, UserMethods>
+
+const userModel = model<User, UserModel>('User', mongooseUserSchema)
+
+export default userModel
