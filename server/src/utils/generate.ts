@@ -1,3 +1,4 @@
+import { type Role } from '@/middlewars/role'
 import { type Client } from '@/model/client'
 import { type User } from '@/model/user'
 import { type ReturnedUser } from '@/routes/auth/auth.test'
@@ -34,18 +35,20 @@ export const getNewClient = (): Client => ({
   address: faker.location.streetAddress()
 })
 
-export const getNewUser = (): User => ({
+export const getNewUser = (role?: Role): User => ({
   name: faker.person.fullName(),
   email: faker.internet.email(),
   password: faker.internet.password(),
+  role: role ?? 'user',
   isValidPassword: async () => true
 })
 
 export const getCredentials = async (
-  port: number
+  port: number,
+  role?: Role
 ): Promise<{ cookie: string; user: ReturnedUser }> => {
   const api = axios.create({ baseURL: `http://localhost:${port}/api/v1` })
-  const user = getNewUser()
+  const user = getNewUser(role)
   const response = await api.post<ReturnedUser>('/auth/signup', user)
   const cookies = response.headers['set-cookie']
   const token = cookies

@@ -5,7 +5,11 @@ import { z } from 'zod'
 export const zodUserShema = z.object({
   name: z.string(),
   email: z.string().email(),
-  password: z.string().min(6)
+  password: z.string().min(6),
+  role: z
+    .union([z.literal('admin'), z.literal('user')])
+    .default('user')
+    .optional()
 })
 
 export type User = z.infer<typeof zodUserShema> & {
@@ -19,7 +23,8 @@ export const mongooseUserSchema = new Schema<User>({
     required: true,
     unique: true
   },
-  password: { type: String, required: true }
+  password: { type: String, required: true },
+  role: { type: String, enum: ['admin', 'user'], default: 'user' }
 })
 
 mongooseUserSchema.path('name').validate(async (value) => {

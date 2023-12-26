@@ -5,7 +5,7 @@ const dbUri =
   process.env.MONGODB_URI ?? 'mongodb://127.0.0.1:27017/invoicing-app'
 
 connection.on('connected', () => {
-  logger.info('Mongoose is connected to ', dbUri)
+  logger.info('Mongoose is connected to ' + dbUri)
 })
 
 connection.on('error', (err) => {
