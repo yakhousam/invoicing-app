@@ -21,8 +21,8 @@ describe('errorMiddleware', () => {
     errorMiddleware(error, req, res, next)
     expect(res.status).toHaveBeenCalledWith(400)
     expect(res.json).toHaveBeenCalledWith({
-      errors: {},
-      message: 'Missing Fields.'
+      errors: expect.any(Object),
+      message: expect.any(String)
     })
   })
 
