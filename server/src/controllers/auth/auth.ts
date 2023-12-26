@@ -36,8 +36,7 @@ const signup = async (
 ): Promise<void> => {
   try {
     zodUserShema.parse(req.body)
-    const { name, email, password } = req.body
-    const user = new UserModel({ name, email, password })
+    const user = new UserModel(req.body)
     const newUser = await user.save()
     const { password: pwd, ...userWithoutPassword } = newUser.toJSON()
     const token = generateToken({ sub: newUser._id })

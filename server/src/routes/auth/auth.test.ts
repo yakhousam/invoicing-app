@@ -22,10 +22,10 @@ describe('auth', () => {
   })
 
   const baseURL = `http://localhost:${PORT}/api/v1`
-  const api = axios.create({ baseURL })
 
   describe('signup', () => {
     it('should signup a new user and return the user object', async () => {
+      const api = axios.create({ baseURL })
       const user = getNewUser()
       const response = await api.post<ReturnedUser>('/auth/signup', user)
       expect(response.status).toBe(201)
@@ -37,6 +37,7 @@ describe('auth', () => {
     })
 
     it('should signup a new user and return a cookie with a token', async () => {
+      const api = axios.create({ baseURL })
       const user = getNewUser()
       const response = await api.post('/auth/signup', user)
       expect(response.status).toBe(201)
@@ -48,8 +49,10 @@ describe('auth', () => {
 
   describe('Signin', () => {
     it('should signin a user and return the user object', async () => {
+      const api = axios.create({ baseURL })
       const user = getNewUser()
-      await api.post('/auth/signup', user)
+      // await api.post('/auth/signup', user)
+      await userModel.create(user)
       const response = await api.post<ReturnedUser>('/auth/signin', {
         name: user.name,
         password: user.password
@@ -63,6 +66,7 @@ describe('auth', () => {
     })
 
     it('should signin a user and return a cookie with a token', async () => {
+      const api = axios.create({ baseURL })
       const user = getNewUser()
       await api.post('/auth/signup', user)
       const response = await api.post('/auth/signin', {
