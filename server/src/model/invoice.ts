@@ -1,10 +1,8 @@
 import { type zodInvoiceSchema } from '@/validation'
-import { Schema, model } from 'mongoose'
+import { Schema, model, type Document } from 'mongoose'
 import { type z } from 'zod'
 
-export type Invoice = z.infer<typeof zodInvoiceSchema> & {
-  _id: string
-}
+export type Invoice = z.infer<typeof zodInvoiceSchema> & Document
 
 const mongooseInvoiceSchema = new Schema<Invoice>(
   {

@@ -1,5 +1,5 @@
 import bcrypt from 'bcrypt'
-import { Schema, model, type Model } from 'mongoose'
+import { Schema, model, type Document, type Model } from 'mongoose'
 import { z } from 'zod'
 
 export const zodUserShema = z.object({
@@ -12,9 +12,7 @@ export const zodUserShema = z.object({
     .optional()
 })
 
-export type User = z.infer<typeof zodUserShema> & {
-  _id: string
-}
+export type User = z.infer<typeof zodUserShema> & Document
 
 export const mongooseUserSchema = new Schema<User>(
   {

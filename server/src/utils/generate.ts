@@ -29,13 +29,15 @@ export function buildNext(): NextFunction {
   return jest.fn().mockName('next') as unknown as NextFunction
 }
 
-export const getNewClient = (): Omit<Client, '_id'> => ({
+export const getNewClient = (): Pick<Client, 'name' | 'email' | 'address'> => ({
   name: faker.person.fullName(),
   email: faker.internet.email(),
   address: faker.location.streetAddress()
 })
 
-export const getNewUser = (role?: Role): Omit<User, '_id'> => ({
+export const getNewUser = (
+  role?: Role
+): Pick<User, 'name' | 'email' | 'password' | 'role'> => ({
   name: faker.person.fullName(),
   email: faker.internet.email(),
   password: faker.internet.password(),

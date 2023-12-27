@@ -1,4 +1,4 @@
-import { Schema, model } from 'mongoose'
+import { Schema, model, type Document } from 'mongoose'
 import { z } from 'zod'
 
 export const zodClientSchema = z.object({
@@ -7,9 +7,7 @@ export const zodClientSchema = z.object({
   address: z.string().optional()
 })
 
-export type Client = z.infer<typeof zodClientSchema> & {
-  _id: string
-}
+export type Client = z.infer<typeof zodClientSchema> & Document
 
 export const mongooseClientSchema = new Schema<Client>({
   name: { type: String, required: true, unique: true },

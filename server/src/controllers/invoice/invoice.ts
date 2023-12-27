@@ -32,8 +32,8 @@ const create = async (
       user: user._id.toString()
     })
     const invoice = new InvoiceModel(parsedData)
-    const newInvoide = await invoice.save()
-    res.status(201).json(newInvoide)
+    const newInvoice = await invoice.save()
+    res.status(201).json(newInvoice)
   } catch (error: unknown) {
     next(error)
   }
