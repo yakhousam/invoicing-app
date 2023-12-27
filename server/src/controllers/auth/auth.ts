@@ -128,8 +128,7 @@ async function localStrategyVerifyFunction(
       done(null, false, { message: 'Incorrect password.' })
       return
     }
-    const { password: pwd, ...userWithoutPassword } = user.toJSON()
-    done(null, userWithoutPassword, { message: 'Logged in Successfully' })
+    done(null, user, { message: 'Logged in Successfully' })
   } catch (error) {
     done(error)
   }

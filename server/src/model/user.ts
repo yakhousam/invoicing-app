@@ -16,16 +16,26 @@ export type User = z.infer<typeof zodUserShema> & {
   _id: string
 }
 
-export const mongooseUserSchema = new Schema<User>({
-  name: { type: String, required: true, unique: true },
-  email: {
-    type: String,
-    required: true,
-    unique: true
+export const mongooseUserSchema = new Schema<User>(
+  {
+    name: { type: String, required: true, unique: true },
+    email: {
+      type: String,
+      required: true,
+      unique: true
+    },
+    password: { type: String, required: true },
+    role: { type: String, enum: ['admin', 'user'], default: 'user' }
   },
-  password: { type: String, required: true },
-  role: { type: String, enum: ['admin', 'user'], default: 'user' }
-})
+  {
+    toJSON: {
+      transform(doc, ret, options) {
+        delete ret.password
+        return ret
+      }
+    }
+  }
+)
 
 mongooseUserSchema.path('name').validate(async (value) => {
   const user = await model<User>('User').findOne({ name: value })
