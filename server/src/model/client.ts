@@ -7,7 +7,9 @@ export const zodClientSchema = z.object({
   address: z.string().optional()
 })
 
-export type Client = z.infer<typeof zodClientSchema>
+export type Client = z.infer<typeof zodClientSchema> & {
+  _id: string
+}
 
 export const mongooseClientSchema = new Schema<Client>({
   name: { type: String, required: true, unique: true },
