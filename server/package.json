@@ -4,12 +4,13 @@
   "description": "",
   "main": "src/app.js",
   "scripts": {
-    "dev": "ts-node-dev --env-file=.env -r tsconfig-paths/register src/index.ts",
-    "test-watch": "jest --watchAll --detectOpenHandles",
-    "lint": "eslint --ext .ts src",
-    "test": "jest",
     "build": "tsc && tsc-alias",
-    "start": "node dist/index.js"
+    "dev": "ts-node-dev --env-file=.env -r tsconfig-paths/register src/index.ts",
+    "lint": "eslint --ext .ts,.test.ts src",
+    "start": "node dist/index.js",
+    "test": "jest",
+    "test:coverage": "jest --coverage",
+    "test:watch": "jest --watchAll --detectOpenHandles"
   },
   "keywords": [],
   "author": "",
