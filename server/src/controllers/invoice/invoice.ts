@@ -1,31 +1,16 @@
 import { type Client } from '@/model/client'
 import InvoiceModel, { type Invoice } from '@/model/invoice'
 import { type User } from '@/model/user'
+import { type CreateInvoice } from '@/types'
 import { zodCreatInvoiceSchema, zodUpdateInvoice } from '@/validation'
 import { type NextFunction, type Request, type Response } from 'express'
 
-export type CreateInvoiceRequest = Request<
-  Record<string, unknown>,
-  Record<string, unknown>,
-  Pick<Invoice, 'items'> & {
-    client: string
-    invoiceDate?: string
-  }
->
-export type FindAllIvoicesRequest = Request
-
-export type findInvoiceByIdRequest = Request<
-  { id: string },
-  Record<string, unknown>,
-  Record<string, unknown>
->
-
 const create = async (
-  req: CreateInvoiceRequest,
+  req: Request<null, null, CreateInvoice> & { user: User },
   res: Response,
   next: NextFunction
 ): Promise<void> => {
-  const user = req.user as User
+  const user = req.user
   try {
     const parsedData = zodCreatInvoiceSchema.parse({
       ...req.body,
@@ -40,11 +25,11 @@ const create = async (
 }
 
 const find = async (
-  req: FindAllIvoicesRequest,
+  req: Request & { user: User },
   res: Response,
   next: NextFunction
 ): Promise<void> => {
-  const user = req.user as User
+  const user = req.user
   try {
     const invoices = await InvoiceModel.find({
       user: user._id
@@ -55,22 +40,14 @@ const find = async (
   }
 }
 
-// export type InvoiceFindById = Pick<
-//   Invoice,
-//   'invoiceNo' | 'invoiceDate' | 'dueDate' | 'paid' | 'totalAmount' | 'items'
-// > & {
-//   user: Omit<User, 'password'>
-//   client: Client
-// }
-
 const findById = async (
-  req: findInvoiceByIdRequest,
+  req: Request<{ id: string }> & { user: User },
   res: Response,
   next: NextFunction
 ): Promise<void> => {
   try {
     const { id } = req.params
-    const user = req.user as User
+    const user = req.user
     const invoice = await InvoiceModel.findOne<Invoice>({
       _id: id,
       user: user._id
@@ -92,14 +69,14 @@ const findById = async (
 }
 
 const updateById = async (
-  req: Request,
+  req: Request<{ id: string }> & { user: User },
   res: Response,
   next: NextFunction
 ): Promise<void> => {
   try {
     const data = zodUpdateInvoice.parse(req.body)
     const { id } = req.params
-    const user = req.user as User
+    const user = req.user
 
     const invoice = await InvoiceModel.findOneAndUpdate<Invoice>(
       {

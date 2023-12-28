@@ -1,10 +1,9 @@
 /* eslint-disable @typescript-eslint/unbound-method */
-import UserModel from '@/model/user'
-import InvoiceModel, { type Invoice } from '@/model/invoice'
-import ClientModel from '@/model/client'
 import userController from '@/controllers/user'
-import { type CreateInvoiceRequest } from '@/controllers/invoice'
-import { Error as MongooseError } from 'mongoose'
+import ClientModel from '@/model/client'
+import InvoiceModel, { type Invoice } from '@/model/invoice'
+import UserModel from '@/model/user'
+import { type CreateInvoice } from '@/types'
 import {
   buildNext,
   buildRes,
@@ -14,6 +13,7 @@ import {
   getProductPrice
 } from '@/utils/generate'
 import { type Request } from 'express'
+import { Error as MongooseError } from 'mongoose'
 
 describe('User Controller', () => {
   beforeEach(async () => {
@@ -113,25 +113,22 @@ describe('User Controller', () => {
 
       const notExpectedUser = await UserModel.create(getNewUser())
 
-      const notExpectedUserInvoices: Array<CreateInvoiceRequest['body']> =
-        Array(10)
-          .fill(null)
-          .map(() => ({
-            user: notExpectedUser._id.toString(),
-            client: expectedClient._id.toString(),
-            items: Array(10)
-              .fill(null)
-              .map(() => ({
-                itemName: getProductName(),
-                itemPrice: getProductPrice()
-              }))
-          }))
+      const notExpectedUserInvoices: CreateInvoice[] = Array(10)
+        .fill(null)
+        .map(() => ({
+          user: notExpectedUser._id.toString(),
+          client: expectedClient._id.toString(),
+          items: Array(10)
+            .fill(null)
+            .map(() => ({
+              itemName: getProductName(),
+              itemPrice: getProductPrice()
+            }))
+        }))
 
       await InvoiceModel.create(notExpectedUserInvoices)
 
-      const expectedUserInvoices: Array<CreateInvoiceRequest['body']> = Array(
-        10
-      )
+      const expectedUserInvoices: CreateInvoice[] = Array(10)
         .fill(null)
         .map(() => ({
           user: expectedUser._id.toString(),

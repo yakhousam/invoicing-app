@@ -1,12 +1,9 @@
 /* eslint-disable @typescript-eslint/unbound-method */
-import invoiceController, {
-  type CreateInvoiceRequest,
-  type FindAllIvoicesRequest,
-  type findInvoiceByIdRequest
-} from '@/controllers/invoice'
+import invoiceController from '@/controllers/invoice'
 import ClientModel, { type Client } from '@/model/client'
 import InvoiceModel, { type Invoice } from '@/model/invoice'
 import UserModel, { type User } from '@/model/user'
+import { type CreateInvoice } from '@/types'
 import {
   buildNext,
   buildRes,
@@ -20,9 +17,11 @@ import { type Request } from 'express'
 import { Error as MongooseError } from 'mongoose'
 import { ZodError } from 'zod'
 
-// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-async function createMockInvoices(user: User, client: Client) {
-  const mockInvoices: Array<CreateInvoiceRequest['body']> = Array(10)
+async function createMockInvoices(
+  user: User,
+  client: Client
+): Promise<Invoice[]> {
+  const mockInvoices: CreateInvoice[] = Array(10)
     .fill(null)
     .map(() => ({
       user: user._id.toString(),
@@ -47,7 +46,7 @@ describe('Invoice Controller', () => {
       const client = await ClientModel.create(getNewClient())
       const user = await UserModel.create(getNewUser())
 
-      const mockInvoice: CreateInvoiceRequest['body'] = {
+      const mockInvoice: CreateInvoice = {
         client: client._id.toString(),
         items: Array(10)
           .fill(null)
@@ -60,7 +59,7 @@ describe('Invoice Controller', () => {
       const req = {
         body: mockInvoice,
         user
-      } as unknown as CreateInvoiceRequest
+      } as unknown as Request<null, null, CreateInvoice> & { user: User }
 
       const res = buildRes()
       const next = buildNext()
@@ -91,7 +90,7 @@ describe('Invoice Controller', () => {
 
     it('should call next with ZodError error, invalid data', async () => {
       const user = { ...getNewUser(), _id: '123456' }
-      const mockInvoice: CreateInvoiceRequest['body'] = {
+      const mockInvoice: CreateInvoice = {
         client: '12456456',
         items: Array(10)
           .fill(null)
@@ -103,7 +102,7 @@ describe('Invoice Controller', () => {
       const req = {
         body: mockInvoice,
         user
-      } as unknown as CreateInvoiceRequest
+      } as unknown as Request<null, null, CreateInvoice> & { user: User }
 
       const res = buildRes()
       const next = buildNext()
@@ -116,7 +115,7 @@ describe('Invoice Controller', () => {
 
     it('should call next with ZodError error, missing required fields', async () => {
       const user = { ...getNewUser(), _id: getObjectId() }
-      const mockInvoice: Partial<CreateInvoiceRequest['body']> = {
+      const mockInvoice: Partial<CreateInvoice> = {
         // client field is missing
         items: Array(10)
           .fill(null)
@@ -128,7 +127,7 @@ describe('Invoice Controller', () => {
       const req = {
         body: mockInvoice,
         user
-      } as unknown as CreateInvoiceRequest
+      } as unknown as Request<null, null, CreateInvoice> & { user: User }
 
       const res = buildRes()
       const next = buildNext()
@@ -141,7 +140,7 @@ describe('Invoice Controller', () => {
 
     it('should call next with mongoose error, userId of clientId not found', async () => {
       const user = { ...getNewUser(), _id: getObjectId() }
-      const mockInvoice: CreateInvoiceRequest['body'] = {
+      const mockInvoice: CreateInvoice = {
         client: getObjectId(),
 
         items: Array(10)
@@ -154,7 +153,7 @@ describe('Invoice Controller', () => {
       const req = {
         body: mockInvoice,
         user
-      } as unknown as CreateInvoiceRequest
+      } as unknown as Request<null, null, CreateInvoice> & { user: User }
 
       const res = buildRes()
       const next = buildNext()
@@ -169,7 +168,7 @@ describe('Invoice Controller', () => {
       const client = await ClientModel.create(getNewClient())
       const user = await UserModel.create(getNewUser())
 
-      const mockInvoice: CreateInvoiceRequest['body'] = {
+      const mockInvoice: CreateInvoice = {
         client: client._id.toString(),
         items: Array(10)
           .fill(null)
@@ -182,7 +181,7 @@ describe('Invoice Controller', () => {
       const req = {
         body: mockInvoice,
         user
-      } as unknown as CreateInvoiceRequest
+      } as unknown as Request<null, null, CreateInvoice> & { user: User }
 
       const res = buildRes()
       const next = buildNext()
@@ -204,7 +203,7 @@ describe('Invoice Controller', () => {
       const client = await ClientModel.create(getNewClient())
       const user = await UserModel.create(getNewUser())
 
-      const mockInvoice: CreateInvoiceRequest['body'] = {
+      const mockInvoice: CreateInvoice = {
         client: client._id.toString(),
         invoiceDate: new Date('2021-12-31').toISOString(),
         items: Array(10)
@@ -218,7 +217,7 @@ describe('Invoice Controller', () => {
       const req = {
         body: mockInvoice,
         user
-      } as unknown as CreateInvoiceRequest
+      } as unknown as Request<null, null, CreateInvoice> & { user: User }
 
       const res = buildRes()
       const next = buildNext()
@@ -248,7 +247,7 @@ describe('Invoice Controller', () => {
       const expectedInvoices = await createMockInvoices(user1, client)
       await createMockInvoices(user2, client)
 
-      const req = { user: user1 } as unknown as FindAllIvoicesRequest
+      const req = { user: user1 } as unknown as Request & { user: User }
 
       const res = buildRes()
       const next = buildNext()
@@ -267,7 +266,7 @@ describe('Invoice Controller', () => {
       const client = await ClientModel.create(getNewClient())
       const user = await UserModel.create(getNewUser())
 
-      const mockInvoice: CreateInvoiceRequest['body'] = {
+      const mockInvoice: CreateInvoice = {
         client: client._id.toString(),
         items: Array(10)
           .fill(null)
@@ -287,7 +286,7 @@ describe('Invoice Controller', () => {
           id: expectedInvoice._id.toString()
         },
         user
-      } as unknown as findInvoiceByIdRequest
+      } as unknown as Request<{ id: string }> & { user: User }
 
       const res = buildRes()
       const next = buildNext()
@@ -307,7 +306,7 @@ describe('Invoice Controller', () => {
           id: 'invalid-id' // Invalid invoice id
         },
         user
-      } as unknown as findInvoiceByIdRequest
+      } as unknown as Request<{ id: string }> & { user: User }
 
       const res = buildRes()
       const next = buildNext()
@@ -323,7 +322,7 @@ describe('Invoice Controller', () => {
       const user1 = await UserModel.create(getNewUser())
       const user2 = await UserModel.create(getNewUser())
 
-      const mockInvoice: CreateInvoiceRequest['body'] = {
+      const mockInvoice: CreateInvoice = {
         client: client._id.toString(),
         items: Array(10)
           .fill(null)
@@ -343,7 +342,7 @@ describe('Invoice Controller', () => {
           id: invoice._id.toString()
         },
         user: user2
-      } as unknown as findInvoiceByIdRequest
+      } as unknown as Request<{ id: string }> & { user: User }
 
       const res = buildRes()
       const next = buildNext()
@@ -357,7 +356,7 @@ describe('Invoice Controller', () => {
     it('should mark the invoice as paid', async () => {
       const client = await ClientModel.create(getNewClient())
       const user = await UserModel.create(getNewUser())
-      const mockInvoice: CreateInvoiceRequest['body'] = {
+      const mockInvoice: CreateInvoice = {
         client: client._id.toString(),
         items: Array(10)
           .fill(null)
@@ -381,7 +380,7 @@ describe('Invoice Controller', () => {
           paid: true
         },
         user
-      } as unknown as Request
+      } as unknown as Request<{ id: string }> & { user: User }
 
       await invoiceController.updateById(req, res, next)
       expect(res.status).toHaveBeenCalledWith(200)
@@ -417,7 +416,7 @@ describe('Invoice Controller', () => {
           paid: false
         },
         user
-      } as unknown as Request
+      } as unknown as Request<{ id: string }> & { user: User }
 
       await invoiceController.updateById(req, res, next)
       expect(next).toHaveBeenCalledTimes(1)
