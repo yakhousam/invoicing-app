@@ -1,10 +1,7 @@
-import { type zodInvoiceSchema } from '@/validation'
+import { type Invoice } from '@/validation'
 import { Schema, model, type Document } from 'mongoose'
-import { type z } from 'zod'
 
-export type Invoice = z.infer<typeof zodInvoiceSchema> & Document
-
-const mongooseInvoiceSchema = new Schema<Invoice>(
+const mongooseInvoiceSchema = new Schema<Invoice & Document>(
   {
     invoiceNo: {
       type: Number
@@ -13,8 +10,8 @@ const mongooseInvoiceSchema = new Schema<Invoice>(
       type: Date,
       default: Date.now
     },
-    dueDate: {
-      type: Date
+    invoiceDueDays: {
+      type: Number
     },
     user: {
       type: Schema.Types.ObjectId,
@@ -101,13 +98,18 @@ mongooseInvoiceSchema.virtual('status').get(function () {
   const today = new Date()
   if (this.paid) {
     return 'paid'
-  } else if (this.dueDate !== undefined && this.dueDate < today) {
+  } else if (
+    new Date(
+      new Date(this.invoiceDate).getTime() +
+        this.invoiceDueDays * 24 * 60 * 60 * 1000
+    ) < today
+  ) {
     return 'overdue'
   } else {
     return 'sent'
   }
 })
 
-const InvoiceModel = model<Invoice>('Invoice', mongooseInvoiceSchema)
+const InvoiceModel = model<Invoice & Document>('Invoice', mongooseInvoiceSchema)
 
 export default InvoiceModel

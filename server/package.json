@@ -7,7 +7,7 @@
     "build": "tsc && tsc-alias",
     "dev": "ts-node-dev --env-file=.env -r tsconfig-paths/register src/index.ts",
     "lint": "eslint --ext .ts,.test.ts src",
-    "start": "node dist/index.js",
+    "start": "node --env-file=.env dist/index.js",
     "test": "jest",
     "test:coverage": "jest --coverage",
     "test:watch": "jest --watchAll --detectOpenHandles"

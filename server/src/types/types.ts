@@ -1,6 +1,6 @@
 import { type Client } from '@/model/client'
-import { type Invoice } from '@/model/invoice'
 import { type User } from '@/model/user'
+import { type Invoice } from '@/validation'
 
 export type { User } from '@/model/user'
 
@@ -40,20 +40,7 @@ export type UserJson = Required<Pick<User, 'name' | 'email' | 'role'>>
 
 export type ClientJson = Pick<Client, 'name' | 'email' | 'address'>
 
-export type InvoiceJson = Required<
-  Pick<
-    Invoice,
-    | '_id'
-    | 'invoiceNo'
-    | 'invoiceDate'
-    | 'dueDate'
-    | 'paid'
-    | 'totalAmount'
-    | 'items'
-    | 'client'
-    | 'user'
-  >
-> & {
+export type InvoiceJson = Invoice & {
   invoiceDate: string
   dueDate: string
   status: 'sent' | 'paid' | 'overdue'

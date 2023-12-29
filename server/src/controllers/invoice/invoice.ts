@@ -1,8 +1,12 @@
 import { type Client } from '@/model/client'
-import InvoiceModel, { type Invoice } from '@/model/invoice'
+import InvoiceModel from '@/model/invoice'
 import { type User } from '@/model/user'
-import { type CreateInvoice } from '@/types'
-import { zodCreatInvoiceSchema, zodUpdateInvoice } from '@/validation'
+import {
+  zodCreatInvoiceSchema,
+  zodUpdateInvoice,
+  type CreateInvoice,
+  type Invoice
+} from '@/validation'
 import { type NextFunction, type Request, type Response } from 'express'
 
 const create = async (

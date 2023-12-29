@@ -2,12 +2,15 @@ import { Types } from 'mongoose'
 import { z } from 'zod'
 
 export const zodInvoiceSchema = z.object({
-  invoiceNo: z.number().optional(),
-  invoiceDate: z.coerce
-    .date()
+  invoiceNo: z.number(),
+  invoiceDate: z
+    .string()
+    .datetime()
     .optional()
-    .default(() => new Date()),
-  dueDate: z.coerce.date().optional(),
+    .transform((val) => {
+      return val !== undefined ? new Date(val) : new Date()
+    }),
+  invoiceDueDays: z.number().min(1).optional().default(7),
   user: z
     .string()
     .min(24)
@@ -22,35 +25,21 @@ export const zodInvoiceSchema = z.object({
     z.object({
       itemName: z.string(),
       itemPrice: z.coerce.number().positive(),
-      itemQuantity: z.coerce.number().positive().optional()
+      itemQuantity: z.coerce.number().positive().optional().default(1)
     })
   ),
-  totalAmount: z.number().optional(),
-  paid: z.boolean().optional().default(false)
+  totalAmount: z.number(),
+  paid: z.boolean()
 })
 
 export const zodCreatInvoiceSchema = zodInvoiceSchema
-  .refine(
-    (data) => {
-      if (data.dueDate === undefined) {
-        data.dueDate = new Date(
-          new Date(data.invoiceDate).getTime() + 7 * 24 * 60 * 60 * 1000
-        )
-      }
-      return data.invoiceDate <= data.dueDate
-    },
-    { message: 'Invoice date must be before due date.', path: ['dueDate'] }
-  )
-  .refine(
-    (data) => {
-      return data.invoiceNo === undefined && data.totalAmount === undefined
-    },
-    {
-      message:
-        'InvoiceNo and TotalAmount are automatically generated and cannot be set.',
-      path: ['invoiceNo', 'totalAmount']
-    }
-  )
+  .pick({
+    invoiceDate: true,
+    invoiceDueDays: true,
+    items: true,
+    client: true,
+    user: true
+  })
   .refine(
     (data) => {
       return data.items.length !== 0
@@ -60,18 +49,23 @@ export const zodCreatInvoiceSchema = zodInvoiceSchema
 
 export const zodUpdateInvoice = zodInvoiceSchema
   .pick({
-    dueDate: true,
+    invoiceDueDays: true,
     invoiceDate: true,
     items: true
   })
-  .merge(
-    z.object({
-      paid: z.boolean().refine((value) => value, {
+  .extend({
+    paid: z
+      .boolean()
+      .optional()
+      .refine((value) => value, {
         message: 'Paid status can only be set to true.',
         path: ['paid']
       })
-    })
-  )
+  })
   .partial()
 
-export type UpdateInvoice = z.infer<typeof zodUpdateInvoice>
+export type Invoice = z.infer<typeof zodInvoiceSchema> & { _id: string }
+
+export type CreateInvoice = Omit<z.input<typeof zodCreatInvoiceSchema>, 'user'>
+
+export type UpdateInvoice = z.input<typeof zodUpdateInvoice>
