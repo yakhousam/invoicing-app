@@ -1,11 +1,11 @@
-import { type User } from '@/model/user'
+import { parseUserSchema } from '@/validation/user'
 import { type NextFunction, type Request, type Response } from 'express'
 
 export type Role = 'admin' | 'user'
 
 function withRole(role: Role) {
   return function (req: Request, res: Response, next: NextFunction) {
-    const user = req.user as User
+    const user = parseUserSchema.parse(req.user)
     if (user?.role === role) {
       next()
     } else {
