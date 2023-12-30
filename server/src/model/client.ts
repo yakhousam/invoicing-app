@@ -1,20 +1,14 @@
+import { type Client } from '@/validation/client'
 import { Schema, model, type Document } from 'mongoose'
-import { z } from 'zod'
 
-export const zodClientSchema = z.object({
-  name: z.string(),
-  email: z.string().email().optional(),
-  address: z.string().optional()
-})
+type ClientDocument = Client & Document
 
-export type Client = z.infer<typeof zodClientSchema> & Document
-
-export const mongooseClientSchema = new Schema<Client>({
+const ClientSchema = new Schema<ClientDocument>({
   name: { type: String, required: true, unique: true },
   email: { type: String, required: false, unique: true, sparse: true },
   address: { type: String, required: false }
 })
 
-const ClientModel = model<Client>('Client', mongooseClientSchema)
+const clientModel = model<ClientDocument>('Client', ClientSchema)
 
-export default ClientModel
+export default clientModel

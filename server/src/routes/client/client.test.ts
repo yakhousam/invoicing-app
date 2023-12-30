@@ -1,9 +1,8 @@
-import ClientModel, { type Client } from '@/model/client'
+import ClientModel from '@/model/client'
 import { getCredentials, getNewClient } from '@/utils/generate'
 import startServer, { type Server } from '@/utils/server'
+import { type Client } from '@/validation/client'
 import axios from 'axios'
-
-export type ReturnedClient = Client & { _id: string }
 
 const PORT = 3011
 
@@ -28,7 +27,7 @@ describe('client', () => {
 
   it('should create a new client and return the client object', async () => {
     const client = getNewClient()
-    const response = await api.post<ReturnedClient>('/clients/create', client)
+    const response = await api.post<Client>('/clients/create', client)
     expect(response.status).toBe(201)
     const returnedClient = response.data
     expect(returnedClient).toHaveProperty('_id')
@@ -41,7 +40,7 @@ describe('client', () => {
     const client2 = getNewClient()
     await api.post('/clients/create', client1)
     await api.post('/clients/create', client2)
-    const response = await api.get<ReturnedClient[]>('/clients')
+    const response = await api.get<Client[]>('/clients')
     expect(response.status).toBe(200)
     const returnedClients = response.data
     expect(returnedClients.length).toBe(2)
@@ -49,11 +48,9 @@ describe('client', () => {
 
   it('should return a client by id', async () => {
     const client = getNewClient()
-    const response = await api.post<ReturnedClient>('/clients/create', client)
+    const response = await api.post<Client>('/clients/create', client)
     const createdClient = response.data
-    const response2 = await api.get<ReturnedClient>(
-      `/clients/${createdClient._id}`
-    )
+    const response2 = await api.get<Client>(`/clients/${createdClient._id}`)
     expect(response2.status).toBe(200)
     const returnedClient = response2.data
     expect(returnedClient.name).toBe(client.name)
@@ -62,9 +59,9 @@ describe('client', () => {
 
   it('should update a client by id', async () => {
     const client = getNewClient()
-    const response = await api.post<ReturnedClient>('/clients/create', client)
+    const response = await api.post<Client>('/clients/create', client)
     const createdClient = response.data
-    const response2 = await api.put<ReturnedClient>(
+    const response2 = await api.put<Client>(
       `/clients/update/${createdClient._id}`,
       {
         name: 'updated name'
@@ -77,9 +74,9 @@ describe('client', () => {
 
   it('should delete a client by id', async () => {
     const client = getNewClient()
-    const response = await api.post<ReturnedClient>('/clients/create', client)
+    const response = await api.post<Client>('/clients/create', client)
     const createdClient = response.data
-    const response2 = await api.delete<ReturnedClient>(
+    const response2 = await api.delete<Client>(
       `/clients/delete/${createdClient._id}`
     )
     expect(response2.status).toBe(200)

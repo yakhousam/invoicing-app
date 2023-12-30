@@ -1,9 +1,5 @@
 /* eslint-disable @typescript-eslint/unbound-method */
-import clientController, {
-  type ClientFindByIdType,
-  type ClientUpdateType,
-  type CreateClientRequest
-} from '@/controllers/client'
+import clientController from '@/controllers/client'
 import ClientModel from '@/model/client'
 import {
   buildNext,
@@ -11,6 +7,7 @@ import {
   getNewClient,
   getObjectId
 } from '@/utils/generate'
+import { type Request } from 'express'
 import { Error as MongooseError } from 'mongoose'
 import { ZodError } from 'zod'
 
@@ -25,7 +22,7 @@ describe('Client Controller', () => {
 
       const req = {
         body: mockClient
-      } as unknown as CreateClientRequest
+      } as unknown as Request
 
       const res = buildRes()
       const next = buildNext()
@@ -42,7 +39,7 @@ describe('Client Controller', () => {
           ...getNewClient(),
           name: undefined
         }
-      } as unknown as CreateClientRequest
+      } as unknown as Request
 
       const res = buildRes()
       const next = buildNext()
@@ -59,7 +56,7 @@ describe('Client Controller', () => {
           ...getNewClient(),
           email: 'invalid email'
         }
-      } as unknown as CreateClientRequest
+      } as unknown as Request
 
       const res = buildRes()
       const next = buildNext()
@@ -79,8 +76,9 @@ describe('Client Controller', () => {
       const expectedClient = await ClientModel.create(mockClients)
       const res = buildRes()
       const next = buildNext()
+      const req = {} as unknown as Request
 
-      await clientController.find(null, res, next)
+      await clientController.find(req, res, next)
 
       expect(res.status).toHaveBeenCalledWith(200)
 
@@ -106,7 +104,7 @@ describe('Client Controller', () => {
         params: {
           id: _id.toString()
         }
-      } as unknown as ClientFindByIdType
+      } as unknown as Request
 
       await clientController.findById(req, res, next)
 
@@ -121,7 +119,7 @@ describe('Client Controller', () => {
         params: {
           id: getObjectId()
         }
-      } as unknown as ClientFindByIdType
+      } as unknown as Request
 
       await clientController.findById(req, res, next)
 
@@ -139,7 +137,7 @@ describe('Client Controller', () => {
         params: {
           id: 'invalid id'
         }
-      } as unknown as ClientFindByIdType
+      } as unknown as Request
 
       await clientController.findById(req, res, next)
 
@@ -163,7 +161,7 @@ describe('Client Controller', () => {
           id: _id.toString()
         },
         body: updatedClient
-      } as unknown as ClientUpdateType
+      } as unknown as Request
 
       await clientController.update(req, res, next)
 
@@ -181,7 +179,7 @@ describe('Client Controller', () => {
           id: getObjectId()
         },
         body: getNewClient()
-      } as unknown as ClientUpdateType
+      } as unknown as Request
 
       await clientController.update(req, res, next)
 
@@ -200,7 +198,7 @@ describe('Client Controller', () => {
           id: 'invalid id'
         },
         body: getNewClient()
-      } as unknown as ClientUpdateType
+      } as unknown as Request
 
       await clientController.update(req, res, next)
 
@@ -215,7 +213,7 @@ describe('Client Controller', () => {
           email: 'invalid email',
           address: 'anything'
         }
-      } as unknown as CreateClientRequest
+      } as unknown as Request
 
       const res = buildRes()
       const next = buildNext()
@@ -240,7 +238,7 @@ describe('Client Controller', () => {
         params: {
           id: _id.toString()
         }
-      } as unknown as ClientFindByIdType
+      } as unknown as Request
 
       await clientController.deleteById(req, res, next)
 
@@ -254,7 +252,7 @@ describe('Client Controller', () => {
         params: {
           id: getObjectId()
         }
-      } as unknown as ClientFindByIdType
+      } as unknown as Request
 
       await clientController.deleteById(req, res, next)
 
@@ -272,7 +270,7 @@ describe('Client Controller', () => {
         params: {
           id: 'invalid id'
         }
-      } as unknown as ClientFindByIdType
+      } as unknown as Request
 
       await clientController.deleteById(req, res, next)
 

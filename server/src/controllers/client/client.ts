@@ -1,40 +1,28 @@
-import ClientModel, { zodClientSchema, type Client } from '@/model/client'
+import ClientModel from '@/model/client'
+import { clientSchema, createClientSchema } from '@/validation/client'
 import { type NextFunction, type Request, type Response } from 'express'
 
-export type CreateClientRequest = Request<
-  Record<string, unknown>,
-  Record<string, unknown>,
-  Client
->
-export type ClientFindByIdType = Request<
-  { id: string },
-  Record<string, unknown>,
-  Record<string, unknown>
->
-export type ClientUpdateType = ClientFindByIdType & CreateClientRequest
-
 const create = async (
-  req: CreateClientRequest,
+  req: Request,
   res: Response,
   next: NextFunction
 ): Promise<void> => {
   try {
-    const { name, email, address } = req.body
-
-    zodClientSchema.parse({ name, email, address })
-
-    const client = new ClientModel({ name, email, address })
+    const parsedClient = createClientSchema.parse(req.body)
+    const client = new ClientModel(parsedClient)
 
     const newClient = await client.save()
 
-    res.status(201).json(newClient)
+    const returedClient = clientSchema.parse(newClient.toJSON())
+
+    res.status(201).json(returedClient)
   } catch (error: unknown) {
     next(error)
   }
 }
 
 const find = async (
-  req: unknown,
+  req: Request,
   res: Response,
   next: NextFunction
 ): Promise<void> => {
@@ -47,7 +35,7 @@ const find = async (
 }
 
 const findById = async (
-  req: ClientFindByIdType,
+  req: Request,
   res: Response,
   next: NextFunction
 ): Promise<void> => {
@@ -68,21 +56,20 @@ const findById = async (
 }
 
 const update = async (
-  req: ClientUpdateType,
+  req: Request,
   res: Response,
   next: NextFunction
 ): Promise<void> => {
   try {
     const { id } = req.params
-    const { name, email, address } = req.body
+    const updates = createClientSchema.partial().parse(req.body)
 
     const client = await ClientModel.findById(id)
 
     if (client !== null) {
-      zodClientSchema.parse({ name, email, address })
-      client.name = name
-      client.email = email
-      client.address = address
+      client.name = updates.name ?? client.name
+      client.email = updates.email ?? client.email
+      client.address = updates.address ?? client.address
 
       const updatedClient = await client.save()
 
@@ -99,7 +86,7 @@ const update = async (
 }
 
 const deleteById = async (
-  req: ClientFindByIdType,
+  req: Request,
   res: Response,
   next: NextFunction
 ): Promise<void> => {
