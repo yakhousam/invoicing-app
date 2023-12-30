@@ -1,26 +1,18 @@
-import { type Client } from '@/model/client'
 import InvoiceModel from '@/model/invoice'
-import { type User } from '@/model/user'
-import {
-  zodCreatInvoiceSchema,
-  zodUpdateInvoice,
-  type CreateInvoice,
-  type Invoice
-} from '@/validation'
+import { creatInvoiceSchema, updateInvoice, type Invoice } from '@/validation'
+import { type Client } from '@/validation/client'
+import { parseUserSchema, type User } from '@/validation/user'
 import { type NextFunction, type Request, type Response } from 'express'
 
 const create = async (
-  req: Request<null, null, CreateInvoice> & { user: User },
+  req: Request,
   res: Response,
   next: NextFunction
 ): Promise<void> => {
-  const user = req.user
+  const user = parseUserSchema.parse(req.user)
   try {
-    const parsedData = zodCreatInvoiceSchema.parse({
-      ...req.body,
-      user: user._id.toString()
-    })
-    const invoice = new InvoiceModel(parsedData)
+    const parsedData = creatInvoiceSchema.parse(req.body)
+    const invoice = new InvoiceModel({ ...parsedData, user: user._id })
     const newInvoice = await invoice.save()
     res.status(201).json(newInvoice)
   } catch (error: unknown) {
@@ -29,11 +21,11 @@ const create = async (
 }
 
 const find = async (
-  req: Request & { user: User },
+  req: Request,
   res: Response,
   next: NextFunction
 ): Promise<void> => {
-  const user = req.user
+  const user = parseUserSchema.parse(req.user)
   try {
     const invoices = await InvoiceModel.find({
       user: user._id
@@ -45,13 +37,13 @@ const find = async (
 }
 
 const findById = async (
-  req: Request<{ id: string }> & { user: User },
+  req: Request,
   res: Response,
   next: NextFunction
 ): Promise<void> => {
   try {
     const { id } = req.params
-    const user = req.user
+    const user = parseUserSchema.parse(req.user)
     const invoice = await InvoiceModel.findOne<Invoice>({
       _id: id,
       user: user._id
@@ -73,14 +65,14 @@ const findById = async (
 }
 
 const updateById = async (
-  req: Request<{ id: string }> & { user: User },
+  req: Request,
   res: Response,
   next: NextFunction
 ): Promise<void> => {
   try {
-    const data = zodUpdateInvoice.parse(req.body)
+    const data = updateInvoice.parse(req.body)
     const { id } = req.params
-    const user = req.user
+    const user = parseUserSchema.parse(req.user)
 
     const invoice = await InvoiceModel.findOneAndUpdate<Invoice>(
       {

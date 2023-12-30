@@ -1,26 +1,12 @@
-import { Types } from 'mongoose'
 import { z } from 'zod'
 
-export const zodInvoiceSchema = z.object({
+export const invoiceSchema = z.object({
+  _id: z.preprocess((val: any) => val.toString(), z.string()),
   invoiceNo: z.number(),
-  invoiceDate: z
-    .string()
-    .datetime()
-    .optional()
-    .transform((val) => {
-      return val !== undefined ? new Date(val) : new Date()
-    }),
+  invoiceDate: z.date(),
   invoiceDueDays: z.number().min(1).optional().default(7),
-  user: z
-    .string()
-    .min(24)
-    .max(24)
-    .transform((value) => new Types.ObjectId(value)),
-  client: z
-    .string()
-    .min(24)
-    .max(24)
-    .transform((value) => new Types.ObjectId(value)),
+  user: z.preprocess((val: any) => val?.toString(), z.string().min(24)),
+  client: z.preprocess((val: any) => val?.toString(), z.string().min(24)),
   items: z.array(
     z.object({
       itemName: z.string(),
@@ -29,16 +15,24 @@ export const zodInvoiceSchema = z.object({
     })
   ),
   totalAmount: z.number(),
-  paid: z.boolean()
+  paid: z.boolean(),
+  status: z.enum(['sent', 'paid', 'overdue']).default('sent')
 })
 
-export const zodCreatInvoiceSchema = zodInvoiceSchema
+export const invoiceArraySchema = z.array(invoiceSchema)
+
+export const creatInvoiceSchema = invoiceSchema
   .pick({
-    invoiceDate: true,
     invoiceDueDays: true,
     items: true,
-    client: true,
-    user: true
+    client: true
+  })
+  .extend({
+    invoiceDate: z
+      .string()
+      .datetime()
+      .optional()
+      .default(new Date().toISOString())
   })
   .refine(
     (data) => {
@@ -47,13 +41,17 @@ export const zodCreatInvoiceSchema = zodInvoiceSchema
     { message: 'Invoice must have at least one item.', path: ['items'] }
   )
 
-export const zodUpdateInvoice = zodInvoiceSchema
+export const updateInvoice = invoiceSchema
   .pick({
     invoiceDueDays: true,
-    invoiceDate: true,
     items: true
   })
   .extend({
+    invoiceDate: z
+      .string()
+      .datetime()
+      .optional()
+      .default(new Date().toISOString()),
     paid: z
       .boolean()
       .optional()
@@ -64,8 +62,8 @@ export const zodUpdateInvoice = zodInvoiceSchema
   })
   .partial()
 
-export type Invoice = z.infer<typeof zodInvoiceSchema> & { _id: string }
+export type Invoice = z.infer<typeof invoiceSchema>
 
-export type CreateInvoice = Omit<z.input<typeof zodCreatInvoiceSchema>, 'user'>
+export type CreateInvoice = z.input<typeof creatInvoiceSchema>
 
-export type UpdateInvoice = z.input<typeof zodUpdateInvoice>
+export type UpdateInvoice = z.input<typeof updateInvoice>

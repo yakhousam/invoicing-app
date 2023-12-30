@@ -2,7 +2,7 @@
 import invoiceController from '@/controllers/invoice'
 import ClientModel from '@/model/client'
 import InvoiceModel from '@/model/invoice'
-import UserModel, { type User } from '@/model/user'
+import UserModel from '@/model/user'
 import {
   buildNext,
   buildRes,
@@ -13,10 +13,12 @@ import {
   getProductPrice
 } from '@/utils/generate'
 import {
-  type CreateInvoice,
-  type Invoice,
-  type UpdateInvoice
+  invoiceArraySchema,
+  invoiceSchema,
+  type CreateInvoice
 } from '@/validation'
+import { clientSchema } from '@/validation/client'
+import { parseUserSchema } from '@/validation/user'
 import { type Request } from 'express'
 import { Error as MongooseError } from 'mongoose'
 import { ZodError } from 'zod'
@@ -28,11 +30,15 @@ describe('Invoice Controller', () => {
 
   describe('Create', () => {
     it('should create a new invoice', async () => {
-      const client = await ClientModel.create(getNewClient())
-      const user = await UserModel.create(getNewUser())
+      const client = clientSchema.parse(
+        (await ClientModel.create(getNewClient())).toJSON()
+      )
+      const user = parseUserSchema.parse(
+        (await UserModel.create(getNewUser())).toJSON()
+      )
 
       const mockInvoice: CreateInvoice = {
-        client: client._id.toString(),
+        client: client._id,
         items: Array(10)
           .fill(null)
           .map(() => ({
@@ -44,7 +50,7 @@ describe('Invoice Controller', () => {
       const req = {
         body: mockInvoice,
         user
-      } as unknown as Request<null, null, CreateInvoice> & { user: User }
+      } as unknown as Request
 
       const res = buildRes()
       const next = buildNext()
@@ -52,10 +58,12 @@ describe('Invoice Controller', () => {
       await invoiceController.create(req, res, next)
       expect(res.status).toHaveBeenCalledWith(201)
 
-      const jsonResponse = (res.json as jest.Mock).mock.calls[0][0] as Invoice
+      const jsonResponse = invoiceSchema.parse(
+        (res.json as jest.Mock).mock.calls[0][0]
+      )
 
-      expect(jsonResponse.client.toString()).toBe(mockInvoice.client)
-      expect(jsonResponse.user.toString()).toBe(user._id.toString())
+      expect(jsonResponse.client).toBe(mockInvoice.client)
+      expect(jsonResponse.user).toBe(user._id)
       expect(jsonResponse.items.length).toBe(mockInvoice.items.length)
       expect(jsonResponse.items).toEqual(
         expect.arrayContaining(
@@ -74,7 +82,7 @@ describe('Invoice Controller', () => {
     })
 
     it('should call next with ZodError error, invalid data', async () => {
-      const user = { ...getNewUser(), _id: '123456' }
+      const user = { ...getNewUser(), _id: getObjectId() }
       const mockInvoice: CreateInvoice = {
         client: '12456456',
         items: Array(10)
@@ -87,7 +95,7 @@ describe('Invoice Controller', () => {
       const req = {
         body: mockInvoice,
         user
-      } as unknown as Request<null, null, CreateInvoice> & { user: User }
+      } as unknown as Request
 
       const res = buildRes()
       const next = buildNext()
@@ -112,7 +120,7 @@ describe('Invoice Controller', () => {
       const req = {
         body: mockInvoice,
         user
-      } as unknown as Request<null, null, CreateInvoice> & { user: User }
+      } as unknown as Request
 
       const res = buildRes()
       const next = buildNext()
@@ -127,7 +135,6 @@ describe('Invoice Controller', () => {
       const user = { ...getNewUser(), _id: getObjectId() }
       const mockInvoice: CreateInvoice = {
         client: getObjectId(),
-
         items: Array(10)
           .fill(null)
           .map(() => ({
@@ -138,7 +145,7 @@ describe('Invoice Controller', () => {
       const req = {
         body: mockInvoice,
         user
-      } as unknown as Request<null, null, CreateInvoice> & { user: User }
+      } as unknown as Request
 
       const res = buildRes()
       const next = buildNext()
@@ -150,11 +157,15 @@ describe('Invoice Controller', () => {
     })
 
     it('should increment invoiceNo', async () => {
-      const client = await ClientModel.create(getNewClient())
-      const user = await UserModel.create(getNewUser())
+      const client = clientSchema.parse(
+        await ClientModel.create(getNewClient())
+      )
+      const user = parseUserSchema.parse(
+        (await UserModel.create(getNewUser())).toJSON()
+      )
 
       const mockInvoice: CreateInvoice = {
-        client: client._id.toString(),
+        client: client._id,
         items: Array(10)
           .fill(null)
           .map(() => ({
@@ -166,7 +177,7 @@ describe('Invoice Controller', () => {
       const req = {
         body: mockInvoice,
         user
-      } as unknown as Request<null, null, CreateInvoice> & { user: User }
+      } as unknown as Request
 
       const res = buildRes()
       const next = buildNext()
@@ -174,22 +185,30 @@ describe('Invoice Controller', () => {
       await invoiceController.create(req, res, next)
       expect(res.status).toHaveBeenCalledWith(201)
 
-      const jsonResponse = (res.json as jest.Mock).mock.calls[0][0] as Invoice
+      const jsonResponse = invoiceSchema.parse(
+        (res.json as jest.Mock).mock.calls[0][0]
+      )
       expect(jsonResponse.invoiceNo).toBe(1)
 
       await invoiceController.create(req, res, next)
       expect(res.status).toHaveBeenCalledWith(201)
 
-      const jsonResponse2 = (res.json as jest.Mock).mock.calls[1][0] as Invoice
+      const jsonResponse2 = invoiceSchema.parse(
+        (res.json as jest.Mock).mock.calls[1][0]
+      )
       expect(jsonResponse2.invoiceNo).toBe(2)
     })
 
     it('should start invoiceNo from 1, new year', async () => {
-      const client = await ClientModel.create(getNewClient())
-      const user = await UserModel.create(getNewUser())
+      const client = clientSchema.parse(
+        await ClientModel.create(getNewClient())
+      )
+      const user = parseUserSchema.parse(
+        (await UserModel.create(getNewUser())).toJSON()
+      )
 
       const mockInvoice: CreateInvoice = {
-        client: client._id.toString(),
+        client: client._id,
         invoiceDate: new Date('2021-12-31').toISOString(),
         items: Array(10)
           .fill(null)
@@ -202,7 +221,7 @@ describe('Invoice Controller', () => {
       const req = {
         body: mockInvoice,
         user
-      } as unknown as Request<null, null, CreateInvoice> & { user: User }
+      } as unknown as Request
 
       const res = buildRes()
       const next = buildNext()
@@ -210,7 +229,9 @@ describe('Invoice Controller', () => {
       await invoiceController.create(req, res, next)
       expect(res.status).toHaveBeenCalledWith(201)
 
-      const jsonResponse = (res.json as jest.Mock).mock.calls[0][0] as Invoice
+      const jsonResponse = invoiceSchema.parse(
+        (res.json as jest.Mock).mock.calls[0][0]
+      )
       expect(jsonResponse.invoiceNo).toBe(1)
 
       await InvoiceModel.deleteMany()
@@ -218,24 +239,32 @@ describe('Invoice Controller', () => {
       await invoiceController.create(req, res, next)
       expect(res.status).toHaveBeenCalledWith(201)
 
-      const jsonResponse2 = (res.json as jest.Mock).mock.calls[1][0] as Invoice
+      const jsonResponse2 = invoiceSchema.parse(
+        (res.json as jest.Mock).mock.calls[1][0]
+      )
       expect(jsonResponse2.invoiceNo).toBe(1)
     })
   })
 
   describe('Find', () => {
     it('should find all user invoices', async () => {
-      const client = await ClientModel.create(getNewClient())
-      const user1 = await UserModel.create(getNewUser())
-      const user2 = await UserModel.create(getNewUser())
+      const client = clientSchema.parse(
+        (await ClientModel.create(getNewClient())).toJSON()
+      )
+      const user1 = parseUserSchema.parse(
+        (await UserModel.create(getNewUser())).toJSON()
+      )
+      const user2 = parseUserSchema.parse(
+        (await UserModel.create(getNewUser())).toJSON()
+      )
 
       // Inject 10 invoices for user1 and 10 invoices for user2 to the database
       const expectedInvoices = await InvoiceModel.create(
         Array(10)
           .fill(null)
           .map(() => ({
-            user: user1._id.toString(),
-            client: client._id.toString(),
+            user: user1._id,
+            client: client._id,
             items: Array(10)
               .fill(null)
               .map(() => ({
@@ -248,8 +277,8 @@ describe('Invoice Controller', () => {
         Array(10)
           .fill(null)
           .map(() => ({
-            user: user2._id.toString(),
-            client: client._id.toString(),
+            user: user2._id,
+            client: client._id,
             items: Array(10)
               .fill(null)
               .map(() => ({
@@ -259,27 +288,34 @@ describe('Invoice Controller', () => {
           }))
       )
 
-      const req = { user: user1 } as unknown as Request & { user: User }
-
+      const req = { user: user1 } as unknown as Request
       const res = buildRes()
       const next = buildNext()
 
       await invoiceController.find(req, res, next)
+
       expect(res.status).toHaveBeenCalledWith(200)
-      const jsonResponse = (res.json as jest.Mock).mock.calls[0][0] as Invoice[]
+
+      const jsonResponse = invoiceArraySchema.parse(
+        (res.json as jest.Mock).mock.calls[0][0]
+      )
       expect(jsonResponse.length).toBe(expectedInvoices.length)
       // all returned invoices should belong to the user
       jsonResponse.forEach((invoice) => {
-        expect(invoice.user.toString()).toBe(user1._id.toString())
+        expect(invoice.user).toBe(user1._id)
       })
     })
 
     it('should find invoice by id', async () => {
-      const client = await ClientModel.create(getNewClient())
-      const user = await UserModel.create(getNewUser())
+      const client = clientSchema.parse(
+        (await ClientModel.create(getNewClient())).toJSON()
+      )
+      const user = parseUserSchema.parse(
+        (await UserModel.create(getNewUser())).toJSON()
+      )
 
       const mockInvoice: CreateInvoice = {
-        client: client._id.toString(),
+        client: client._id,
         items: Array(10)
           .fill(null)
           .map(() => ({
@@ -288,36 +324,44 @@ describe('Invoice Controller', () => {
           }))
       }
 
-      const expectedInvoice = await InvoiceModel.create({
-        ...mockInvoice,
-        user: user._id.toString()
-      })
+      const expectedInvoice = invoiceSchema.parse(
+        (
+          await InvoiceModel.create({
+            ...mockInvoice,
+            user: user._id
+          })
+        ).toJSON()
+      )
 
       const req = {
         params: {
-          id: expectedInvoice._id.toString()
+          id: expectedInvoice._id
         },
         user
-      } as unknown as Request<{ id: string }> & { user: User }
+      } as unknown as Request
 
       const res = buildRes()
       const next = buildNext()
 
       await invoiceController.findById(req, res, next)
       expect(res.status).toHaveBeenCalledWith(200)
-      const jsonResponse = (res.json as jest.Mock).mock.calls[0][0] as Invoice
-      expect(jsonResponse._id.toString()).toBe(expectedInvoice._id.toString())
+      const jsonResponse = invoiceSchema.parse(
+        (res.json as jest.Mock).mock.calls[0][0]
+      )
+      expect(jsonResponse._id).toBe(expectedInvoice._id)
     })
 
     it('should call next with error, invalid invoice id', async () => {
-      const user = await UserModel.create(getNewUser())
+      const user = parseUserSchema.parse(
+        (await UserModel.create(getNewUser())).toJSON()
+      )
 
       const req = {
         params: {
           id: 'invalid-id' // Invalid invoice id
         },
         user
-      } as unknown as Request<{ id: string }> & { user: User }
+      } as unknown as Request
 
       const res = buildRes()
       const next = buildNext()
@@ -329,12 +373,18 @@ describe('Invoice Controller', () => {
     })
 
     it('should call res with status 404, invoice not found', async () => {
-      const client = await ClientModel.create(getNewClient())
-      const user1 = await UserModel.create(getNewUser())
-      const user2 = await UserModel.create(getNewUser())
+      const client = clientSchema.parse(
+        (await ClientModel.create(getNewClient())).toJSON()
+      )
+      const user1 = parseUserSchema.parse(
+        (await UserModel.create(getNewUser())).toJSON()
+      )
+      const user2 = parseUserSchema.parse(
+        (await UserModel.create(getNewUser())).toJSON()
+      )
 
       const mockInvoice: CreateInvoice = {
-        client: client._id.toString(),
+        client: client._id,
         items: Array(10)
           .fill(null)
           .map(() => ({
@@ -345,15 +395,15 @@ describe('Invoice Controller', () => {
 
       const invoice = await InvoiceModel.create({
         ...mockInvoice,
-        user: user1._id.toString()
+        user: user1._id
       })
 
       const req = {
         params: {
-          id: invoice._id.toString()
+          id: invoice._id
         },
         user: user2
-      } as unknown as Request<{ id: string }> & { user: User }
+      } as unknown as Request
 
       const res = buildRes()
       const next = buildNext()
@@ -365,10 +415,14 @@ describe('Invoice Controller', () => {
   })
   describe('Invoice Status', () => {
     it('should return sent status', async () => {
-      const client = await ClientModel.create(getNewClient())
-      const user = await UserModel.create(getNewUser())
+      const client = clientSchema.parse(
+        (await ClientModel.create(getNewClient())).toJSON()
+      )
+      const user = parseUserSchema.parse(
+        (await UserModel.create(getNewUser())).toJSON()
+      )
       const mockInvoice: CreateInvoice = {
-        client: client._id.toString(),
+        client: client._id,
         items: Array(10)
           .fill(null)
           .map(() => ({
@@ -379,31 +433,40 @@ describe('Invoice Controller', () => {
         invoiceDueDays: 7
       }
 
-      const invoice = await InvoiceModel.create({
-        ...mockInvoice,
-        user: user._id.toString()
-      })
+      const invoice = invoiceSchema.parse(
+        (
+          await InvoiceModel.create({
+            ...mockInvoice,
+            user: user._id
+          })
+        ).toJSON()
+      )
       const res = buildRes()
       const next = buildNext()
       const req = {
         params: {
-          id: invoice._id.toString()
+          id: invoice._id
         },
         user
-      } as unknown as Request<{ id: string }> & { user: User }
+      } as unknown as Request
 
       await invoiceController.findById(req, res, next)
       expect(res.status).toHaveBeenCalledWith(200)
-      const jsonResponse = (res.json as jest.Mock).mock
-        .calls[0][0] as Invoice & { status: boolean }
+      const jsonResponse = invoiceSchema.parse(
+        (res.json as jest.Mock).mock.calls[0][0]
+      )
       expect(jsonResponse.status).toBe('sent')
     })
 
     it('should return paid status', async () => {
-      const client = await ClientModel.create(getNewClient())
-      const user = await UserModel.create(getNewUser())
+      const client = clientSchema.parse(
+        (await ClientModel.create(getNewClient())).toJSON()
+      )
+      const user = parseUserSchema.parse(
+        (await UserModel.create(getNewUser())).toJSON()
+      )
       const mockInvoice: CreateInvoice = {
-        client: client._id.toString(),
+        client: client._id,
         items: Array(10)
           .fill(null)
           .map(() => ({
@@ -414,32 +477,41 @@ describe('Invoice Controller', () => {
         invoiceDueDays: 7
       }
 
-      const invoice = await InvoiceModel.create({
-        ...mockInvoice,
-        paid: true,
-        user: user._id.toString()
-      })
+      const invoice = invoiceSchema.parse(
+        (
+          await InvoiceModel.create({
+            ...mockInvoice,
+            paid: true,
+            user: user._id
+          })
+        ).toJSON()
+      )
       const res = buildRes()
       const next = buildNext()
       const req = {
         params: {
-          id: invoice._id.toString()
+          id: invoice._id
         },
         user
-      } as unknown as Request<{ id: string }> & { user: User }
+      } as unknown as Request
 
       await invoiceController.findById(req, res, next)
       expect(res.status).toHaveBeenCalledWith(200)
-      const jsonResponse = (res.json as jest.Mock).mock
-        .calls[0][0] as Invoice & { status: boolean }
+      const jsonResponse = invoiceSchema.parse(
+        (res.json as jest.Mock).mock.calls[0][0]
+      )
       expect(jsonResponse.status).toBe('paid')
     })
 
     it('should return overdue status', async () => {
-      const client = await ClientModel.create(getNewClient())
-      const user = await UserModel.create(getNewUser())
+      const client = clientSchema.parse(
+        (await ClientModel.create(getNewClient())).toJSON()
+      )
+      const user = parseUserSchema.parse(
+        (await UserModel.create(getNewUser())).toJSON()
+      )
       const mockInvoice: CreateInvoice = {
-        client: client._id.toString(),
+        client: client._id,
         items: Array(10)
           .fill(null)
           .map(() => ({
@@ -452,30 +524,35 @@ describe('Invoice Controller', () => {
 
       const invoice = await InvoiceModel.create({
         ...mockInvoice,
-        user: user._id.toString()
+        user: user._id
       })
       const res = buildRes()
       const next = buildNext()
       const req = {
         params: {
-          id: invoice._id.toString()
+          id: invoice._id
         },
         user
-      } as unknown as Request<{ id: string }> & { user: User }
+      } as unknown as Request
 
       await invoiceController.findById(req, res, next)
       expect(res.status).toHaveBeenCalledWith(200)
-      const jsonResponse = (res.json as jest.Mock).mock
-        .calls[0][0] as Invoice & { status: boolean }
+      const jsonResponse = invoiceSchema.parse(
+        (res.json as jest.Mock).mock.calls[0][0]
+      )
       expect(jsonResponse.status).toBe('overdue')
     })
   })
   describe('Update', () => {
     it('should mark the invoice as paid', async () => {
-      const client = await ClientModel.create(getNewClient())
-      const user = await UserModel.create(getNewUser())
+      const client = clientSchema.parse(
+        (await ClientModel.create(getNewClient())).toJSON()
+      )
+      const user = parseUserSchema.parse(
+        (await UserModel.create(getNewUser())).toJSON()
+      )
       const mockInvoice: CreateInvoice = {
-        client: client._id.toString(),
+        client: client._id,
         items: Array(10)
           .fill(null)
           .map(() => ({
@@ -484,36 +561,44 @@ describe('Invoice Controller', () => {
           }))
       }
 
-      const invoice = await InvoiceModel.create({
-        ...mockInvoice,
-        user: user._id.toString()
-      })
+      const invoice = invoiceSchema.parse(
+        (
+          await InvoiceModel.create({
+            ...mockInvoice,
+            user: user._id
+          })
+        ).toJSON()
+      )
       const res = buildRes()
       const next = buildNext()
       const req = {
         params: {
-          id: invoice._id.toString()
+          id: invoice._id
         },
         body: {
           paid: true
         },
         user
-      } as unknown as Request<{ id: string }, null, UpdateInvoice> & {
-        user: User
-      }
+      } as unknown as Request
 
       await invoiceController.updateById(req, res, next)
       expect(res.status).toHaveBeenCalledWith(200)
-      const jsonResponse = (res.json as jest.Mock).mock.calls[0][0] as Invoice
+      const jsonResponse = invoiceSchema.parse(
+        (res.json as jest.Mock).mock.calls[0][0]
+      )
       expect(jsonResponse.paid).toBe(true)
     })
 
     it('should not allow to mark the invoice unpaid once it was paid', async () => {
-      const client = await ClientModel.create(getNewClient())
-      const user = await UserModel.create(getNewUser())
+      const client = clientSchema.parse(
+        (await ClientModel.create(getNewClient())).toJSON()
+      )
+      const user = parseUserSchema.parse(
+        (await UserModel.create(getNewUser())).toJSON()
+      )
       const mockInvoice = {
         paid: true,
-        client: client._id.toString(),
+        client: client._id,
         items: Array(10)
           .fill(null)
           .map(() => ({
@@ -522,21 +607,25 @@ describe('Invoice Controller', () => {
           }))
       }
 
-      const invoice = await InvoiceModel.create({
-        ...mockInvoice,
-        user: user._id.toString()
-      })
+      const invoice = invoiceSchema.parse(
+        (
+          await InvoiceModel.create({
+            ...mockInvoice,
+            user: user._id
+          })
+        ).toJSON()
+      )
       const res = buildRes()
       const next = buildNext()
       const req = {
         params: {
-          id: invoice._id.toString()
+          id: invoice._id
         },
         body: {
           paid: false
         },
         user
-      } as unknown as Request<{ id: string }> & { user: User }
+      } as unknown as Request
 
       await invoiceController.updateById(req, res, next)
       expect(next).toHaveBeenCalledTimes(1)
@@ -544,10 +633,14 @@ describe('Invoice Controller', () => {
     })
 
     it('should update invoice due days', async () => {
-      const client = await ClientModel.create(getNewClient())
-      const user = await UserModel.create(getNewUser())
+      const client = clientSchema.parse(
+        (await ClientModel.create(getNewClient())).toJSON()
+      )
+      const user = parseUserSchema.parse(
+        (await UserModel.create(getNewUser())).toJSON()
+      )
       const mockInvoice = {
-        client: client._id.toString(),
+        client: client._id,
         items: Array(10)
           .fill(null)
           .map(() => ({
@@ -556,35 +649,43 @@ describe('Invoice Controller', () => {
           }))
       }
 
-      const invoice = await InvoiceModel.create({
-        ...mockInvoice,
-        user: user._id.toString()
-      })
+      const invoice = invoiceSchema.parse(
+        (
+          await InvoiceModel.create({
+            ...mockInvoice,
+            user: user._id
+          })
+        ).toJSON()
+      )
       const res = buildRes()
       const next = buildNext()
       const req = {
         params: {
-          id: invoice._id.toString()
+          id: invoice._id
         },
         body: {
           invoiceDueDays: 10
         },
         user
-      } as unknown as Request<{ id: string }, null, UpdateInvoice> & {
-        user: User
-      }
+      } as unknown as Request
 
       await invoiceController.updateById(req, res, next)
       expect(res.status).toHaveBeenCalledWith(200)
-      const jsonResponse = (res.json as jest.Mock).mock.calls[0][0] as Invoice
+      const jsonResponse = invoiceSchema.parse(
+        (res.json as jest.Mock).mock.calls[0][0]
+      )
       expect(jsonResponse.invoiceDueDays).toBe(10)
     })
 
     it('should update invoice date', async () => {
-      const client = await ClientModel.create(getNewClient())
-      const user = await UserModel.create(getNewUser())
+      const client = clientSchema.parse(
+        (await ClientModel.create(getNewClient())).toJSON()
+      )
+      const user = parseUserSchema.parse(
+        (await UserModel.create(getNewUser())).toJSON()
+      )
       const mockInvoice = {
-        client: client._id.toString(),
+        client: client._id,
         items: Array(10)
           .fill(null)
           .map(() => ({
@@ -593,37 +694,43 @@ describe('Invoice Controller', () => {
           }))
       }
 
-      const invoice = await InvoiceModel.create({
-        ...mockInvoice,
-        user: user._id.toString()
-      })
+      const invoice = invoiceSchema.parse(
+        await InvoiceModel.create({
+          ...mockInvoice,
+          user: user._id
+        })
+      )
       const res = buildRes()
       const next = buildNext()
       const req = {
         params: {
-          id: invoice._id.toString()
+          id: invoice._id
         },
         body: {
           invoiceDate: new Date('2020-01-01').toISOString()
         },
         user
-      } as unknown as Request<{ id: string }, null, UpdateInvoice> & {
-        user: User
-      }
+      } as unknown as Request
 
       await invoiceController.updateById(req, res, next)
       expect(res.status).toHaveBeenCalledWith(200)
-      const jsonResponse = (res.json as jest.Mock).mock.calls[0][0] as Invoice
+      const jsonResponse = invoiceSchema.parse(
+        (res.json as jest.Mock).mock.calls[0][0]
+      )
       expect(jsonResponse.invoiceDate.toISOString()).toBe(
         '2020-01-01T00:00:00.000Z'
       )
     })
 
     it('should update invoice items', async () => {
-      const client = await ClientModel.create(getNewClient())
-      const user = await UserModel.create(getNewUser())
+      const client = clientSchema.parse(
+        (await ClientModel.create(getNewClient())).toJSON()
+      )
+      const user = parseUserSchema.parse(
+        (await UserModel.create(getNewUser())).toJSON()
+      )
       const mockInvoice = {
-        client: client._id.toString(),
+        client: client._id,
         items: Array(10)
           .fill(null)
           .map(() => ({
@@ -632,15 +739,19 @@ describe('Invoice Controller', () => {
           }))
       }
 
-      const invoice = await InvoiceModel.create({
-        ...mockInvoice,
-        user: user._id.toString()
-      })
+      const invoice = invoiceSchema.parse(
+        (
+          await InvoiceModel.create({
+            ...mockInvoice,
+            user: user._id
+          })
+        ).toJSON()
+      )
       const res = buildRes()
       const next = buildNext()
       const req = {
         params: {
-          id: invoice._id.toString()
+          id: invoice._id
         },
         body: {
           items: [
@@ -651,20 +762,22 @@ describe('Invoice Controller', () => {
           ]
         },
         user
-      } as unknown as Request<{ id: string }, null, UpdateInvoice> & {
-        user: User
-      }
+      } as unknown as Request
 
       await invoiceController.updateById(req, res, next)
       expect(res.status).toHaveBeenCalledWith(200)
-      const jsonResponse = (res.json as jest.Mock).mock.calls[0][0] as Invoice
+      const jsonResponse = invoiceSchema.parse(
+        (res.json as jest.Mock).mock.calls[0][0]
+      )
       expect(jsonResponse.items.length).toBe(1)
       expect(jsonResponse.items[0].itemName).toBe('test2')
       expect(jsonResponse.items[0].itemPrice).toBe(20)
     })
 
     it('should call next with error, invalid invoice id', async () => {
-      const user = await UserModel.create(getNewUser())
+      const user = parseUserSchema.parse(
+        (await UserModel.create(getNewUser())).toJSON()
+      )
 
       const req = {
         params: {
@@ -674,7 +787,7 @@ describe('Invoice Controller', () => {
           paid: true
         },
         user
-      } as unknown as Request<{ id: string }> & { user: User }
+      } as unknown as Request
 
       const res = buildRes()
       const next = buildNext()
@@ -686,12 +799,18 @@ describe('Invoice Controller', () => {
     })
 
     it('should call res with status 404, invoice not found', async () => {
-      const client = await ClientModel.create(getNewClient())
-      const user1 = await UserModel.create(getNewUser())
-      const user2 = await UserModel.create(getNewUser())
+      const client = clientSchema.parse(
+        (await ClientModel.create(getNewClient())).toJSON()
+      )
+      const user1 = parseUserSchema.parse(
+        (await UserModel.create(getNewUser())).toJSON()
+      )
+      const user2 = parseUserSchema.parse(
+        (await UserModel.create(getNewUser())).toJSON()
+      )
 
       const mockInvoice: CreateInvoice = {
-        client: client._id.toString(),
+        client: client._id,
         items: Array(10)
           .fill(null)
           .map(() => ({
@@ -700,20 +819,24 @@ describe('Invoice Controller', () => {
           }))
       }
 
-      const invoice = await InvoiceModel.create({
-        ...mockInvoice,
-        user: user1._id.toString()
-      })
+      const invoice = invoiceSchema.parse(
+        (
+          await InvoiceModel.create({
+            ...mockInvoice,
+            user: user1._id
+          })
+        ).toJSON()
+      )
 
       const req = {
         params: {
-          id: invoice._id.toString()
+          id: invoice._id
         },
         body: {
           paid: true
         },
         user: user2
-      } as unknown as Request<{ id: string }> & { user: User }
+      } as unknown as Request
 
       const res = buildRes()
       const next = buildNext()
@@ -724,11 +847,15 @@ describe('Invoice Controller', () => {
     })
 
     it('should not update user and client fields', async () => {
-      const client = await ClientModel.create(getNewClient())
-      const user = await UserModel.create(getNewUser())
+      const client = clientSchema.parse(
+        (await ClientModel.create(getNewClient())).toJSON()
+      )
+      const user = parseUserSchema.parse(
+        (await UserModel.create(getNewUser())).toJSON()
+      )
       const mockInvoice = {
-        client: client._id.toString(),
-        user: user._id.toString(),
+        client: client._id,
+        user: user._id,
         items: Array(10)
           .fill(null)
           .map(() => ({
@@ -737,27 +864,29 @@ describe('Invoice Controller', () => {
           }))
       }
 
-      const invoice = await InvoiceModel.create(mockInvoice)
+      const invoice = invoiceSchema.parse(
+        (await InvoiceModel.create(mockInvoice)).toJSON()
+      )
       const res = buildRes()
       const next = buildNext()
       const req = {
         params: {
-          id: invoice._id.toString()
+          id: invoice._id
         },
         body: {
           client: 'new client id',
           user: 'new user id'
         },
         user
-      } as unknown as Request<{ id: string }, null, UpdateInvoice> & {
-        user: User
-      }
+      } as unknown as Request
 
       await invoiceController.updateById(req, res, next)
       expect(res.status).toHaveBeenCalledWith(200)
-      const jsonResponse = (res.json as jest.Mock).mock.calls[0][0] as Invoice
-      expect(jsonResponse.client.toString()).toBe(client._id.toString())
-      expect(jsonResponse.user.toString()).toBe(user._id.toString())
+      const jsonResponse = invoiceSchema.parse(
+        (res.json as jest.Mock).mock.calls[0][0]
+      )
+      expect(jsonResponse.client).toBe(client._id)
+      expect(jsonResponse.user).toBe(user._id)
     })
   })
 })

@@ -1,7 +1,9 @@
 import { type Invoice } from '@/validation'
 import { Schema, model, type Document } from 'mongoose'
 
-const mongooseInvoiceSchema = new Schema<Invoice & Document>(
+type InvoiceDocument = Invoice & Document
+
+const InvoiceSchema = new Schema<InvoiceDocument>(
   {
     invoiceNo: {
       type: Number
@@ -14,13 +16,13 @@ const mongooseInvoiceSchema = new Schema<Invoice & Document>(
       type: Number
     },
     user: {
-      type: Schema.Types.ObjectId,
+      type: String,
       required: true,
       ref: 'User',
       immutable: true
     },
     client: {
-      type: Schema.Types.ObjectId,
+      type: String,
       required: true,
       ref: 'Client',
       immutable: true
@@ -43,33 +45,20 @@ const mongooseInvoiceSchema = new Schema<Invoice & Document>(
       default: false
     }
   },
-  {
-    timestamps: true,
-    toJSON: {
-      virtuals: true,
-      transform(doc, ret, options) {
-        delete ret.id
-        delete ret.user.password
-        ret.items.forEach((item: { id: any }) => {
-          delete item.id
-        })
-        return ret
-      }
-    }
-  }
+  { timestamps: true }
 )
 
-mongooseInvoiceSchema.path('user').validate(async (value) => {
+InvoiceSchema.path('user').validate(async (value) => {
   const user = await model('User').findById(value)
   return user !== null
 }, 'Invalid User Id')
 
-mongooseInvoiceSchema.path('client').validate(async (value) => {
+InvoiceSchema.path('client').validate(async (value) => {
   const client = await model('Client').findById(value)
   return client !== null
 }, 'Invalid Client Id')
 
-mongooseInvoiceSchema.pre('save', async function (next) {
+InvoiceSchema.pre('save', async function (next) {
   if (this.invoiceNo === undefined) {
     const currentYear = new Date().getFullYear()
     const countCurrentYearInvoices = await (
@@ -94,7 +83,7 @@ mongooseInvoiceSchema.pre('save', async function (next) {
   next()
 })
 
-mongooseInvoiceSchema.virtual('status').get(function () {
+InvoiceSchema.virtual('status').get(function () {
   const today = new Date()
   if (this.paid) {
     return 'paid'
@@ -110,6 +99,6 @@ mongooseInvoiceSchema.virtual('status').get(function () {
   }
 })
 
-const InvoiceModel = model<Invoice & Document>('Invoice', mongooseInvoiceSchema)
+const InvoiceModel = model<InvoiceDocument>('Invoice', InvoiceSchema)
 
 export default InvoiceModel

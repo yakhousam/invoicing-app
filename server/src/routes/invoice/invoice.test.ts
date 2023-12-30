@@ -1,17 +1,16 @@
-import InvoiceModel, { type Invoice } from '@/model/invoice'
-import { type ReturnedUser } from '@/routes/auth/auth.test'
-import { type ReturnedClient } from '@/routes/client/client.test'
+import InvoiceModel from '@/model/invoice'
 import { getCredentials, getNewClient } from '@/utils/generate'
 import startServer, { type Server } from '@/utils/server'
+import { invoiceSchema, type Invoice } from '@/validation'
+import { clientSchema, type Client } from '@/validation/client'
+import { type User } from '@/validation/user'
 import axios from 'axios'
 
 const PORT = 3012
 
-export type ReturnedInvoice = Invoice & { _id: string }
-
 describe('Invoice', () => {
   let server: Server
-  let user: ReturnedUser
+  let user: User
   const api = axios.create({ baseURL: `http://localhost:${PORT}/api/v1` })
   beforeAll(async () => {
     server = await startServer(PORT)
@@ -29,12 +28,11 @@ describe('Invoice', () => {
   })
 
   it('should create an invoice', async () => {
-    const client = await api.post<ReturnedClient>(
-      '/clients/create',
-      getNewClient()
+    const client = clientSchema.parse(
+      (await api.post<Client>('/clients/create', getNewClient())).data
     )
-    const invoice = await api.post<ReturnedInvoice>('/invoices/create', {
-      client: client.data._id,
+    const invoiceResponse = await api.post<Invoice>('/invoices/create', {
+      client: client._id,
       user: user._id,
       items: [
         {
@@ -47,21 +45,20 @@ describe('Invoice', () => {
         }
       ]
     })
-    expect(invoice.status).toBe(201)
-    expect(invoice.data).toHaveProperty('_id')
-    expect(invoice.data).toHaveProperty('client')
-    expect(invoice.data).toHaveProperty('user')
-    expect(invoice.data).toHaveProperty('items')
-    expect(invoice.data).toHaveProperty('totalAmount')
-    expect(invoice.data.totalAmount).toBe(30)
+    expect(invoiceResponse.status).toBe(201)
+    const invoice = invoiceSchema.parse(invoiceResponse.data)
+    expect(invoice).toHaveProperty('_id')
+    expect(invoice.client).toBe(client._id)
+    expect(invoice.user).toBe(user._id)
+    expect(invoice.items.length).toBe(2)
+    expect(invoice.totalAmount).toBe(30)
+    expect(invoice.paid).toBe(false)
+    expect(invoice.status).toBe('sent')
   })
 
   it('should return all invoices', async () => {
-    const client = await api.post<ReturnedClient>(
-      '/clients/create',
-      getNewClient()
-    )
-    await api.post<ReturnedInvoice>('/invoices/create', {
+    const client = await api.post<Client>('/clients/create', getNewClient())
+    await api.post<Invoice>('/invoices/create', {
       client: client.data._id,
       user: user._id,
       items: [
@@ -75,7 +72,7 @@ describe('Invoice', () => {
         }
       ]
     })
-    await api.post<ReturnedInvoice>('/invoices/create', {
+    await api.post<Invoice>('/invoices/create', {
       client: client.data._id,
       user: user._id,
       items: [
