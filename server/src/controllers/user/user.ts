@@ -1,11 +1,12 @@
 import InvoiceModel from '@/model/invoice'
-import UserModel, { type User } from '@/model/user'
+import UserModel from '@/model/user'
+import { type UpdateUser } from '@/validation/user'
 import { type NextFunction, type Request, type Response } from 'express'
 
 export type UserUpdateType = Request<
   { id: string },
   Record<string, unknown>,
-  User
+  UpdateUser
 >
 
 const find = async (
@@ -73,7 +74,7 @@ const findInvoices = async (
 //     const user = await UserModel.findById(id)
 
 //     if (user !== null) {
-//       zodUserShema.parse({ name, email, password })
+//       userShema.parse({ name, email, password })
 //       user.name = name
 //       user.email = email
 //       user.password = password

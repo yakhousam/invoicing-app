@@ -1,14 +1,14 @@
 import UserModel from '@/model/user'
 import { getCredentials, getNewUser } from '@/utils/generate'
 import startServer, { type Server } from '@/utils/server'
+import { type User } from '@/validation/user'
 import axios from 'axios'
-import { type ReturnedUser } from '../auth/auth.test'
 
 const PORT = 3013
 
 describe('user', () => {
   let server: Server
-  let user: ReturnedUser
+  let user: User
 
   const api = axios.create({ baseURL: `http://localhost:${PORT}/api/v1` })
 

@@ -1,20 +1,10 @@
+import { type User } from '@/validation/user'
 import bcrypt from 'bcrypt'
 import { Schema, model, type Document, type Model } from 'mongoose'
-import { z } from 'zod'
 
-export const zodUserShema = z.object({
-  name: z.string(),
-  email: z.string().email(),
-  password: z.string().min(6),
-  role: z
-    .union([z.literal('admin'), z.literal('user')])
-    .default('user')
-    .optional()
-})
+type UserDocument = User & Document
 
-export type User = z.infer<typeof zodUserShema> & Document
-
-export const mongooseUserSchema = new Schema<User>(
+export const UserSchema = new Schema<UserDocument>(
   {
     name: { type: String, required: true, unique: true },
     email: {
@@ -25,27 +15,20 @@ export const mongooseUserSchema = new Schema<User>(
     password: { type: String, required: true },
     role: { type: String, enum: ['admin', 'user'], default: 'user' }
   },
-  {
-    toJSON: {
-      transform(doc, ret, options) {
-        delete ret.password
-        return ret
-      }
-    }
-  }
+  { timestamps: true }
 )
 
-mongooseUserSchema.path('name').validate(async (value) => {
+UserSchema.path('name').validate(async (value: string) => {
   const user = await model<User>('User').findOne({ name: value })
   return user === null
 }, 'Duplicated name')
 
-mongooseUserSchema.path('email').validate(async (value) => {
+UserSchema.path('email').validate(async (value: string) => {
   const user = await model<User>('User').findOne({ email: value })
   return user === null
 }, 'Duplicated email')
 
-mongooseUserSchema.pre('save', function (next) {
+UserSchema.pre('save', function (next) {
   if (this.isModified('password')) {
     bcrypt.hash(this.password, 12, (err, hashedPassword) => {
       if (err !== undefined) {
@@ -58,7 +41,7 @@ mongooseUserSchema.pre('save', function (next) {
   }
 })
 
-mongooseUserSchema.methods.isValidPassword = async function (password: string) {
+UserSchema.methods.isValidPassword = async function (password: string) {
   const compare = await bcrypt.compare(password, this.password)
   return compare
 }
@@ -67,8 +50,8 @@ type UserMethods = {
   isValidPassword: (password: string) => Promise<boolean>
 }
 
-type UserModel = Model<User, Record<string, unknown>, UserMethods>
+type UserModel = Model<UserDocument, Record<string, unknown>, UserMethods>
 
-const userModel = model<User, UserModel>('User', mongooseUserSchema)
+const userModel = model<UserDocument, UserModel>('User', UserSchema)
 
 export default userModel

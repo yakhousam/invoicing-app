@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/unbound-method */
 import userController from '@/controllers/user'
 import ClientModel from '@/model/client'
-import InvoiceModel, { type Invoice } from '@/model/invoice'
+import InvoiceModel from '@/model/invoice'
 import UserModel from '@/model/user'
 import {
   buildNext,
@@ -11,7 +11,7 @@ import {
   getProductName,
   getProductPrice
 } from '@/utils/generate'
-import { type CreateInvoice } from '@/validation/invoice'
+import { type CreateInvoice, type Invoice } from '@/validation/invoice'
 import { type Request } from 'express'
 import { Error as MongooseError } from 'mongoose'
 
