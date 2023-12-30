@@ -1,9 +1,10 @@
-import UserModel, { zodUserShema, type User } from '@/model/user'
+import UserModel from '@/model/user'
+import { createUserSchema, parseUserSchema } from '@/validation/user'
 import { type NextFunction, type Request, type Response } from 'express'
 import jwt from 'jsonwebtoken'
 import passport from 'passport'
 import { Strategy as JwtStrategy, type VerifiedCallback } from 'passport-jwt'
-import { Strategy as LocalStrategy, type IVerifyOptions } from 'passport-local'
+import { Strategy as LocalStrategy } from 'passport-local'
 
 const JWT_SECRET =
   process.env.JWT_SECRET ?? 'rNgc3v7NxYenUVFoI1AbqH82AIDItLpSPWcmXeC4qPo='
@@ -23,20 +24,14 @@ const cookieExtractor = (req: {
   return token
 }
 
-export type AuthSignupRequest = Request<
-  Record<string, unknown>,
-  Record<string, unknown>,
-  User
->
-
 const signup = async (
-  req: AuthSignupRequest,
-  res: Response<Omit<User, 'password'>>,
+  req: Request,
+  res: Response,
   next: NextFunction
 ): Promise<void> => {
   try {
-    zodUserShema.parse(req.body)
-    const user = new UserModel(req.body)
+    const parsedUser = createUserSchema.parse(req.body)
+    const user = new UserModel(parsedUser)
     const newUser = await user.save()
     const token = generateToken({ sub: newUser._id })
     res.cookie('token', token, {
@@ -44,8 +39,8 @@ const signup = async (
       secure: true,
       sameSite: 'none'
     })
-    const { password, ...userWithoutPassword } = newUser.toJSON()
-    res.status(201).json(userWithoutPassword)
+    const returnedUser = parseUserSchema.parse(newUser.toJSON())
+    res.status(201).json(returnedUser)
   } catch (error) {
     next(error)
   }
@@ -53,7 +48,7 @@ const signup = async (
 
 const signin = (req: Request, res: Response, next: NextFunction): void => {
   try {
-    const user = req.user as User
+    const user = parseUserSchema.parse(req.user)
     const token = generateToken({ sub: user._id })
     res.cookie('token', token, {
       httpOnly: true,
@@ -101,7 +96,8 @@ async function jwtStrategyVerifyFunction(
     if (user === null) {
       done(null, false)
     } else {
-      done(null, user)
+      const returnedUser = parseUserSchema.parse(user.toJSON())
+      done(null, returnedUser)
     }
   } catch (error) {
     done(error, false)
@@ -111,11 +107,7 @@ async function jwtStrategyVerifyFunction(
 async function localStrategyVerifyFunction(
   name: string,
   password: string,
-  done: (
-    error: any,
-    user?: false | Omit<User, 'password'> | undefined,
-    options?: IVerifyOptions | undefined
-  ) => void
+  done: VerifiedCallback
 ): Promise<void> {
   try {
     const user = await UserModel.findOne({ name })
@@ -128,7 +120,8 @@ async function localStrategyVerifyFunction(
       done(null, false, { message: 'Incorrect password.' })
       return
     }
-    done(null, user, { message: 'Logged in Successfully' })
+    const returnedUser = parseUserSchema.parse(user.toJSON())
+    done(null, returnedUser, { message: 'Logged in Successfully' })
   } catch (error) {
     done(error)
   }

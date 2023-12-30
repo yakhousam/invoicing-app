@@ -1,9 +1,8 @@
-import userModel, { type User } from '@/model/user'
+import userModel from '@/model/user'
 import { getNewUser } from '@/utils/generate'
 import startServer, { type Server } from '@/utils/server'
+import { type User } from '@/validation/user'
 import axios from 'axios'
-
-export type ReturnedUser = User & { _id: string }
 
 const PORT = 3010
 
@@ -27,7 +26,7 @@ describe('auth', () => {
     it('should signup a new user and return the user object', async () => {
       const api = axios.create({ baseURL })
       const user = getNewUser()
-      const response = await api.post<ReturnedUser>('/auth/signup', user)
+      const response = await api.post<User>('/auth/signup', user)
       expect(response.status).toBe(201)
       const returnedUser = response.data
       expect(returnedUser).toHaveProperty('_id')
@@ -53,7 +52,7 @@ describe('auth', () => {
       const user = getNewUser()
       // await api.post('/auth/signup', user)
       await userModel.create(user)
-      const response = await api.post<ReturnedUser>('/auth/signin', {
+      const response = await api.post<User>('/auth/signin', {
         name: user.name,
         password: user.password
       })

@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/unbound-method */
-import authController, { type AuthSignupRequest } from '@/controllers/auth'
-import UserModel, { type User } from '@/model/user'
-import { buildNext, buildRes, getNewUser, getObjectId } from '@/utils/generate'
+import authController from '@/controllers/auth'
+import UserModel from '@/model/user'
+import { buildNext, buildRes, getNewUser } from '@/utils/generate'
+import { parseUserSchema } from '@/validation/user'
 import { type Request } from 'express'
 import { Error as MongooseError } from 'mongoose'
 import { ZodError } from 'zod'
@@ -10,10 +11,9 @@ describe('Auth Controller', () => {
   describe('Signup', () => {
     it('should signup a new user', async () => {
       const mockUser = getNewUser()
-
       const req = {
         body: mockUser
-      } as unknown as AuthSignupRequest
+      } as unknown as Request
 
       const res = buildRes()
       const next = buildNext()
@@ -27,7 +27,9 @@ describe('Auth Controller', () => {
         sameSite: 'none'
       })
 
-      const user = (res.json as jest.Mock).mock.calls[0][0] as User
+      const user = parseUserSchema.parse(
+        (res.json as jest.Mock).mock.calls[0][0]
+      )
       expect(user.name).toBe(mockUser.name)
       expect(user.email).toBe(mockUser.email)
       expect(user).not.toHaveProperty('password')
@@ -41,7 +43,7 @@ describe('Auth Controller', () => {
           ...getNewUser(),
           name: undefined
         }
-      } as unknown as AuthSignupRequest
+      } as unknown as Request
 
       const res = buildRes()
       const next = buildNext()
@@ -58,7 +60,7 @@ describe('Auth Controller', () => {
           ...getNewUser(),
           email: 'invalid email'
         }
-      } as unknown as AuthSignupRequest
+      } as unknown as Request
 
       const res = buildRes()
       const next = buildNext()
@@ -77,7 +79,7 @@ describe('Auth Controller', () => {
         body: {
           ...mockUser
         }
-      } as unknown as AuthSignupRequest
+      } as unknown as Request
 
       const res = buildRes()
       const next = buildNext()
@@ -90,16 +92,15 @@ describe('Auth Controller', () => {
   })
 
   describe('singin', () => {
-    it('should signin a user', async () => {
+    it('should sign a token and return user object', async () => {
+      // The authController.signin function is invoked by passport.js upon successful sign-in.
+      // Its sole responsibility is to generate a token, place it in a cookie, and send the user in JSON format.
+
       const mockUser = getNewUser()
-      await UserModel.create(mockUser)
+      const createdUser = await UserModel.create(mockUser)
 
       const req = {
-        user: {
-          _id: getObjectId(),
-          email: mockUser.email,
-          name: mockUser.name
-        }
+        user: parseUserSchema.parse(createdUser.toJSON())
       } as unknown as Request
 
       const res = buildRes()
@@ -114,7 +115,9 @@ describe('Auth Controller', () => {
         sameSite: 'none'
       })
 
-      const user = (res.json as jest.Mock).mock.calls[0][0] as User
+      const user = parseUserSchema.parse(
+        (res.json as jest.Mock).mock.calls[0][0]
+      )
 
       expect(user.name).toBe(mockUser.name)
       expect(user.email).toBe(mockUser.email)

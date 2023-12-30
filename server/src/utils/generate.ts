@@ -1,14 +1,10 @@
 import { type Role } from '@/middlewars/role'
-import { type Client } from '@/model/client'
-import { type User } from '@/model/user'
-import { type ReturnedUser } from '@/routes/auth/auth.test'
+import { type CreateClient } from '@/validation/client'
+import { type CreateUser, type User } from '@/validation/user'
 import { faker } from '@faker-js/faker'
 import axios from 'axios'
 import { type NextFunction, type Response } from 'express'
 
-export const getName = (): string => faker.person.fullName()
-export const getEmail = (): string => faker.internet.email()
-export const getAdress = (): string => faker.location.streetAddress()
 export const getObjectId = (): string => faker.database.mongodbObjectId()
 export const getPassword = (): string => faker.internet.password()
 export const getProductName = (): string => faker.commerce.productName()
@@ -29,15 +25,13 @@ export function buildNext(): NextFunction {
   return jest.fn().mockName('next') as unknown as NextFunction
 }
 
-export const getNewClient = (): Pick<Client, 'name' | 'email' | 'address'> => ({
+export const getNewClient = (): CreateClient => ({
   name: faker.person.fullName(),
   email: faker.internet.email(),
   address: faker.location.streetAddress()
 })
 
-export const getNewUser = (
-  role?: Role
-): Pick<User, 'name' | 'email' | 'password' | 'role'> => ({
+export const getNewUser = (role?: Role): CreateUser => ({
   name: faker.person.fullName(),
   email: faker.internet.email(),
   password: faker.internet.password(),
@@ -47,10 +41,10 @@ export const getNewUser = (
 export const getCredentials = async (
   port: number,
   role?: Role
-): Promise<{ cookie: string; user: ReturnedUser }> => {
+): Promise<{ cookie: string; user: User }> => {
   const api = axios.create({ baseURL: `http://localhost:${port}/api/v1` })
   const user = getNewUser(role)
-  const response = await api.post<ReturnedUser>('/auth/signup', user)
+  const response = await api.post<User>('/auth/signup', user)
   const cookies = response.headers['set-cookie']
   const token = cookies
     ?.find((cookie) => cookie.includes('token'))
