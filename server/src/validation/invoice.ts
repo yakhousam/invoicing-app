@@ -1,69 +1,63 @@
 import { z } from 'zod'
+import { clientSchema } from './client'
+import { dateToZodDatetime, objectIdSchema, objectIdToString } from './common'
+import { userShema } from './user'
+
+const itemSchema = z.object({
+  _id: objectIdToString,
+  itemName: z.string(),
+  itemPrice: z.coerce.number().positive(),
+  itemQuantity: z.coerce.number().positive().optional().default(1)
+})
 
 export const invoiceSchema = z.object({
-  _id: z.preprocess((val: any) => val.toString(), z.string()),
+  _id: objectIdToString,
   invoiceNo: z.number(),
-  invoiceDate: z.date(),
-  invoiceDueDays: z.number().min(1).optional().default(7),
-  user: z.preprocess((val: any) => val?.toString(), z.string().min(24)),
-  client: z.preprocess((val: any) => val?.toString(), z.string().min(24)),
-  items: z.array(
-    z.object({
-      itemName: z.string(),
-      itemPrice: z.coerce.number().positive(),
-      itemQuantity: z.coerce.number().positive().optional().default(1)
-    })
-  ),
+  invoiceDate: dateToZodDatetime,
+  invoiceDueDays: z.number(),
+  user: userShema.omit({ password: true }),
+  client: clientSchema,
+  items: z.array(itemSchema),
   totalAmount: z.number(),
   paid: z.boolean(),
-  status: z.enum(['sent', 'paid', 'overdue']).default('sent')
+  status: z.enum(['sent', 'paid', 'overdue']),
+  createdAt: dateToZodDatetime,
+  updatedAt: dateToZodDatetime
 })
 
 export const invoiceArraySchema = z.array(invoiceSchema)
 
-export const creatInvoiceSchema = invoiceSchema
-  .pick({
-    invoiceDueDays: true,
-    items: true,
-    client: true
-  })
-  .extend({
-    invoiceDate: z
-      .string()
-      .datetime()
-      .optional()
-      .default(new Date().toISOString())
-  })
-  .refine(
-    (data) => {
-      return data.items.length !== 0
-    },
-    { message: 'Invoice must have at least one item.', path: ['items'] }
-  )
+export const creatInvoiceSchema = z.object({
+  invoiceDate: z
+    .string()
+    .datetime()
+    .optional()
+    .default(new Date().toISOString()),
+  invoiceDueDays: z.number().min(1).optional().default(7),
+  items: z
+    .array(itemSchema.omit({ _id: true }))
+    .refine((items) => items.length !== 0, {
+      message: 'Invoice must have at least one item.',
+      path: ['items']
+    }),
+  client: objectIdSchema
+})
 
-export const updateInvoice = invoiceSchema
-  .pick({
-    invoiceDueDays: true,
-    items: true
-  })
+export const updateInvoice = creatInvoiceSchema
+  .omit({ client: true })
+  .partial()
   .extend({
-    invoiceDate: z
-      .string()
-      .datetime()
-      .optional()
-      .default(new Date().toISOString()),
     paid: z
       .boolean()
       .optional()
-      .refine((value) => value, {
+      .refine((value) => value === true || value === undefined, {
         message: 'Paid status can only be set to true.',
         path: ['paid']
       })
   })
-  .partial()
 
 export type Invoice = z.infer<typeof invoiceSchema>
 
 export type CreateInvoice = z.input<typeof creatInvoiceSchema>
 
-export type UpdateInvoice = z.input<typeof updateInvoice>
+export type UpdateInvoice = z.infer<typeof updateInvoice>

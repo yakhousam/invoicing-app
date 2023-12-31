@@ -1,5 +1,11 @@
 import InvoiceModel from '@/model/invoice'
-import { creatInvoiceSchema, updateInvoice, type Invoice } from '@/validation'
+import {
+  creatInvoiceSchema,
+  invoiceArraySchema,
+  invoiceSchema,
+  updateInvoice,
+  type Invoice
+} from '@/validation'
 import { type Client } from '@/validation/client'
 import { parseUserSchema, type User } from '@/validation/user'
 import { type NextFunction, type Request, type Response } from 'express'
@@ -9,12 +15,24 @@ const create = async (
   res: Response,
   next: NextFunction
 ): Promise<void> => {
-  const user = parseUserSchema.parse(req.user)
   try {
-    const parsedData = creatInvoiceSchema.parse(req.body)
-    const invoice = new InvoiceModel({ ...parsedData, user: user._id })
-    const newInvoice = await invoice.save()
-    res.status(201).json(newInvoice)
+    const authenticatedUser = parseUserSchema.parse(req.user)
+    const parsedInvoiceData = creatInvoiceSchema.parse(req.body)
+    const newInvoice = new InvoiceModel({
+      ...parsedInvoiceData,
+      user: authenticatedUser._id
+    })
+    const savedInvoice = await newInvoice.save()
+
+    const populatedInvoice = await InvoiceModel.findById(savedInvoice._id)
+      .populate('user', '-password')
+      .populate('client')
+
+    if (populatedInvoice === null) {
+      throw new Error('Invoice not found')
+    }
+    const jsonResponse = invoiceSchema.parse(populatedInvoice.toJSON())
+    res.status(201).json(jsonResponse)
   } catch (error: unknown) {
     next(error)
   }
@@ -25,12 +43,15 @@ const find = async (
   res: Response,
   next: NextFunction
 ): Promise<void> => {
-  const user = parseUserSchema.parse(req.user)
   try {
+    const authenticatedUser = parseUserSchema.parse(req.user)
     const invoices = await InvoiceModel.find({
-      user: user._id
+      user: authenticatedUser._id
     })
-    res.status(200).json(invoices)
+      .populate<{ user: User }>('user', '-password')
+      .populate<{ client: Client }>('client')
+    const jsonResponse = invoiceArraySchema.parse(invoices)
+    res.status(200).json(jsonResponse)
   } catch (error: unknown) {
     next(error)
   }
@@ -43,12 +64,12 @@ const findById = async (
 ): Promise<void> => {
   try {
     const { id } = req.params
-    const user = parseUserSchema.parse(req.user)
+    const authenticatedUser = parseUserSchema.parse(req.user)
     const invoice = await InvoiceModel.findOne<Invoice>({
       _id: id,
-      user: user._id
+      user: authenticatedUser._id
     })
-      .populate<{ user: User }>('user')
+      .populate<{ user: User }>('user', '-password')
       .populate<{ client: Client }>('client')
 
     if (invoice === null) {
@@ -58,7 +79,8 @@ const findById = async (
       })
       return
     }
-    res.status(200).json(invoice)
+    const jsonResponse = invoiceSchema.parse(invoice)
+    res.status(200).json(jsonResponse)
   } catch (error: unknown) {
     next(error)
   }
@@ -72,16 +94,19 @@ const updateById = async (
   try {
     const data = updateInvoice.parse(req.body)
     const { id } = req.params
-    const user = parseUserSchema.parse(req.user)
+    const authenticatedUser = parseUserSchema.parse(req.user)
 
     const invoice = await InvoiceModel.findOneAndUpdate<Invoice>(
       {
         _id: id,
-        user: user._id
+        user: authenticatedUser._id
       },
       data,
       { new: true }
     )
+      .populate<{ user: User }>('user', '-password')
+      .populate<{ client: Client }>('client')
+
     if (invoice === null) {
       res.status(404).json({
         error: 'Not found',
@@ -89,7 +114,9 @@ const updateById = async (
       })
       return
     }
-    res.status(200).json(invoice)
+
+    const jsonResponse = invoiceSchema.parse(invoice)
+    res.status(200).json(jsonResponse)
   } catch (error) {
     next(error)
   }

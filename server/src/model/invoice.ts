@@ -1,7 +1,19 @@
-import { type Invoice } from '@/validation'
 import { Schema, model, type Document } from 'mongoose'
 
-type InvoiceDocument = Invoice & Document
+type InvoiceDocument = {
+  invoiceNo: number
+  invoiceDate: Date
+  invoiceDueDays: number
+  user: Schema.Types.ObjectId
+  client: Schema.Types.ObjectId
+  items: Array<{
+    itemName: string
+    itemPrice: number
+    itemQuantity: number
+  }>
+  totalAmount: number
+  paid: boolean
+} & Document
 
 const InvoiceSchema = new Schema<InvoiceDocument>(
   {
@@ -13,16 +25,17 @@ const InvoiceSchema = new Schema<InvoiceDocument>(
       default: Date.now
     },
     invoiceDueDays: {
-      type: Number
+      type: Number,
+      default: 7
     },
     user: {
-      type: String,
+      type: Schema.Types.ObjectId,
       required: true,
       ref: 'User',
       immutable: true
     },
     client: {
-      type: String,
+      type: Schema.Types.ObjectId,
       required: true,
       ref: 'Client',
       immutable: true
@@ -45,7 +58,7 @@ const InvoiceSchema = new Schema<InvoiceDocument>(
       default: false
     }
   },
-  { timestamps: true }
+  { timestamps: true, toJSON: { virtuals: true } }
 )
 
 InvoiceSchema.path('user').validate(async (value) => {
@@ -67,14 +80,14 @@ InvoiceSchema.pre('save', async function (next) {
       .find({
         user: this.user,
         invoiceDate: {
-          $gte: new Date(currentYear, 0, 1), // Start of the current year
-          $lte: new Date(currentYear, 11, 31) // End of the current year
+          $gte: new Date(currentYear, 0, 1, 0, 0, 0), // Start of the current year
+          $lte: new Date(currentYear, 11, 31, 23, 59, 59) // End of the current year
         }
       })
       .countDocuments()
+
     this.invoiceNo = countCurrentYearInvoices + 1
   }
-
   const totalAmount = this.items.reduce(
     (acc, item) => acc + item.itemPrice * (item.itemQuantity ?? 1),
     0

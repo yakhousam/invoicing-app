@@ -1,8 +1,12 @@
-import { type User } from '@/validation/user'
 import bcrypt from 'bcrypt'
 import { Schema, model, type Document, type Model } from 'mongoose'
 
-type UserDocument = User & Document
+type UserDocument = {
+  name: string
+  email: string
+  password: string
+  role: 'admin' | 'user'
+} & Document
 
 export const UserSchema = new Schema<UserDocument>(
   {
@@ -19,12 +23,12 @@ export const UserSchema = new Schema<UserDocument>(
 )
 
 UserSchema.path('name').validate(async (value: string) => {
-  const user = await model<User>('User').findOne({ name: value })
+  const user = await model<UserDocument>('User').findOne({ name: value })
   return user === null
 }, 'Duplicated name')
 
 UserSchema.path('email').validate(async (value: string) => {
-  const user = await model<User>('User').findOne({ email: value })
+  const user = await model<UserDocument>('User').findOne({ email: value })
   return user === null
 }, 'Duplicated email')
 
@@ -45,9 +49,15 @@ UserSchema.methods.isValidPassword = async function (password: string) {
   const compare = await bcrypt.compare(password, this.password)
   return compare
 }
+UserSchema.methods.toJSON = function () {
+  const user = this.toObject()
+  delete user.password
+  return user
+}
 
 type UserMethods = {
   isValidPassword: (password: string) => Promise<boolean>
+  toJSON: () => Record<string, unknown>
 }
 
 type UserModel = Model<UserDocument, Record<string, unknown>, UserMethods>
