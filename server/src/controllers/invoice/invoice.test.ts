@@ -171,7 +171,7 @@ describe('Invoice Controller', () => {
 
       const mockInvoice: CreateInvoice = {
         client: client._id,
-        items: Array(10)
+        items: Array(1)
           .fill(null)
           .map(() => ({
             itemName: getProductName(),

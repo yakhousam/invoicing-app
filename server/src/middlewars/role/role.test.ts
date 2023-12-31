@@ -15,7 +15,12 @@ describe('Role middlewars', () => {
   describe('withRole', () => {
     it('should call next() if user has the specified role', () => {
       const role: Role = 'admin'
-      const user = { ...getNewUser(role), _id: getObjectId() }
+      const user = {
+        ...getNewUser(role),
+        _id: getObjectId(),
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      }
       mockRequest.user = user
       const middleware = withRole(role)
       middleware(mockRequest, mockResponse, mockNext)
@@ -25,7 +30,12 @@ describe('Role middlewars', () => {
 
     it('should send 403 status if user does not have the specified role', () => {
       const role: Role = 'admin'
-      const user = { ...getNewUser('user'), _id: getObjectId() }
+      const user = {
+        ...getNewUser('user'),
+        _id: getObjectId(),
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      }
       mockRequest.user = user
       const middleware = withRole(role)
       middleware(mockRequest, mockResponse, mockNext)
@@ -36,7 +46,12 @@ describe('Role middlewars', () => {
 
   describe('isAmin', () => {
     it('should call next() if user has the specified role', () => {
-      const admin = { ...getNewUser('admin'), _id: getObjectId() }
+      const admin = {
+        ...getNewUser('admin'),
+        _id: getObjectId(),
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      }
       mockRequest.user = admin
       isAdmin(mockRequest, mockResponse, mockNext)
       expect(mockNext).toHaveBeenCalled()
@@ -44,7 +59,12 @@ describe('Role middlewars', () => {
     })
 
     it('should send 403 status if user does not have the specified role', () => {
-      const user = { ...getNewUser('user'), _id: getObjectId() }
+      const user = {
+        ...getNewUser('user'),
+        _id: getObjectId(),
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      }
       mockRequest.user = user
       isAdmin(mockRequest, mockResponse, mockNext)
       expect(mockNext).not.toHaveBeenCalled()
