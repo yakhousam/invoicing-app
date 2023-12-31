@@ -858,4 +858,124 @@ describe('Invoice Controller', () => {
       expect(jsonResponse.user._id).toBe(user._id)
     })
   })
+
+  describe('Delete', () => {
+    it('should delete invoice', async () => {
+      const client = clientSchema.parse(
+        (await ClientModel.create(getNewClient())).toJSON()
+      )
+      const user = parseUserSchema.parse(
+        (await UserModel.create(getNewUser())).toJSON()
+      )
+      const mockInvoice = {
+        client: client._id,
+        user: user._id,
+        items: Array(10)
+          .fill(null)
+          .map(() => ({
+            itemName: 'test',
+            itemPrice: 10
+          }))
+      }
+
+      const invoice = (await InvoiceModel.create(mockInvoice)).toJSON()
+      const res = buildRes()
+      const next = buildNext()
+      const req = {
+        params: {
+          id: invoice._id
+        },
+        user
+      } as unknown as Request
+
+      await invoiceController.delteById(req, res, next)
+      expect(res.sendStatus).toHaveBeenCalledWith(204)
+    })
+
+    it('should not delete paied invoice', async () => {
+      const client = clientSchema.parse(
+        (await ClientModel.create(getNewClient())).toJSON()
+      )
+      const user = parseUserSchema.parse(
+        (await UserModel.create(getNewUser())).toJSON()
+      )
+      const mockInvoice = {
+        client: client._id,
+        user: user._id,
+        paid: true,
+        items: Array(10)
+          .fill(null)
+          .map(() => ({
+            itemName: 'test',
+            itemPrice: 10
+          }))
+      }
+
+      const invoice = (await InvoiceModel.create(mockInvoice)).toJSON()
+      const res = buildRes()
+      const next = buildNext()
+      const req = {
+        params: {
+          id: invoice._id
+        },
+        user
+      } as unknown as Request
+
+      await invoiceController.delteById(req, res, next)
+      expect(res.status).toHaveBeenCalledWith(400)
+    })
+
+    it('should return status 404, invoice not found', async () => {
+      const user = parseUserSchema.parse(
+        (await UserModel.create(getNewUser())).toJSON()
+      )
+
+      const res = buildRes()
+      const next = buildNext()
+      const req = {
+        params: {
+          id: getObjectId()
+        },
+        user
+      } as unknown as Request
+
+      await invoiceController.delteById(req, res, next)
+      expect(res.status).toHaveBeenCalledWith(404)
+    })
+
+    it('should not be able to delete other users invoices', async () => {
+      const client = clientSchema.parse(
+        (await ClientModel.create(getNewClient())).toJSON()
+      )
+      const user1 = parseUserSchema.parse(
+        (await UserModel.create(getNewUser())).toJSON()
+      )
+      const user2 = parseUserSchema.parse(
+        (await UserModel.create(getNewUser())).toJSON()
+      )
+      const mockInvoice = {
+        client: client._id,
+        user: user1._id,
+        items: Array(10)
+          .fill(null)
+          .map(() => ({
+            itemName: 'test',
+            itemPrice: 10
+          }))
+      }
+
+      const invoice = (await InvoiceModel.create(mockInvoice)).toJSON()
+      const res = buildRes()
+      const next = buildNext()
+      const req = {
+        params: {
+          id: invoice._id
+        },
+        user: user2
+      } as unknown as Request
+
+      await invoiceController.delteById(req, res, next)
+      expect(res.status).toHaveBeenCalledWith(404)
+    })
+  })
 })

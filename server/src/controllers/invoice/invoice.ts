@@ -122,11 +122,49 @@ const updateById = async (
   }
 }
 
+const delteById = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const { id } = req.params
+    const authenticatedUser = parseUserSchema.parse(req.user)
+
+    const invoice = await InvoiceModel.findOne({
+      _id: id,
+      user: authenticatedUser._id
+    })
+
+    if (invoice === null) {
+      res.status(404).json({
+        error: 'Not found',
+        message: `Invoice with id: ${id} not found`
+      })
+      return
+    }
+
+    if (invoice.paid) {
+      res.status(400).json({
+        error: 'Bad request',
+        message: `Invoice with id: ${id} is already paid, can't delete it`
+      })
+      return
+    }
+    await invoice.deleteOne()
+
+    res.sendStatus(204)
+  } catch (error) {
+    next(error)
+  }
+}
+
 const invoiceController = {
   create,
   find,
   findById,
-  updateById
+  updateById,
+  delteById
 }
 
 export default invoiceController
