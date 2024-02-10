@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/unbound-method */
 import { buildNext, buildRes, getNewUser, getObjectId } from '@/utils/generate'
+import { type Role } from '@/validation/user'
 import { type Request } from 'express'
-import withRole, { isAdmin, type Role } from './role'
+import withRole, { isAdmin } from './role'
 
 describe('Role middlewars', () => {
   const mockRequest = {} as unknown as Request
