@@ -26,6 +26,8 @@ export const updateUserSchema = createUserSchema.omit({ role: true }).partial()
 
 export type User = z.infer<typeof userShema>
 
+export type Role = User['role']
+
 export type CreateUser = z.input<typeof createUserSchema>
 
 export type UpdateUser = z.infer<typeof updateUserSchema>

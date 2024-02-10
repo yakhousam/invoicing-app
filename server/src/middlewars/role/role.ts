@@ -1,15 +1,20 @@
-import { parseUserSchema } from '@/validation/user'
+import logger from '@/utils/logger'
+import { parseUserSchema, type Role } from '@/validation/user'
 import { type NextFunction, type Request, type Response } from 'express'
-
-export type Role = 'admin' | 'user'
 
 function withRole(role: Role) {
   return function (req: Request, res: Response, next: NextFunction) {
-    const user = parseUserSchema.parse(req.user)
-    if (user?.role === role) {
-      next()
-    } else {
-      res.sendStatus(403)
+    try {
+      const user = parseUserSchema.parse(req.user)
+      if (user?.role === role) {
+        next()
+      } else {
+        logger.error('Access denied')
+        res.sendStatus(403)
+      }
+    } catch (error) {
+      logger.error(error)
+      res.sendStatus(500)
     }
   }
 }

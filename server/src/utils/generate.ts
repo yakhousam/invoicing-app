@@ -1,6 +1,5 @@
-import { type Role } from '@/middlewars/role'
 import { type CreateClient } from '@/validation/client'
-import { type CreateUser, type User } from '@/validation/user'
+import { type CreateUser, type User, type Role } from '@/validation/user'
 import { faker } from '@faker-js/faker'
 import axios from 'axios'
 import { type NextFunction, type Response } from 'express'
