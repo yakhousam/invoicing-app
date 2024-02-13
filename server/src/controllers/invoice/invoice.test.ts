@@ -307,7 +307,7 @@ describe('Invoice Controller', () => {
       expect(jsonResponse.length).toBe(expectedInvoices.length)
       // all returned invoices should belong to the user
       jsonResponse.forEach((invoice) => {
-        expect(invoice.user._id).toBe(user1._id)
+        expect(invoice.user).toBe(user1._id)
       })
     })
 

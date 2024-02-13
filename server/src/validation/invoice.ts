@@ -25,7 +25,9 @@ export const invoiceSchema = z.object({
   updatedAt: dateToZodDatetime
 })
 
-export const invoiceArraySchema = z.array(invoiceSchema)
+export const invoiceArraySchema = z.array(
+  invoiceSchema.omit({ user: true }).merge(z.object({ user: objectIdToString }))
+)
 
 export const creatInvoiceSchema = z.object({
   invoiceDate: z

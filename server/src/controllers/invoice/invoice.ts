@@ -48,11 +48,12 @@ const find = async (
     const invoices = await InvoiceModel.find({
       user: authenticatedUser._id
     })
-      .populate<{ user: User }>('user', '-password')
+      // .populate<{ user: User }>('user', '-password')
       .populate<{ client: Client }>('client')
     const jsonResponse = invoiceArraySchema.parse(invoices)
     res.status(200).json(jsonResponse)
   } catch (error: unknown) {
+    // console.error(error)
     next(error)
   }
 }
