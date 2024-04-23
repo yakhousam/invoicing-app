@@ -10,5 +10,6 @@ module.exports = {
     '^@/(.*)$': '<rootDir>/src/$1'
   },
   watchPathIgnorePatterns: ['globalConfig'],
-  collectCoverageFrom: ['src/**/*.{js,ts}']
+  collectCoverageFrom: ['src/**/*.{js,ts}'],
+  testPathIgnorePatterns: ['<rootDir>/dist/']
 }
