@@ -1,7 +1,12 @@
 import InvoiceModel from '@/model/invoice'
 import { getCredentials, getNewClient } from '@/utils/generate'
 import startServer, { type Server } from '@/utils/server'
-import { invoiceSchema, type Invoice } from '@/validation'
+import {
+  invoiceArraySchema,
+  invoiceSchema,
+  type CreateInvoice,
+  type Invoice
+} from '@/validation'
 import { clientSchema, type Client } from '@/validation/client'
 import { type User } from '@/validation/user'
 import axios from 'axios'
@@ -31,9 +36,8 @@ describe('Invoice', () => {
     const client = clientSchema.parse(
       (await api.post<Client>('/clients/create', getNewClient())).data
     )
-    const invoiceResponse = await api.post<Invoice>('/invoices/create', {
-      client: client._id,
-      user: user._id,
+    const invoiceData: CreateInvoice = {
+      client: { _id: client._id },
       items: [
         {
           itemName: 'item1',
@@ -44,7 +48,11 @@ describe('Invoice', () => {
           itemPrice: 20
         }
       ]
-    })
+    }
+    const invoiceResponse = await api.post<Invoice>(
+      '/invoices/create',
+      invoiceData
+    )
     expect(invoiceResponse.status).toBe(201)
     const invoice = invoiceSchema.parse(invoiceResponse.data)
     expect(invoice).toHaveProperty('_id')
@@ -58,9 +66,8 @@ describe('Invoice', () => {
 
   it('should return all invoices', async () => {
     const client = await api.post<Client>('/clients/create', getNewClient())
-    await api.post<Invoice>('/invoices/create', {
-      client: client.data._id,
-      user: user._id,
+    const invoiceData: CreateInvoice = {
+      client: { _id: client.data._id },
       items: [
         {
           itemName: 'item1',
@@ -71,23 +78,14 @@ describe('Invoice', () => {
           itemPrice: 20
         }
       ]
-    })
-    await api.post<Invoice>('/invoices/create', {
-      client: client.data._id,
-      user: user._id,
-      items: [
-        {
-          itemName: 'item1',
-          itemPrice: 10
-        },
-        {
-          itemName: 'item2',
-          itemPrice: 20
-        }
-      ]
-    })
-    const invoices = await api.get('/invoices')
-    expect(invoices.status).toBe(200)
-    expect(invoices.data.length).toBe(2)
+    }
+
+    await api.post<Invoice>('/invoices/create', invoiceData)
+    await api.post<Invoice>('/invoices/create', invoiceData)
+
+    const response = await api.get('/invoices')
+    expect(response.status).toBe(200)
+    const parsedInvoices = invoiceArraySchema.parse(response.data)
+    expect(parsedInvoices.length).toBe(2)
   })
 })
