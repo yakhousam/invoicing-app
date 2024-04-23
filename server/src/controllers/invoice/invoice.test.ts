@@ -38,7 +38,7 @@ describe('Invoice Controller', () => {
       )
 
       const mockInvoice: CreateInvoice = {
-        client: client._id,
+        client: { _id: client._id },
         items: Array(10)
           .fill(null)
           .map(() => ({
@@ -61,7 +61,7 @@ describe('Invoice Controller', () => {
       const jsonResponse = invoiceSchema.parse(
         (res.json as jest.Mock).mock.calls[0][0]
       )
-      expect(jsonResponse.client._id).toBe(mockInvoice.client)
+      expect(jsonResponse.client._id).toBe(mockInvoice.client._id)
       expect(jsonResponse.user._id).toBe(user._id)
       expect(jsonResponse.items.length).toBe(mockInvoice.items.length)
       expect(jsonResponse.items).toEqual(
@@ -84,7 +84,7 @@ describe('Invoice Controller', () => {
     it('should call next with ZodError error, invalid data', async () => {
       const user = { ...getNewUser(), _id: getObjectId() }
       const mockInvoice: CreateInvoice = {
-        client: '12456456',
+        client: { _id: '12456456' },
         items: Array(10)
           .fill(null)
           .map(() => ({
@@ -139,7 +139,7 @@ describe('Invoice Controller', () => {
         updatedAt: new Date().toISOString()
       }
       const mockInvoice: CreateInvoice = {
-        client: getObjectId(),
+        client: { _id: getObjectId() },
         items: Array(10)
           .fill(null)
           .map(() => ({
@@ -170,7 +170,7 @@ describe('Invoice Controller', () => {
       )
 
       const mockInvoice: CreateInvoice = {
-        client: client._id,
+        client: { _id: client._id },
         items: Array(1)
           .fill(null)
           .map(() => ({
@@ -213,7 +213,7 @@ describe('Invoice Controller', () => {
       )
 
       const mockInvoice: CreateInvoice = {
-        client: client._id,
+        client: { _id: client._id },
         invoiceDate: new Date('2021-12-31').toISOString(),
         items: Array(10)
           .fill(null)
@@ -269,7 +269,7 @@ describe('Invoice Controller', () => {
           .fill(null)
           .map(() => ({
             user: user1._id,
-            client: client._id,
+            client: { _id: client._id },
             items: Array(10)
               .fill(null)
               .map(() => ({
@@ -283,7 +283,7 @@ describe('Invoice Controller', () => {
           .fill(null)
           .map(() => ({
             user: user2._id,
-            client: client._id,
+            client: { _id: client._id },
             items: Array(10)
               .fill(null)
               .map(() => ({
@@ -320,7 +320,7 @@ describe('Invoice Controller', () => {
       )
 
       const mockInvoice: CreateInvoice = {
-        client: client._id,
+        client: { _id: client._id },
         items: Array(10)
           .fill(null)
           .map(() => ({
@@ -385,7 +385,7 @@ describe('Invoice Controller', () => {
       )
 
       const mockInvoice: CreateInvoice = {
-        client: client._id,
+        client: { _id: client._id },
         items: Array(10)
           .fill(null)
           .map(() => ({
@@ -423,7 +423,7 @@ describe('Invoice Controller', () => {
         (await UserModel.create(getNewUser())).toJSON()
       )
       const mockInvoice: CreateInvoice = {
-        client: client._id,
+        client: { _id: client._id },
         items: Array(10)
           .fill(null)
           .map(() => ({
@@ -463,7 +463,7 @@ describe('Invoice Controller', () => {
         (await UserModel.create(getNewUser())).toJSON()
       )
       const mockInvoice: CreateInvoice = {
-        client: client._id,
+        client: { _id: client._id },
         items: Array(10)
           .fill(null)
           .map(() => ({
@@ -504,7 +504,7 @@ describe('Invoice Controller', () => {
         (await UserModel.create(getNewUser())).toJSON()
       )
       const mockInvoice: CreateInvoice = {
-        client: client._id,
+        client: { _id: client._id },
         items: Array(10)
           .fill(null)
           .map(() => ({
@@ -545,7 +545,7 @@ describe('Invoice Controller', () => {
         (await UserModel.create(getNewUser())).toJSON()
       )
       const mockInvoice: CreateInvoice = {
-        client: client._id,
+        client: { _id: client._id },
         items: Array(10)
           .fill(null)
           .map(() => ({
@@ -585,9 +585,9 @@ describe('Invoice Controller', () => {
       const user = parseUserSchema.parse(
         (await UserModel.create(getNewUser())).toJSON()
       )
-      const mockInvoice = {
+      const mockInvoice: CreateInvoice & { paid: true } = {
         paid: true,
-        client: client._id,
+        client: { _id: client._id },
         items: Array(10)
           .fill(null)
           .map(() => ({
@@ -624,8 +624,8 @@ describe('Invoice Controller', () => {
       const user = parseUserSchema.parse(
         (await UserModel.create(getNewUser())).toJSON()
       )
-      const mockInvoice = {
-        client: client._id,
+      const mockInvoice: CreateInvoice = {
+        client: { _id: client._id },
         items: Array(10)
           .fill(null)
           .map(() => ({
@@ -665,8 +665,8 @@ describe('Invoice Controller', () => {
       const user = parseUserSchema.parse(
         (await UserModel.create(getNewUser())).toJSON()
       )
-      const mockInvoice = {
-        client: client._id,
+      const mockInvoice: CreateInvoice = {
+        client: { _id: client._id },
         items: Array(10)
           .fill(null)
           .map(() => ({
@@ -707,8 +707,8 @@ describe('Invoice Controller', () => {
       const user = parseUserSchema.parse(
         (await UserModel.create(getNewUser())).toJSON()
       )
-      const mockInvoice = {
-        client: client._id,
+      const mockInvoice: CreateInvoice = {
+        client: { _id: client._id },
         items: Array(10)
           .fill(null)
           .map(() => ({
@@ -784,7 +784,7 @@ describe('Invoice Controller', () => {
       )
 
       const mockInvoice: CreateInvoice = {
-        client: client._id,
+        client: { _id: client._id },
         items: Array(10)
           .fill(null)
           .map(() => ({
@@ -823,8 +823,10 @@ describe('Invoice Controller', () => {
       const user = parseUserSchema.parse(
         (await UserModel.create(getNewUser())).toJSON()
       )
-      const mockInvoice = {
-        client: client._id,
+      const mockInvoice: CreateInvoice & {
+        user: string
+      } = {
+        client: { _id: client._id },
         user: user._id,
         items: Array(10)
           .fill(null)
@@ -867,8 +869,10 @@ describe('Invoice Controller', () => {
       const user = parseUserSchema.parse(
         (await UserModel.create(getNewUser())).toJSON()
       )
-      const mockInvoice = {
-        client: client._id,
+      const mockInvoice: CreateInvoice & {
+        user: string
+      } = {
+        client: { _id: client._id },
         user: user._id,
         items: Array(10)
           .fill(null)
@@ -899,8 +903,11 @@ describe('Invoice Controller', () => {
       const user = parseUserSchema.parse(
         (await UserModel.create(getNewUser())).toJSON()
       )
-      const mockInvoice = {
-        client: client._id,
+      const mockInvoice: CreateInvoice & {
+        paid: true
+        user: string
+      } = {
+        client: { _id: client._id },
         user: user._id,
         paid: true,
         items: Array(10)
@@ -953,8 +960,10 @@ describe('Invoice Controller', () => {
       const user2 = parseUserSchema.parse(
         (await UserModel.create(getNewUser())).toJSON()
       )
-      const mockInvoice = {
-        client: client._id,
+      const mockInvoice: CreateInvoice & {
+        user: string
+      } = {
+        client: { _id: client._id },
         user: user1._id,
         items: Array(10)
           .fill(null)

@@ -16,7 +16,7 @@ export const invoiceSchema = z.object({
   invoiceDate: dateToZodDatetime,
   invoiceDueDays: z.number(),
   user: userShema.omit({ password: true }),
-  client: clientSchema,
+  client: clientSchema.pick({ _id: true, name: true }),
   items: z.array(itemSchema),
   totalAmount: z.number(),
   paid: z.boolean(),
@@ -42,7 +42,9 @@ export const creatInvoiceSchema = z.object({
       message: 'Invoice must have at least one item.',
       path: ['items']
     }),
-  client: objectIdSchema
+  client: z.object({
+    _id: objectIdSchema
+  })
 })
 
 export const updateInvoice = creatInvoiceSchema

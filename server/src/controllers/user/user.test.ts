@@ -117,7 +117,7 @@ describe('User Controller', () => {
         .fill(null)
         .map(() => ({
           user: notExpectedUser._id.toString(),
-          client: expectedClient._id.toString(),
+          client: { _id: expectedClient._id.toString() },
           items: Array(10)
             .fill(null)
             .map(() => ({
@@ -132,7 +132,7 @@ describe('User Controller', () => {
         .fill(null)
         .map(() => ({
           user: expectedUser._id.toString(),
-          client: expectedClient._id.toString(),
+          client: { _id: expectedClient._id.toString() },
           items: Array(10)
             .fill(null)
             .map(() => ({

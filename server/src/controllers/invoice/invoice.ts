@@ -6,7 +6,6 @@ import {
   updateInvoice,
   type Invoice
 } from '@/validation'
-import { type Client } from '@/validation/client'
 import { parseUserSchema, type User } from '@/validation/user'
 import { type NextFunction, type Request, type Response } from 'express'
 
@@ -24,9 +23,9 @@ const create = async (
     })
     const savedInvoice = await newInvoice.save()
 
-    const populatedInvoice = await InvoiceModel.findById(savedInvoice._id)
-      .populate('user', '-password')
-      .populate('client')
+    const populatedInvoice = await InvoiceModel.findById(
+      savedInvoice._id
+    ).populate('user', '-password')
 
     if (populatedInvoice === null) {
       throw new Error('Invoice not found')
@@ -48,8 +47,7 @@ const find = async (
     const invoices = await InvoiceModel.find({
       user: authenticatedUser._id
     })
-      // .populate<{ user: User }>('user', '-password')
-      .populate<{ client: Client }>('client')
+
     const jsonResponse = invoiceArraySchema.parse(invoices)
     res.status(200).json(jsonResponse)
   } catch (error: unknown) {
@@ -69,9 +67,7 @@ const findById = async (
     const invoice = await InvoiceModel.findOne<Invoice>({
       _id: id,
       user: authenticatedUser._id
-    })
-      .populate<{ user: User }>('user', '-password')
-      .populate<{ client: Client }>('client')
+    }).populate<{ user: User }>('user', '-password')
 
     if (invoice === null) {
       res.status(404).json({
@@ -104,9 +100,7 @@ const updateById = async (
       },
       data,
       { new: true }
-    )
-      .populate<{ user: User }>('user', '-password')
-      .populate<{ client: Client }>('client')
+    ).populate<{ user: User }>('user', '-password')
 
     if (invoice === null) {
       res.status(404).json({

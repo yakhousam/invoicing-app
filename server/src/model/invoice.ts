@@ -5,7 +5,10 @@ type InvoiceDocument = {
   invoiceDate: Date
   invoiceDueDays: number
   user: Schema.Types.ObjectId
-  client: Schema.Types.ObjectId
+  client: {
+    _id: Schema.Types.ObjectId
+    name: string
+  }
   items: Array<{
     itemName: string
     itemPrice: number
@@ -35,10 +38,15 @@ const InvoiceSchema = new Schema<InvoiceDocument>(
       immutable: true
     },
     client: {
-      type: Schema.Types.ObjectId,
-      required: true,
-      ref: 'Client',
-      immutable: true
+      _id: {
+        type: Schema.Types.ObjectId,
+        required: true,
+        ref: 'Client',
+        immutable: true
+      },
+      name: {
+        type: String
+      }
     },
     items: [
       {
@@ -61,12 +69,22 @@ const InvoiceSchema = new Schema<InvoiceDocument>(
   { timestamps: true, toJSON: { virtuals: true } }
 )
 
+InvoiceSchema.pre('save', async function (next) {
+  if (this.isNew) {
+    const client = await model('Client').findById(this.client._id)
+    if (client !== null) {
+      this.client.name = client.name
+    }
+  }
+  next()
+})
+
 InvoiceSchema.path('user').validate(async (value) => {
   const user = await model('User').findById(value)
   return user !== null
 }, 'Invalid User Id')
 
-InvoiceSchema.path('client').validate(async (value) => {
+InvoiceSchema.path('client._id').validate(async (value) => {
   const client = await model('Client').findById(value)
   return client !== null
 }, 'Invalid Client Id')
