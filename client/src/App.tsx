@@ -1,34 +1,31 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { Box } from '@mui/material'
+import { useQueryClient } from '@tanstack/react-query'
+import { RouterProvider } from '@tanstack/react-router'
+import { useAuth } from './auth'
+import { Spinner } from './components/spinner'
+import router from './router'
 
 function App() {
-  const [count, setCount] = useState(0)
-
+  const auth = useAuth()
+  const queryClient = useQueryClient()
+  if (auth.isFetching) {
+    return (
+      <Box
+        height="80vh"
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+      >
+        <Spinner />
+      </Box>
+    )
+  }
   return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+    <RouterProvider
+      router={router}
+      context={{ auth, queryClient }}
+      defaultStaleTime={0}
+    />
   )
 }
 
