@@ -24,7 +24,7 @@ export const parseUserSchema = userShema.omit({ password: true })
 
 export const updateUserSchema = createUserSchema.omit({ role: true }).partial()
 
-export type User = z.infer<typeof userShema>
+export type User = z.infer<typeof parseUserSchema>
 
 export type Role = User['role']
 

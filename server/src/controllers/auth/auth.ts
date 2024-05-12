@@ -61,6 +61,11 @@ const signin = (req: Request, res: Response, next: NextFunction): void => {
   }
 }
 
+const signout = (req: Request, res: Response): void => {
+  res.clearCookie('token')
+  res.status(200).json({ message: 'Logged out' })
+}
+
 // Local Strategy for username/password authentication
 passport.use(
   new LocalStrategy(
@@ -129,7 +134,8 @@ async function localStrategyVerifyFunction(
 
 const authController = {
   signin,
-  signup
+  signup,
+  signout
 }
 
 export default authController

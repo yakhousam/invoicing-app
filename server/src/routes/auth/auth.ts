@@ -1,5 +1,5 @@
-import { Router } from 'express'
 import authController from '@/controllers/auth'
+import { Router } from 'express'
 import passport from 'passport'
 
 const authRoute = Router()
@@ -13,5 +13,9 @@ authRoute.post(
   passport.authenticate('local', { session: false }),
   authController.signin
 )
+
+authRoute.get('/auth/signout', (req, res) => {
+  authController.signout(req, res)
+})
 
 export default authRoute
