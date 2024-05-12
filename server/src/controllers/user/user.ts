@@ -110,11 +110,25 @@ const deleteById = async (
   }
 }
 
+const findMe = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const { user } = req
+    res.status(200).json(user)
+  } catch (error: unknown) {
+    next(error)
+  }
+}
+
 const userController = {
   find,
   findById,
   findInvoices,
-  deleteById
+  deleteById,
+  findMe
 }
 
 export default userController
