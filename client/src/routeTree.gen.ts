@@ -16,6 +16,7 @@ import { Route as LoginRouteImport } from './routes/login/route'
 import { Route as AuthLayoutImport } from './routes/_auth/_layout'
 import { Route as AuthLayoutInvoicesImport } from './routes/_auth/_layout/invoices'
 import { Route as AuthLayoutIndexRouteImport } from './routes/_auth/_layout/index/route'
+import { Route as AuthLayoutInvoicesIdImport } from './routes/_auth/_layout/invoices.$id'
 
 // Create/Update Routes
 
@@ -46,6 +47,11 @@ const AuthLayoutIndexRouteRoute = AuthLayoutIndexRouteImport.update({
   import('./routes/_auth/_layout/index/route.lazy').then((d) => d.Route),
 )
 
+const AuthLayoutInvoicesIdRoute = AuthLayoutInvoicesIdImport.update({
+  path: '/$id',
+  getParentRoute: () => AuthLayoutInvoicesRoute,
+} as any)
+
 // Populate the FileRoutesByPath interface
 
 declare module '@tanstack/react-router' {
@@ -70,6 +76,10 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthLayoutInvoicesImport
       parentRoute: typeof AuthLayoutImport
     }
+    '/_auth/_layout/invoices/$id': {
+      preLoaderRoute: typeof AuthLayoutInvoicesIdImport
+      parentRoute: typeof AuthLayoutInvoicesImport
+    }
   }
 }
 
@@ -80,7 +90,7 @@ export const routeTree = rootRoute.addChildren([
   AuthRoute.addChildren([
     AuthLayoutRoute.addChildren([
       AuthLayoutIndexRouteRoute,
-      AuthLayoutInvoicesRoute,
+      AuthLayoutInvoicesRoute.addChildren([AuthLayoutInvoicesIdRoute]),
     ]),
   ]),
 ])

@@ -27,4 +27,4 @@ declare module '@tanstack/react-router' {
 
 export default router
 
-export type RoutesPath = keyof RoutesByPath<typeof routeTree>
+export type RouterPath = keyof RoutesByPath<typeof routeTree>
