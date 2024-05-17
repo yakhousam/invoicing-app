@@ -14,9 +14,9 @@ import { Route as rootRoute } from './routes/__root'
 import { Route as AuthImport } from './routes/_auth'
 import { Route as LoginRouteImport } from './routes/login/route'
 import { Route as AuthLayoutImport } from './routes/_auth/_layout'
-import { Route as AuthLayoutInvoicesImport } from './routes/_auth/_layout/invoices'
 import { Route as AuthLayoutIndexRouteImport } from './routes/_auth/_layout/index/route'
-import { Route as AuthLayoutInvoicesIdImport } from './routes/_auth/_layout/invoices.$id'
+import { Route as AuthLayoutInvoicesIndexImport } from './routes/_auth/_layout/invoices/index'
+import { Route as AuthLayoutInvoicesIdImport } from './routes/_auth/_layout/invoices/$id'
 
 // Create/Update Routes
 
@@ -35,11 +35,6 @@ const AuthLayoutRoute = AuthLayoutImport.update({
   getParentRoute: () => AuthRoute,
 } as any)
 
-const AuthLayoutInvoicesRoute = AuthLayoutInvoicesImport.update({
-  path: '/invoices',
-  getParentRoute: () => AuthLayoutRoute,
-} as any)
-
 const AuthLayoutIndexRouteRoute = AuthLayoutIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AuthLayoutRoute,
@@ -47,9 +42,14 @@ const AuthLayoutIndexRouteRoute = AuthLayoutIndexRouteImport.update({
   import('./routes/_auth/_layout/index/route.lazy').then((d) => d.Route),
 )
 
+const AuthLayoutInvoicesIndexRoute = AuthLayoutInvoicesIndexImport.update({
+  path: '/invoices/',
+  getParentRoute: () => AuthLayoutRoute,
+} as any)
+
 const AuthLayoutInvoicesIdRoute = AuthLayoutInvoicesIdImport.update({
-  path: '/$id',
-  getParentRoute: () => AuthLayoutInvoicesRoute,
+  path: '/invoices/$id',
+  getParentRoute: () => AuthLayoutRoute,
 } as any)
 
 // Populate the FileRoutesByPath interface
@@ -72,13 +72,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthLayoutIndexRouteImport
       parentRoute: typeof AuthLayoutImport
     }
-    '/_auth/_layout/invoices': {
-      preLoaderRoute: typeof AuthLayoutInvoicesImport
-      parentRoute: typeof AuthLayoutImport
-    }
     '/_auth/_layout/invoices/$id': {
       preLoaderRoute: typeof AuthLayoutInvoicesIdImport
-      parentRoute: typeof AuthLayoutInvoicesImport
+      parentRoute: typeof AuthLayoutImport
+    }
+    '/_auth/_layout/invoices/': {
+      preLoaderRoute: typeof AuthLayoutInvoicesIndexImport
+      parentRoute: typeof AuthLayoutImport
     }
   }
 }
@@ -90,7 +90,8 @@ export const routeTree = rootRoute.addChildren([
   AuthRoute.addChildren([
     AuthLayoutRoute.addChildren([
       AuthLayoutIndexRouteRoute,
-      AuthLayoutInvoicesRoute.addChildren([AuthLayoutInvoicesIdRoute]),
+      AuthLayoutInvoicesIdRoute,
+      AuthLayoutInvoicesIndexRoute,
     ]),
   ]),
 ])
