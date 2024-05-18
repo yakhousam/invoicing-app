@@ -1,8 +1,10 @@
+import LoadingButton from '@/components/LoadingButton'
 import RHFTextField from '@/components/RHF/RHFTextField'
-import { Box, Button, Container, CssBaseline, Typography } from '@mui/material'
+import { Box, Container, CssBaseline, Typography } from '@mui/material'
 import { FormProvider, useForm } from 'react-hook-form'
 
 type LoginFormProps = {
+  submitError?: string | null
   handleSubmit: ({
     username,
     password
@@ -12,13 +14,19 @@ type LoginFormProps = {
   }) => Promise<void>
 }
 
-const LoginForm = ({ handleSubmit: onSubmit }: LoginFormProps) => {
+const LoginForm = ({ handleSubmit: onSubmit, submitError }: LoginFormProps) => {
   const formMethods = useForm({
     defaultValues: {
       username: '',
       password: ''
     }
   })
+
+  const {
+    handleSubmit,
+
+    formState: { isSubmitting }
+  } = formMethods
 
   return (
     <>
@@ -29,7 +37,7 @@ const LoginForm = ({ handleSubmit: onSubmit }: LoginFormProps) => {
             Sign in
           </Typography>
           <FormProvider {...formMethods}>
-            <form onSubmit={formMethods.handleSubmit(onSubmit)}>
+            <form onSubmit={handleSubmit(onSubmit)}>
               <RHFTextField
                 variant="outlined"
                 margin="normal"
@@ -48,17 +56,18 @@ const LoginForm = ({ handleSubmit: onSubmit }: LoginFormProps) => {
                 label="Password"
                 type="password"
               />
-              <Button
+              <LoadingButton
                 type="submit"
+                loading={isSubmitting}
                 fullWidth
                 variant="contained"
                 color="primary"
-                sx={{ mt: 2 }}
               >
                 Sign In
-              </Button>
+              </LoadingButton>
             </form>
           </FormProvider>
+          {submitError && <Typography color="error">{submitError}</Typography>}
         </Box>
       </Container>
     </>
