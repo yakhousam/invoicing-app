@@ -2,9 +2,10 @@ import AppBar from '@/components/AppBar'
 import Breadcrumbs from '@/components/Breadcrumbs'
 import Drawer, { DrawerHeader } from '@/components/Drawer'
 import DrawerNavigation from '@/components/DrawerNavigation'
+import LoadingButton from '@/components/LoadingButton'
 import useLogout from '@/hooks/useLogout'
 
-import { Box, Button, CssBaseline } from '@mui/material'
+import { Box, CssBaseline } from '@mui/material'
 import { Outlet, createFileRoute, useRouter } from '@tanstack/react-router'
 import React from 'react'
 
@@ -59,10 +60,15 @@ function Layout() {
 }
 
 const LogoutButton = () => {
-  const { handleLogout } = useLogout()
+  const { handleLogout, status } = useLogout()
   return (
-    <Button variant="contained" color="secondary" onClick={handleLogout}>
+    <LoadingButton
+      loading={status === 'pending'}
+      variant="contained"
+      color="secondary"
+      onClick={handleLogout}
+    >
       Logout
-    </Button>
+    </LoadingButton>
   )
 }
