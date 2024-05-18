@@ -1,6 +1,7 @@
 import { fetchInvoices } from '@/api/invoice'
 import { invoicesQueryOptions } from '@/invoicesQueryOptions'
 import { useSuspenseQuery } from '@tanstack/react-query'
+import { useNavigate } from '@tanstack/react-router'
 import {
   MaterialReactTable,
   useMaterialReactTable,
@@ -11,6 +12,7 @@ import { useMemo } from 'react'
 type Columns = Awaited<ReturnType<typeof fetchInvoices>>[0]
 
 const DashboardTable = () => {
+  const navigate = useNavigate()
   const { data, isError, isLoading } = useSuspenseQuery(invoicesQueryOptions)
   const columns = useMemo<MRT_ColumnDef<Columns>[]>(() => {
     return [
@@ -50,6 +52,15 @@ const DashboardTable = () => {
           children: 'Error loading data'
         }
       : undefined,
+    muiTableBodyRowProps: ({ row }) => ({
+      onClick: () => {
+        navigate({
+          to: '/invoices/$id',
+          params: { id: row.original._id }
+        })
+      },
+      sx: { cursor: 'pointer' }
+    }),
     enablePagination: false,
     enableFilters: false,
     enableDensityToggle: false,
