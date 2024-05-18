@@ -4,8 +4,7 @@ import { Box, Container, CssBaseline, Typography } from '@mui/material'
 import { FormProvider, useForm } from 'react-hook-form'
 
 type LoginFormProps = {
-  submitError?: string | null
-  handleSubmit: ({
+  onSubmit: ({
     username,
     password
   }: {
@@ -14,7 +13,7 @@ type LoginFormProps = {
   }) => Promise<void>
 }
 
-const LoginForm = ({ handleSubmit: onSubmit, submitError }: LoginFormProps) => {
+const LoginForm = ({ onSubmit }: LoginFormProps) => {
   const formMethods = useForm({
     defaultValues: {
       username: '',
@@ -24,10 +23,24 @@ const LoginForm = ({ handleSubmit: onSubmit, submitError }: LoginFormProps) => {
 
   const {
     handleSubmit,
-
-    formState: { isSubmitting }
+    setError,
+    formState: { isSubmitting, errors }
   } = formMethods
 
+  const formSubmit = async (data: Parameters<typeof onSubmit>[0]) => {
+    try {
+      await onSubmit(data)
+    } catch (error) {
+      setError('username', {
+        type: 'manual',
+        message: 'username or password invalide'
+      })
+      setError('password', {
+        type: 'manual',
+        message: 'username or password invalide'
+      })
+    }
+  }
   return (
     <>
       <CssBaseline />
@@ -37,7 +50,7 @@ const LoginForm = ({ handleSubmit: onSubmit, submitError }: LoginFormProps) => {
             Sign in
           </Typography>
           <FormProvider {...formMethods}>
-            <form onSubmit={handleSubmit(onSubmit)}>
+            <form onSubmit={handleSubmit(formSubmit)}>
               <RHFTextField
                 variant="outlined"
                 margin="normal"
@@ -67,7 +80,9 @@ const LoginForm = ({ handleSubmit: onSubmit, submitError }: LoginFormProps) => {
               </LoadingButton>
             </form>
           </FormProvider>
-          {submitError && <Typography color="error">{submitError}</Typography>}
+          {errors.username && errors.password && (
+            <Typography color="error">{errors.username.message}</Typography>
+          )}
         </Box>
       </Container>
     </>
