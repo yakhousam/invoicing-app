@@ -18,7 +18,7 @@ const LoginForm = ({ onLogin }: { onLogin: (user: User) => void }) => {
   const {
     handleSubmit,
     setError,
-    formState: { isSubmitting, errors }
+    formState: { isSubmitting, errors, isSubmitSuccessful }
   } = formMethods
 
   const onSubmit = async ({
@@ -35,11 +35,11 @@ const LoginForm = ({ onLogin }: { onLogin: (user: User) => void }) => {
     } catch (error) {
       setError('username', {
         type: 'manual',
-        message: 'username or password invalide'
+        message: 'Username or password invalide'
       })
       setError('password', {
         type: 'manual',
-        message: 'username or password invalide'
+        message: 'Username or password invalide'
       })
     }
   }
@@ -71,9 +71,10 @@ const LoginForm = ({ onLogin }: { onLogin: (user: User) => void }) => {
                 label="Password"
                 type="password"
               />
+              <Box mt={2} />
               <LoadingButton
                 type="submit"
-                loading={isSubmitting}
+                loading={isSubmitting || isSubmitSuccessful}
                 fullWidth
                 variant="contained"
                 color="primary"
@@ -83,7 +84,9 @@ const LoginForm = ({ onLogin }: { onLogin: (user: User) => void }) => {
             </form>
           </FormProvider>
           {errors.username && errors.password && (
-            <Typography color="error">{errors.username.message}</Typography>
+            <Typography color="error" textAlign="center">
+              {errors.username.message}
+            </Typography>
           )}
         </Box>
       </Container>
