@@ -1,4 +1,4 @@
-import { useAuth } from '@/auth'
+import { useAuth } from '@/hooks/useAuth'
 import { useRouter } from '@tanstack/react-router'
 import React from 'react'
 

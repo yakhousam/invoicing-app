@@ -1,5 +1,4 @@
 import * as api from '@/api/auth'
-import { useAuth } from '@/auth'
 import LoadingButton from '@/components/LoadingButton'
 import RHFTextField from '@/components/RHF/RHFTextField'
 import { User } from '@/validations'
@@ -7,7 +6,6 @@ import { Box, Container, CssBaseline, Typography } from '@mui/material'
 import { FormProvider, useForm } from 'react-hook-form'
 
 const LoginForm = ({ onLogin }: { onLogin: (user: User) => void }) => {
-  const auth = useAuth()
   const formMethods = useForm({
     defaultValues: {
       username: '',
@@ -30,7 +28,6 @@ const LoginForm = ({ onLogin }: { onLogin: (user: User) => void }) => {
   }) => {
     try {
       const user = await api.login(username, password)
-      auth.setUser(user)
       onLogin(user)
     } catch (error) {
       setError('username', {

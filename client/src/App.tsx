@@ -1,7 +1,7 @@
+import { useAuth } from '@/hooks/useAuth'
 import { Box } from '@mui/material'
 import { useQueryClient } from '@tanstack/react-query'
 import { RouterProvider } from '@tanstack/react-router'
-import { useAuth } from './auth'
 import { Spinner } from './components/spinner'
 import router from './router'
 

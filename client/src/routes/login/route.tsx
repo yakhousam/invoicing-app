@@ -20,8 +20,10 @@ export const Route = createFileRoute('/login')({
 function LoginPage() {
   const router = useRouter()
   const search = Route.useSearch()
+  const { auth } = Route.useRouteContext()
 
   const onLogin = (user: User) => {
+    auth.setUser(user)
     // I need to update the context to set the user as authenticated before navigating
     router.update({
       context: {
