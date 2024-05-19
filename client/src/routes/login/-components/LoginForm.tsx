@@ -1,19 +1,13 @@
+import * as api from '@/api/auth'
+import { useAuth } from '@/auth'
 import LoadingButton from '@/components/LoadingButton'
 import RHFTextField from '@/components/RHF/RHFTextField'
+import { User } from '@/validations'
 import { Box, Container, CssBaseline, Typography } from '@mui/material'
 import { FormProvider, useForm } from 'react-hook-form'
 
-type LoginFormProps = {
-  onSubmit: ({
-    username,
-    password
-  }: {
-    username: string
-    password: string
-  }) => Promise<void>
-}
-
-const LoginForm = ({ onSubmit }: LoginFormProps) => {
+const LoginForm = ({ onLogin }: { onLogin: (user: User) => void }) => {
+  const auth = useAuth()
   const formMethods = useForm({
     defaultValues: {
       username: '',
@@ -27,9 +21,17 @@ const LoginForm = ({ onSubmit }: LoginFormProps) => {
     formState: { isSubmitting, errors }
   } = formMethods
 
-  const formSubmit = async (data: Parameters<typeof onSubmit>[0]) => {
+  const onSubmit = async ({
+    username,
+    password
+  }: {
+    username: string
+    password: string
+  }) => {
     try {
-      await onSubmit(data)
+      const user = await api.login(username, password)
+      auth.setUser(user)
+      onLogin(user)
     } catch (error) {
       setError('username', {
         type: 'manual',
@@ -50,7 +52,7 @@ const LoginForm = ({ onSubmit }: LoginFormProps) => {
             Sign in
           </Typography>
           <FormProvider {...formMethods}>
-            <form onSubmit={handleSubmit(formSubmit)}>
+            <form onSubmit={handleSubmit(onSubmit)}>
               <RHFTextField
                 variant="outlined"
                 margin="normal"
