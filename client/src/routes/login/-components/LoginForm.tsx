@@ -81,7 +81,7 @@ const LoginForm = ({ onLogin }: { onLogin: (user: User) => void }) => {
             </form>
           </FormProvider>
           {errors.username && errors.password && (
-            <Typography color="error" textAlign="center">
+            <Typography role="alert" color="error" textAlign="center">
               {errors.username.message}
             </Typography>
           )}

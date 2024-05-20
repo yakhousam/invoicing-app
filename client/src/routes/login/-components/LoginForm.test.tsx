@@ -1,29 +1,45 @@
-import { render } from '@testing-library/react'
-import { expect, test } from 'vitest'
+import { render, waitFor } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+import { describe, expect, it, vi } from 'vitest'
+import LoginForm from './LoginForm'
 
-function LoginForm() {
-  return (
-    <form>
-      <label>
-        Username
-        <input type="text" name="username" />
-      </label>
-      <label>
-        Password
-        <input type="password" name="password" />
-      </label>
-      <button type="submit">Submit</button>
-    </form>
-  )
-}
+describe('LoginForm', () => {
+  it('renders', () => {
+    const { getByLabelText, getByRole } = render(
+      <LoginForm onLogin={() => {}} />
+    )
+    expect(getByRole('heading', { name: /sign in/i })).toBeInTheDocument()
+    expect(getByLabelText(/username/i)).toBeInTheDocument()
+    expect(getByLabelText(/password/i)).toBeInTheDocument()
+    expect(getByRole('button', { name: /sign in/i })).toBeInTheDocument()
+  })
 
-test('LoginForm', () => {
-  const { getByRole, getByLabelText } = render(<LoginForm />)
-  const username = getByLabelText('Username')
-  const password = getByLabelText('Password')
-  const submit = getByRole('button', { name: 'Submit' })
+  it('login user', async () => {
+    const mockOnLogin = vi.fn()
+    const { getByLabelText, getByRole } = render(
+      <LoginForm onLogin={mockOnLogin} />
+    )
+    await userEvent.type(getByLabelText(/username/i), 'test')
+    await userEvent.type(getByLabelText(/password/i), 'password')
+    await userEvent.click(getByRole('button', { name: /sign in/i }))
+    await waitFor(() => {
+      expect(mockOnLogin).toHaveBeenCalled()
+    })
+  })
 
-  expect(username).toHaveAttribute('type', 'text')
-  expect(password).toHaveAttribute('type', 'password')
-  expect(submit).toHaveAttribute('type', 'submit')
+  it('not login user with invalid credentials', async () => {
+    const mockOnLogin = vi.fn()
+    const { getByLabelText, getByRole } = render(
+      <LoginForm onLogin={mockOnLogin} />
+    )
+
+    await userEvent.type(getByLabelText(/username/i), 'test')
+    await userEvent.type(getByLabelText(/password/i), 'wrongpassword')
+    await userEvent.click(getByRole('button', { name: /sign in/i }))
+
+    await waitFor(() => {
+      expect(mockOnLogin).not.toHaveBeenCalled()
+    })
+    expect(getByRole('alert')).toBeInTheDocument() // error message
+  })
 })
