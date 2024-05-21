@@ -19,6 +19,13 @@ const RHFTextField = ({ name, label, ...delegated }: RHFTextFieldProps) => {
           error={!!error}
           helperText={error?.message}
           fullWidth
+          onChange={(e) => {
+            if (delegated.type === 'number' && e.target.value !== '') {
+              field.onChange(parseInt(e.target.value))
+            } else {
+              field.onChange(e.target.value)
+            }
+          }}
           {...delegated}
         />
       )}
