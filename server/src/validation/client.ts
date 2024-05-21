@@ -3,8 +3,8 @@ import { dateToZodDatetime, objectIdToString } from './common'
 
 export const clientSchema = z.object({
   _id: objectIdToString,
-  name: z.string(),
-  email: z.string().email().optional(),
+  name: z.string().min(2),
+  email: z.union([z.string().email(), z.literal(''), z.undefined()]),
   address: z.string().optional(),
   createdAt: dateToZodDatetime,
   updatedAt: dateToZodDatetime
@@ -15,6 +15,8 @@ export const createClientSchema = clientSchema.omit({
   createdAt: true,
   updatedAt: true
 })
+
+export const clientArraySchema = z.array(clientSchema)
 
 export type Client = z.infer<typeof clientSchema>
 
