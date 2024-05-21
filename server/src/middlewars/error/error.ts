@@ -1,3 +1,4 @@
+import { MongoServerError } from 'mongodb'
 import { Error as MongooseError } from 'mongoose'
 import { ZodError } from 'zod'
 
@@ -20,6 +21,19 @@ function errorMiddleware(
     res.status(400).json({
       error: error.name,
       message: error.message
+    })
+  } else if (error instanceof MongoServerError && error.code === 11000) {
+    const mongoError = error as MongoServerError & {
+      keyPattern: any
+      keyValue: any
+    }
+    const fieldName = Object.keys(mongoError.keyPattern)[0]
+    const fieldValue = mongoError.keyValue[fieldName]
+    res.status(409).json({
+      error: 'DuplicateKeyError',
+      message: `A document with the same ${fieldName} already exists: ${fieldValue}.`,
+      field: fieldName,
+      value: fieldValue
     })
   } else {
     res.sendStatus(500)
