@@ -12,8 +12,15 @@ const RHFTextField = ({ name, label, ...delegated }: RHFTextFieldProps) => {
     <Controller
       name={name}
       control={control}
-      render={({ field }) => (
-        <TextField {...field} label={label} fullWidth {...delegated} />
+      render={({ field, fieldState: { error } }) => (
+        <TextField
+          {...field}
+          label={label}
+          error={!!error}
+          helperText={error?.message}
+          fullWidth
+          {...delegated}
+        />
       )}
     />
   )

@@ -1,6 +1,7 @@
 import { RouterPath } from '@/router'
 import {
   LineAxis as LineAxisIcon,
+  People as PeopleIcon,
   Receipt as ReceiptIcon
 } from '@mui/icons-material'
 import {
@@ -23,7 +24,8 @@ type Link = {
 
 const links: Array<Link> = [
   { id: 1, label: 'Dashboard', icon: <LineAxisIcon />, href: '/' },
-  { id: 2, label: 'Invoices', icon: <ReceiptIcon />, href: '/invoices' }
+  { id: 2, label: 'Invoices', icon: <ReceiptIcon />, href: '/invoices' },
+  { id: 3, label: 'Clients', icon: <PeopleIcon />, href: '/clients' }
 ]
 
 const DrawerNavigation = ({ open }: { open: boolean }) => {
