@@ -16,7 +16,9 @@ import { Route as LoginRouteImport } from './routes/login/route'
 import { Route as AuthLayoutImport } from './routes/_auth/_layout'
 import { Route as AuthLayoutIndexRouteImport } from './routes/_auth/_layout/index/route'
 import { Route as AuthLayoutInvoicesIndexImport } from './routes/_auth/_layout/invoices/index'
+import { Route as AuthLayoutClientsIndexImport } from './routes/_auth/_layout/clients/index'
 import { Route as AuthLayoutInvoicesIdImport } from './routes/_auth/_layout/invoices/$id'
+import { Route as AuthLayoutClientsNewImport } from './routes/_auth/_layout/clients/new'
 
 // Create/Update Routes
 
@@ -47,8 +49,18 @@ const AuthLayoutInvoicesIndexRoute = AuthLayoutInvoicesIndexImport.update({
   getParentRoute: () => AuthLayoutRoute,
 } as any)
 
+const AuthLayoutClientsIndexRoute = AuthLayoutClientsIndexImport.update({
+  path: '/clients/',
+  getParentRoute: () => AuthLayoutRoute,
+} as any)
+
 const AuthLayoutInvoicesIdRoute = AuthLayoutInvoicesIdImport.update({
   path: '/invoices/$id',
+  getParentRoute: () => AuthLayoutRoute,
+} as any)
+
+const AuthLayoutClientsNewRoute = AuthLayoutClientsNewImport.update({
+  path: '/clients/new',
   getParentRoute: () => AuthLayoutRoute,
 } as any)
 
@@ -72,8 +84,16 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthLayoutIndexRouteImport
       parentRoute: typeof AuthLayoutImport
     }
+    '/_auth/_layout/clients/new': {
+      preLoaderRoute: typeof AuthLayoutClientsNewImport
+      parentRoute: typeof AuthLayoutImport
+    }
     '/_auth/_layout/invoices/$id': {
       preLoaderRoute: typeof AuthLayoutInvoicesIdImport
+      parentRoute: typeof AuthLayoutImport
+    }
+    '/_auth/_layout/clients/': {
+      preLoaderRoute: typeof AuthLayoutClientsIndexImport
       parentRoute: typeof AuthLayoutImport
     }
     '/_auth/_layout/invoices/': {
@@ -90,7 +110,9 @@ export const routeTree = rootRoute.addChildren([
   AuthRoute.addChildren([
     AuthLayoutRoute.addChildren([
       AuthLayoutIndexRouteRoute,
+      AuthLayoutClientsNewRoute,
       AuthLayoutInvoicesIdRoute,
+      AuthLayoutClientsIndexRoute,
       AuthLayoutInvoicesIndexRoute,
     ]),
   ]),
