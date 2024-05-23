@@ -49,10 +49,7 @@ describe('Invoice', () => {
         }
       ]
     }
-    const invoiceResponse = await api.post<Invoice>(
-      '/invoices/create',
-      invoiceData
-    )
+    const invoiceResponse = await api.post<Invoice>('/invoices', invoiceData)
     expect(invoiceResponse.status).toBe(201)
     const invoice = invoiceSchema.parse(invoiceResponse.data)
     expect(invoice).toHaveProperty('_id')
@@ -80,8 +77,8 @@ describe('Invoice', () => {
       ]
     }
 
-    await api.post<Invoice>('/invoices/create', invoiceData)
-    await api.post<Invoice>('/invoices/create', invoiceData)
+    await api.post<Invoice>('/invoices', invoiceData)
+    await api.post<Invoice>('/invoices', invoiceData)
 
     const response = await api.get('/invoices')
     expect(response.status).toBe(200)

@@ -3,7 +3,7 @@ import { Router } from 'express'
 
 const invoiceRoute = Router()
 
-invoiceRoute.post('/invoices/create', (req, res, next) => {
+invoiceRoute.post('/invoices', (req, res, next) => {
   void invoiceController.create(req, res, next)
 })
 
