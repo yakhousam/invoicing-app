@@ -5,7 +5,7 @@ import { userShema } from './user'
 
 const itemSchema = z.object({
   _id: objectIdToString,
-  itemName: z.string(),
+  itemName: z.string().min(1),
   itemPrice: z.coerce.number().positive(),
   itemQuantity: z.coerce.number().positive().optional().default(1)
 })
@@ -39,8 +39,7 @@ export const creatInvoiceSchema = z.object({
   items: z
     .array(itemSchema.omit({ _id: true }))
     .refine((items) => items.length !== 0, {
-      message: 'Invoice must have at least one item.',
-      path: ['items']
+      message: 'Invoice must have at least one item.'
     }),
   client: z.object({
     _id: objectIdSchema
