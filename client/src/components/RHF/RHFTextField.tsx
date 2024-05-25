@@ -21,7 +21,7 @@ const RHFTextField = ({ name, label, ...delegated }: RHFTextFieldProps) => {
           fullWidth
           onChange={(e) => {
             if (delegated.type === 'number' && e.target.value !== '') {
-              field.onChange(parseInt(e.target.value))
+              field.onChange(parseFloat(e.target.value))
             } else {
               field.onChange(e.target.value)
             }
