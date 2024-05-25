@@ -9,9 +9,7 @@ export const Route = createFileRoute('/_auth/_layout/invoices/')({
 function Invoices() {
   return (
     <Box>
-      <Link to="/invoices/$id" params={{ id: '123' }}>
-        Invoice 123
-      </Link>
+      <Link to="/invoices/create">Create Invoice</Link>
       <Typography component="h1" variant="h3">
         Invoices
       </Typography>
