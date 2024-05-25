@@ -1,19 +1,29 @@
 /* eslint-disable @typescript-eslint/unbound-method */
 import clientController from '@/controllers/client'
 import ClientModel from '@/model/client'
+import userModel from '@/model/user'
 import {
   buildNext,
   buildRes,
   getNewClient,
+  getNewUser,
   getObjectId
 } from '@/utils/generate'
+import { parseUserSchema, type User } from '@/validation/user'
 import { type Request } from 'express'
 import { Error as MongooseError } from 'mongoose'
 import { ZodError } from 'zod'
 
 describe('Client Controller', () => {
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  let user: User = undefined!
   beforeEach(async () => {
     await ClientModel.deleteMany({})
+  })
+  beforeAll(async () => {
+    user = parseUserSchema.parse(
+      (await userModel.create(getNewUser())).toJSON()
+    )
   })
 
   describe('Create', () => {
@@ -21,7 +31,8 @@ describe('Client Controller', () => {
       const mockClient = getNewClient()
 
       const req = {
-        body: mockClient
+        body: mockClient,
+        user
       } as unknown as Request
 
       const res = buildRes()
@@ -38,7 +49,8 @@ describe('Client Controller', () => {
         body: {
           ...getNewClient(),
           name: undefined
-        }
+        },
+        user
       } as unknown as Request
 
       const res = buildRes()
@@ -55,7 +67,8 @@ describe('Client Controller', () => {
         body: {
           ...getNewClient(),
           email: 'invalid email'
-        }
+        },
+        user
       } as unknown as Request
 
       const res = buildRes()
@@ -72,11 +85,11 @@ describe('Client Controller', () => {
     it('should find all clients', async () => {
       const mockClients = Array(2)
         .fill(null)
-        .map(() => getNewClient())
+        .map(() => ({ ...getNewClient(), userId: user._id }))
       const expectedClient = await ClientModel.create(mockClients)
       const res = buildRes()
       const next = buildNext()
-      const req = {} as unknown as Request
+      const req = { user } as unknown as Request
 
       await clientController.find(req, res, next)
 
@@ -94,22 +107,26 @@ describe('Client Controller', () => {
     })
 
     it('should find client by id', async () => {
-      const mockClient = getNewClient()
+      const mockClient = { ...getNewClient(), userId: user._id }
 
-      const { _id } = await ClientModel.create(mockClient)
+      const createdClient = await ClientModel.create(mockClient)
 
       const res = buildRes()
       const next = buildNext()
       const req = {
         params: {
-          id: _id.toString()
-        }
+          id: createdClient._id.toString()
+        },
+        user
       } as unknown as Request
 
       await clientController.findById(req, res, next)
 
       expect(res.status).toHaveBeenCalledWith(200)
-      expect(res.json).toHaveBeenCalledWith(expect.objectContaining(mockClient))
+
+      expect(res.json).toHaveBeenCalledWith(
+        expect.objectContaining(createdClient.toJSON())
+      )
     })
 
     it('should return status 404, client not found', async () => {
@@ -118,7 +135,8 @@ describe('Client Controller', () => {
       const req = {
         params: {
           id: getObjectId()
-        }
+        },
+        user
       } as unknown as Request
 
       await clientController.findById(req, res, next)
@@ -136,7 +154,8 @@ describe('Client Controller', () => {
       const req = {
         params: {
           id: 'invalid id'
-        }
+        },
+        user
       } as unknown as Request
 
       await clientController.findById(req, res, next)
@@ -148,7 +167,7 @@ describe('Client Controller', () => {
 
   describe('update', () => {
     it('should update client', async () => {
-      const mockClient = getNewClient()
+      const mockClient = { ...getNewClient(), userId: user._id }
 
       const { _id } = await ClientModel.create(mockClient)
 
@@ -160,7 +179,8 @@ describe('Client Controller', () => {
         params: {
           id: _id.toString()
         },
-        body: updatedClient
+        body: updatedClient,
+        user
       } as unknown as Request
 
       await clientController.update(req, res, next)
@@ -178,7 +198,8 @@ describe('Client Controller', () => {
         params: {
           id: getObjectId()
         },
-        body: getNewClient()
+        body: getNewClient(),
+        user
       } as unknown as Request
 
       await clientController.update(req, res, next)
@@ -197,7 +218,8 @@ describe('Client Controller', () => {
         params: {
           id: 'invalid id'
         },
-        body: getNewClient()
+        body: getNewClient(),
+        user
       } as unknown as Request
 
       await clientController.update(req, res, next)
@@ -212,7 +234,8 @@ describe('Client Controller', () => {
           name: undefined,
           email: 'invalid email',
           address: 'anything'
-        }
+        },
+        user
       } as unknown as Request
 
       const res = buildRes()
@@ -227,7 +250,7 @@ describe('Client Controller', () => {
 
   describe('delete', () => {
     it('should delete client', async () => {
-      const mockClient = getNewClient()
+      const mockClient = { ...getNewClient(), userId: user._id }
 
       const { _id } = await ClientModel.create(mockClient)
 
@@ -237,7 +260,8 @@ describe('Client Controller', () => {
       const req = {
         params: {
           id: _id.toString()
-        }
+        },
+        user
       } as unknown as Request
 
       await clientController.deleteById(req, res, next)
@@ -251,7 +275,8 @@ describe('Client Controller', () => {
       const req = {
         params: {
           id: getObjectId()
-        }
+        },
+        user
       } as unknown as Request
 
       await clientController.deleteById(req, res, next)
@@ -269,7 +294,8 @@ describe('Client Controller', () => {
       const req = {
         params: {
           id: 'invalid id'
-        }
+        },
+        user
       } as unknown as Request
 
       await clientController.deleteById(req, res, next)

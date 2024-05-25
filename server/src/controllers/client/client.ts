@@ -1,5 +1,6 @@
 import ClientModel from '@/model/client'
 import { clientSchema, createClientSchema } from '@/validation/client'
+import { parseUserSchema } from '@/validation/user'
 import { type NextFunction, type Request, type Response } from 'express'
 
 const create = async (
@@ -8,8 +9,12 @@ const create = async (
   next: NextFunction
 ): Promise<void> => {
   try {
+    const authenticatedUser = parseUserSchema.parse(req.user)
     const parsedClient = createClientSchema.parse(req.body)
-    const client = new ClientModel(parsedClient)
+    const client = new ClientModel({
+      ...parsedClient,
+      userId: authenticatedUser._id
+    })
 
     const newClient = await client.save()
 
@@ -27,7 +32,8 @@ const find = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    const clients = await ClientModel.find()
+    const authenticatedUser = parseUserSchema.parse(req.user)
+    const clients = await ClientModel.find({ userId: authenticatedUser._id })
     res.status(200).json(clients)
   } catch (error: unknown) {
     next(error)
@@ -41,7 +47,11 @@ const findById = async (
 ): Promise<void> => {
   try {
     const { id } = req.params
-    const client = await ClientModel.findById(id)
+    const authenticatedUser = parseUserSchema.parse(req.user)
+    const client = await ClientModel.findOne({
+      _id: id,
+      userId: authenticatedUser._id
+    })
     if (client !== null) {
       res.status(200).json(client)
     } else {
@@ -62,9 +72,13 @@ const update = async (
 ): Promise<void> => {
   try {
     const { id } = req.params
+    const authenticatedUser = parseUserSchema.parse(req.user)
     const updates = createClientSchema.partial().parse(req.body)
 
-    const client = await ClientModel.findById(id)
+    const client = await ClientModel.findOne({
+      _id: id,
+      userId: authenticatedUser._id
+    })
 
     if (client !== null) {
       client.name = updates.name ?? client.name
@@ -92,7 +106,11 @@ const deleteById = async (
 ): Promise<void> => {
   try {
     const { id } = req.params
-    const client = await ClientModel.findByIdAndDelete(id)
+    const authenticatedUser = parseUserSchema.parse(req.user)
+    const client = await ClientModel.findOneAndDelete({
+      _id: id,
+      userId: authenticatedUser._id
+    })
     if (client !== null) {
       res.status(200).json(client)
     } else {

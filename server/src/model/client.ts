@@ -1,13 +1,16 @@
 import { type Client } from '@/validation/client'
 import { Schema, model, type Document } from 'mongoose'
 
-type ClientDocument = Client & Document
+type ClientDocument = Omit<Client, 'userId'> & {
+  userId: Schema.Types.ObjectId
+} & Document
 
 const ClientSchema = new Schema<ClientDocument>(
   {
     name: { type: String, required: true, unique: true },
     email: { type: String, required: false, unique: true, sparse: true },
-    address: { type: String, required: false, default: '' }
+    address: { type: String, required: false, default: '' },
+    userId: { type: Schema.Types.ObjectId, ref: 'User', required: true }
   },
   { timestamps: true }
 )
