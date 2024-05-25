@@ -6,6 +6,7 @@ import UserModel from '@/model/user'
 import {
   buildNext,
   buildRes,
+  getNewClient,
   getNewUser,
   getObjectId,
   getProductName,
@@ -109,7 +110,10 @@ describe('User Controller', () => {
 
     it('should find invoices by user id', async () => {
       const expectedUser = await UserModel.create(getNewUser())
-      const expectedClient = await ClientModel.create(getNewUser())
+      const expectedClient = await ClientModel.create({
+        ...getNewClient(),
+        userId: expectedUser.id
+      })
 
       const notExpectedUser = await UserModel.create(getNewUser())
 
