@@ -27,7 +27,7 @@ describe('client', () => {
 
   it('should create a new client and return the client object', async () => {
     const client = getNewClient(null)
-    const response = await api.post<Client>('/clients/create', client)
+    const response = await api.post<Client>('/clients', client)
     expect(response.status).toBe(201)
     const returnedClient = response.data
     expect(returnedClient).toHaveProperty('_id')
@@ -38,8 +38,8 @@ describe('client', () => {
   it('should return all clients', async () => {
     const client1 = getNewClient(null)
     const client2 = getNewClient(null)
-    await api.post('/clients/create', client1)
-    await api.post('/clients/create', client2)
+    await api.post('/clients', client1)
+    await api.post('/clients', client2)
     const response = await api.get<Client[]>('/clients')
     expect(response.status).toBe(200)
     const returnedClients = response.data
@@ -48,7 +48,7 @@ describe('client', () => {
 
   it('should return a client by id', async () => {
     const client = getNewClient(null)
-    const response = await api.post<Client>('/clients/create', client)
+    const response = await api.post<Client>('/clients', client)
     const createdClient = response.data
     const response2 = await api.get<Client>(`/clients/${createdClient._id}`)
     expect(response2.status).toBe(200)
@@ -59,14 +59,11 @@ describe('client', () => {
 
   it('should update a client by id', async () => {
     const client = getNewClient(null)
-    const response = await api.post<Client>('/clients/create', client)
+    const response = await api.post<Client>('/clients', client)
     const createdClient = response.data
-    const response2 = await api.put<Client>(
-      `/clients/update/${createdClient._id}`,
-      {
-        name: 'updated name'
-      }
-    )
+    const response2 = await api.put<Client>(`/clients/${createdClient._id}`, {
+      name: 'updated name'
+    })
     expect(response2.status).toBe(200)
     const updatedClient = response2.data
     expect(updatedClient.name).toBe('updated name')
@@ -74,11 +71,9 @@ describe('client', () => {
 
   it('should delete a client by id', async () => {
     const client = getNewClient(null)
-    const response = await api.post<Client>('/clients/create', client)
+    const response = await api.post<Client>('/clients', client)
     const createdClient = response.data
-    const response2 = await api.delete<Client>(
-      `/clients/delete/${createdClient._id}`
-    )
+    const response2 = await api.delete<Client>(`/clients/${createdClient._id}`)
     expect(response2.status).toBe(200)
     const deletedClient = response2.data
     expect(deletedClient.name).toBe(client.name)

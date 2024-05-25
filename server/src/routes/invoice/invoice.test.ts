@@ -34,7 +34,7 @@ describe('Invoice', () => {
 
   it('should create an invoice', async () => {
     const client = clientSchema.parse(
-      (await api.post<Client>('/clients/create', getNewClient(null))).data
+      (await api.post<Client>('/clients', getNewClient(null))).data
     )
     const invoiceData: CreateInvoice = {
       client: { _id: client._id },
@@ -62,7 +62,7 @@ describe('Invoice', () => {
   })
 
   it('should return all invoices', async () => {
-    const client = await api.post<Client>('/clients/create', getNewClient(null))
+    const client = await api.post<Client>('/clients', getNewClient(null))
     const invoiceData: CreateInvoice = {
       client: { _id: client.data._id },
       items: [
