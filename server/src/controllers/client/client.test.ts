@@ -28,7 +28,7 @@ describe('Client Controller', () => {
 
   describe('Create', () => {
     it('should create a new client', async () => {
-      const mockClient = getNewClient()
+      const mockClient = getNewClient(user._id)
 
       const req = {
         body: mockClient,
@@ -47,7 +47,7 @@ describe('Client Controller', () => {
     it('should call next with ZodError error, required name', async () => {
       const req = {
         body: {
-          ...getNewClient(),
+          ...getNewClient(user._id),
           name: undefined
         },
         user
@@ -65,7 +65,7 @@ describe('Client Controller', () => {
     it('should return status 400, invalid email', async () => {
       const req = {
         body: {
-          ...getNewClient(),
+          ...getNewClient(user._id),
           email: 'invalid email'
         },
         user
@@ -85,7 +85,7 @@ describe('Client Controller', () => {
     it('should find all clients', async () => {
       const mockClients = Array(2)
         .fill(null)
-        .map(() => ({ ...getNewClient(), userId: user._id }))
+        .map(() => getNewClient(user._id))
       const expectedClient = await ClientModel.create(mockClients)
       const res = buildRes()
       const next = buildNext()
@@ -107,7 +107,7 @@ describe('Client Controller', () => {
     })
 
     it('should find client by id', async () => {
-      const mockClient = { ...getNewClient(), userId: user._id }
+      const mockClient = getNewClient(user._id)
 
       const createdClient = await ClientModel.create(mockClient)
 
@@ -167,28 +167,26 @@ describe('Client Controller', () => {
 
   describe('update', () => {
     it('should update client', async () => {
-      const mockClient = { ...getNewClient(), userId: user._id }
+      const mockClient = getNewClient(user._id)
 
       const { _id } = await ClientModel.create(mockClient)
 
       const res = buildRes()
       const next = buildNext()
 
-      const updatedClient = getNewClient()
+      const { userId, ...updates } = getNewClient(user._id)
       const req = {
         params: {
           id: _id.toString()
         },
-        body: updatedClient,
+        body: updates,
         user
       } as unknown as Request
 
       await clientController.update(req, res, next)
 
       expect(res.status).toHaveBeenCalledWith(200)
-      expect(res.json).toHaveBeenCalledWith(
-        expect.objectContaining(updatedClient)
-      )
+      expect(res.json).toHaveBeenCalledWith(expect.objectContaining(updates))
     })
 
     it('should return status 404, client not found', async () => {
@@ -198,7 +196,7 @@ describe('Client Controller', () => {
         params: {
           id: getObjectId()
         },
-        body: getNewClient(),
+        body: getNewClient(user._id),
         user
       } as unknown as Request
 
@@ -218,7 +216,7 @@ describe('Client Controller', () => {
         params: {
           id: 'invalid id'
         },
-        body: getNewClient(),
+        body: getNewClient(user._id),
         user
       } as unknown as Request
 
@@ -250,7 +248,7 @@ describe('Client Controller', () => {
 
   describe('delete', () => {
     it('should delete client', async () => {
-      const mockClient = { ...getNewClient(), userId: user._id }
+      const mockClient = getNewClient(user._id)
 
       const { _id } = await ClientModel.create(mockClient)
 

@@ -30,11 +30,11 @@ describe('Invoice Controller', () => {
 
   describe('Create', () => {
     it('should create a new invoice', async () => {
-      const client = clientSchema.parse(
-        (await ClientModel.create(getNewClient())).toJSON()
-      )
       const user = parseUserSchema.parse(
         (await UserModel.create(getNewUser())).toJSON()
+      )
+      const client = clientSchema.parse(
+        (await ClientModel.create(getNewClient(user._id))).toJSON()
       )
 
       const mockInvoice: CreateInvoice = {
@@ -162,11 +162,11 @@ describe('Invoice Controller', () => {
     })
 
     it('should increment invoiceNo', async () => {
-      const client = clientSchema.parse(
-        await ClientModel.create(getNewClient())
-      )
       const user = parseUserSchema.parse(
         (await UserModel.create(getNewUser())).toJSON()
+      )
+      const client = clientSchema.parse(
+        await ClientModel.create(getNewClient(user._id))
       )
 
       const mockInvoice: CreateInvoice = {
@@ -205,11 +205,11 @@ describe('Invoice Controller', () => {
     })
 
     it('should start invoiceNo from 1, new year', async () => {
-      const client = clientSchema.parse(
-        await ClientModel.create(getNewClient())
-      )
       const user = parseUserSchema.parse(
         (await UserModel.create(getNewUser())).toJSON()
+      )
+      const client = clientSchema.parse(
+        await ClientModel.create(getNewClient(user._id))
       )
 
       const mockInvoice: CreateInvoice = {
@@ -253,14 +253,18 @@ describe('Invoice Controller', () => {
 
   describe('Find', () => {
     it('should find all user invoices', async () => {
-      const client = clientSchema.parse(
-        (await ClientModel.create(getNewClient())).toJSON()
-      )
       const user1 = parseUserSchema.parse(
         (await UserModel.create(getNewUser())).toJSON()
       )
       const user2 = parseUserSchema.parse(
         (await UserModel.create(getNewUser())).toJSON()
+      )
+
+      const client1 = clientSchema.parse(
+        (await ClientModel.create(getNewClient(user1._id))).toJSON()
+      )
+      const client2 = clientSchema.parse(
+        (await ClientModel.create(getNewClient(user2._id))).toJSON()
       )
 
       // Inject 10 invoices for user1 and 10 invoices for user2 to the database
@@ -269,7 +273,7 @@ describe('Invoice Controller', () => {
           .fill(null)
           .map(() => ({
             user: user1._id,
-            client: { _id: client._id },
+            client: { _id: client1._id },
             items: Array(10)
               .fill(null)
               .map(() => ({
@@ -283,7 +287,7 @@ describe('Invoice Controller', () => {
           .fill(null)
           .map(() => ({
             user: user2._id,
-            client: { _id: client._id },
+            client: { _id: client2._id },
             items: Array(10)
               .fill(null)
               .map(() => ({
@@ -312,13 +316,13 @@ describe('Invoice Controller', () => {
     })
 
     it('should find invoice by id', async () => {
-      const client = clientSchema.parse(
-        (await ClientModel.create(getNewClient())).toJSON()
-      )
       const user = parseUserSchema.parse(
         (await UserModel.create(getNewUser())).toJSON()
       )
 
+      const client = clientSchema.parse(
+        (await ClientModel.create(getNewClient(user._id))).toJSON()
+      )
       const mockInvoice: CreateInvoice = {
         client: { _id: client._id },
         items: Array(10)
@@ -374,11 +378,11 @@ describe('Invoice Controller', () => {
     })
 
     it('should call res with status 404, invoice not found', async () => {
-      const client = clientSchema.parse(
-        (await ClientModel.create(getNewClient())).toJSON()
-      )
       const user1 = parseUserSchema.parse(
         (await UserModel.create(getNewUser())).toJSON()
+      )
+      const client = clientSchema.parse(
+        (await ClientModel.create(getNewClient(user1._id))).toJSON()
       )
       const user2 = parseUserSchema.parse(
         (await UserModel.create(getNewUser())).toJSON()
@@ -416,11 +420,11 @@ describe('Invoice Controller', () => {
   })
   describe('Invoice Status', () => {
     it('should return sent status', async () => {
-      const client = clientSchema.parse(
-        (await ClientModel.create(getNewClient())).toJSON()
-      )
       const user = parseUserSchema.parse(
         (await UserModel.create(getNewUser())).toJSON()
+      )
+      const client = clientSchema.parse(
+        (await ClientModel.create(getNewClient(user._id))).toJSON()
       )
       const mockInvoice: CreateInvoice = {
         client: { _id: client._id },
@@ -456,11 +460,11 @@ describe('Invoice Controller', () => {
     })
 
     it('should return paid status', async () => {
-      const client = clientSchema.parse(
-        (await ClientModel.create(getNewClient())).toJSON()
-      )
       const user = parseUserSchema.parse(
         (await UserModel.create(getNewUser())).toJSON()
+      )
+      const client = clientSchema.parse(
+        (await ClientModel.create(getNewClient(user._id))).toJSON()
       )
       const mockInvoice: CreateInvoice = {
         client: { _id: client._id },
@@ -497,11 +501,11 @@ describe('Invoice Controller', () => {
     })
 
     it('should return overdue status', async () => {
-      const client = clientSchema.parse(
-        (await ClientModel.create(getNewClient())).toJSON()
-      )
       const user = parseUserSchema.parse(
         (await UserModel.create(getNewUser())).toJSON()
+      )
+      const client = clientSchema.parse(
+        (await ClientModel.create(getNewClient(user._id))).toJSON()
       )
       const mockInvoice: CreateInvoice = {
         client: { _id: client._id },
@@ -538,11 +542,11 @@ describe('Invoice Controller', () => {
   })
   describe('Update', () => {
     it('should mark the invoice as paid', async () => {
-      const client = clientSchema.parse(
-        (await ClientModel.create(getNewClient())).toJSON()
-      )
       const user = parseUserSchema.parse(
         (await UserModel.create(getNewUser())).toJSON()
+      )
+      const client = clientSchema.parse(
+        (await ClientModel.create(getNewClient(user._id))).toJSON()
       )
       const mockInvoice: CreateInvoice = {
         client: { _id: client._id },
@@ -579,11 +583,11 @@ describe('Invoice Controller', () => {
     })
 
     it('should not allow to mark the invoice unpaid once it was paid', async () => {
-      const client = clientSchema.parse(
-        (await ClientModel.create(getNewClient())).toJSON()
-      )
       const user = parseUserSchema.parse(
         (await UserModel.create(getNewUser())).toJSON()
+      )
+      const client = clientSchema.parse(
+        (await ClientModel.create(getNewClient(user._id))).toJSON()
       )
       const mockInvoice: CreateInvoice & { paid: true } = {
         paid: true,
@@ -618,11 +622,11 @@ describe('Invoice Controller', () => {
     })
 
     it('should update invoice due days', async () => {
-      const client = clientSchema.parse(
-        (await ClientModel.create(getNewClient())).toJSON()
-      )
       const user = parseUserSchema.parse(
         (await UserModel.create(getNewUser())).toJSON()
+      )
+      const client = clientSchema.parse(
+        (await ClientModel.create(getNewClient(user._id))).toJSON()
       )
       const mockInvoice: CreateInvoice = {
         client: { _id: client._id },
@@ -659,11 +663,11 @@ describe('Invoice Controller', () => {
     })
 
     it('should update invoice date', async () => {
-      const client = clientSchema.parse(
-        (await ClientModel.create(getNewClient())).toJSON()
-      )
       const user = parseUserSchema.parse(
         (await UserModel.create(getNewUser())).toJSON()
+      )
+      const client = clientSchema.parse(
+        (await ClientModel.create(getNewClient(user._id))).toJSON()
       )
       const mockInvoice: CreateInvoice = {
         client: { _id: client._id },
@@ -701,11 +705,11 @@ describe('Invoice Controller', () => {
     })
 
     it('should update invoice items', async () => {
-      const client = clientSchema.parse(
-        (await ClientModel.create(getNewClient())).toJSON()
-      )
       const user = parseUserSchema.parse(
         (await UserModel.create(getNewUser())).toJSON()
+      )
+      const client = clientSchema.parse(
+        (await ClientModel.create(getNewClient(user._id))).toJSON()
       )
       const mockInvoice: CreateInvoice = {
         client: { _id: client._id },
@@ -773,11 +777,11 @@ describe('Invoice Controller', () => {
     })
 
     it('should call res with status 404, invoice not found', async () => {
-      const client = clientSchema.parse(
-        (await ClientModel.create(getNewClient())).toJSON()
-      )
       const user1 = parseUserSchema.parse(
         (await UserModel.create(getNewUser())).toJSON()
+      )
+      const client = clientSchema.parse(
+        (await ClientModel.create(getNewClient(user1._id))).toJSON()
       )
       const user2 = parseUserSchema.parse(
         (await UserModel.create(getNewUser())).toJSON()
@@ -817,11 +821,11 @@ describe('Invoice Controller', () => {
     })
 
     it('should not update user and client fields', async () => {
-      const client = clientSchema.parse(
-        (await ClientModel.create(getNewClient())).toJSON()
-      )
       const user = parseUserSchema.parse(
         (await UserModel.create(getNewUser())).toJSON()
+      )
+      const client = clientSchema.parse(
+        (await ClientModel.create(getNewClient(user._id))).toJSON()
       )
       const mockInvoice: CreateInvoice & {
         user: string
@@ -863,11 +867,11 @@ describe('Invoice Controller', () => {
 
   describe('Delete', () => {
     it('should delete invoice', async () => {
-      const client = clientSchema.parse(
-        (await ClientModel.create(getNewClient())).toJSON()
-      )
       const user = parseUserSchema.parse(
         (await UserModel.create(getNewUser())).toJSON()
+      )
+      const client = clientSchema.parse(
+        (await ClientModel.create(getNewClient(user._id))).toJSON()
       )
       const mockInvoice: CreateInvoice & {
         user: string
@@ -897,11 +901,11 @@ describe('Invoice Controller', () => {
     })
 
     it('should not delete paied invoice', async () => {
-      const client = clientSchema.parse(
-        (await ClientModel.create(getNewClient())).toJSON()
-      )
       const user = parseUserSchema.parse(
         (await UserModel.create(getNewUser())).toJSON()
+      )
+      const client = clientSchema.parse(
+        (await ClientModel.create(getNewClient(user._id))).toJSON()
       )
       const mockInvoice: CreateInvoice & {
         paid: true
@@ -951,11 +955,11 @@ describe('Invoice Controller', () => {
     })
 
     it('should not be able to delete other users invoices', async () => {
-      const client = clientSchema.parse(
-        (await ClientModel.create(getNewClient())).toJSON()
-      )
       const user1 = parseUserSchema.parse(
         (await UserModel.create(getNewUser())).toJSON()
+      )
+      const client = clientSchema.parse(
+        (await ClientModel.create(getNewClient(user1._id))).toJSON()
       )
       const user2 = parseUserSchema.parse(
         (await UserModel.create(getNewUser())).toJSON()

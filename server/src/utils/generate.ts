@@ -1,5 +1,5 @@
 import { type CreateClient } from '@/validation/client'
-import { type CreateUser, type User, type Role } from '@/validation/user'
+import { type CreateUser, type Role, type User } from '@/validation/user'
 import { faker } from '@faker-js/faker'
 import axios from 'axios'
 import { type NextFunction, type Response } from 'express'
@@ -24,10 +24,11 @@ export function buildNext(): NextFunction {
   return jest.fn().mockName('next') as unknown as NextFunction
 }
 
-export const getNewClient = (): CreateClient => ({
+export const getNewClient = <T>(userId: T): CreateClient & { userId: T } => ({
   name: faker.person.fullName(),
   email: faker.internet.email(),
-  address: faker.location.streetAddress()
+  address: faker.location.streetAddress(),
+  userId
 })
 
 export const getNewUser = (role?: Role): CreateUser => ({

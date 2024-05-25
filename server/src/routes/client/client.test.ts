@@ -26,7 +26,7 @@ describe('client', () => {
   })
 
   it('should create a new client and return the client object', async () => {
-    const client = getNewClient()
+    const client = getNewClient(null)
     const response = await api.post<Client>('/clients/create', client)
     expect(response.status).toBe(201)
     const returnedClient = response.data
@@ -36,8 +36,8 @@ describe('client', () => {
   })
 
   it('should return all clients', async () => {
-    const client1 = getNewClient()
-    const client2 = getNewClient()
+    const client1 = getNewClient(null)
+    const client2 = getNewClient(null)
     await api.post('/clients/create', client1)
     await api.post('/clients/create', client2)
     const response = await api.get<Client[]>('/clients')
@@ -47,7 +47,7 @@ describe('client', () => {
   })
 
   it('should return a client by id', async () => {
-    const client = getNewClient()
+    const client = getNewClient(null)
     const response = await api.post<Client>('/clients/create', client)
     const createdClient = response.data
     const response2 = await api.get<Client>(`/clients/${createdClient._id}`)
@@ -58,7 +58,7 @@ describe('client', () => {
   })
 
   it('should update a client by id', async () => {
-    const client = getNewClient()
+    const client = getNewClient(null)
     const response = await api.post<Client>('/clients/create', client)
     const createdClient = response.data
     const response2 = await api.put<Client>(
@@ -73,7 +73,7 @@ describe('client', () => {
   })
 
   it('should delete a client by id', async () => {
-    const client = getNewClient()
+    const client = getNewClient(null)
     const response = await api.post<Client>('/clients/create', client)
     const createdClient = response.data
     const response2 = await api.delete<Client>(
