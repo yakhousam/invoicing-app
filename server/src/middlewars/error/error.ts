@@ -2,6 +2,7 @@ import { MongoServerError } from 'mongodb'
 import { Error as MongooseError } from 'mongoose'
 import { ZodError } from 'zod'
 
+import logger from '@/utils/logger'
 import { type NextFunction, type Request, type Response } from 'express'
 
 function errorMiddleware(
@@ -37,6 +38,7 @@ function errorMiddleware(
     })
   } else {
     res.sendStatus(500)
+    logger.error(error)
   }
 }
 
