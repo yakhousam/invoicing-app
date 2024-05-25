@@ -7,7 +7,7 @@ export const fetchClients = async () => {
 }
 
 export const createClient = async (client: CreateClient) => {
-  const newClient = await fetchApi('/clients/create', {
+  const newClient = await fetchApi('/clients', {
     method: 'POST',
     body: JSON.stringify(client)
   })
