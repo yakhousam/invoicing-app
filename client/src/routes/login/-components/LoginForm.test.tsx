@@ -1,3 +1,5 @@
+import { baseUrl } from '@/config'
+import { HttpResponse, http, server } from '@/mocks/node'
 import { render, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
@@ -28,6 +30,11 @@ describe('LoginForm', () => {
   })
 
   it('not login user with invalid credentials', async () => {
+    server.use(
+      http.post(`${baseUrl}/auth/signin`, () => {
+        return new HttpResponse(null, { status: 401 })
+      })
+    )
     const mockOnLogin = vi.fn()
     const { getByLabelText, getByRole } = render(
       <LoginForm onLogin={mockOnLogin} />
