@@ -1,4 +1,4 @@
-import { baseUrl } from '@/config'
+import { API_URL } from '@/config'
 import { HttpResponse, http, server } from '@/mocks/node'
 import { render, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
@@ -31,7 +31,7 @@ describe('LoginForm', () => {
 
   it('not login user with invalid credentials', async () => {
     server.use(
-      http.post(`${baseUrl}/auth/signin`, () => {
+      http.post(API_URL.auth.login, () => {
         return new HttpResponse(null, { status: 401 })
       })
     )
@@ -43,7 +43,6 @@ describe('LoginForm', () => {
     await userEvent.type(getByLabelText(/username/i), 'test')
     await userEvent.type(getByLabelText(/password/i), 'wrongpassword')
     await userEvent.click(getByRole('button', { name: /sign in/i }))
-
     await waitFor(() => {
       expect(mockOnLogin).not.toHaveBeenCalled()
     })
