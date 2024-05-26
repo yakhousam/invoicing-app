@@ -1,12 +1,10 @@
-import { baseUrl } from '@/config'
-
 // wrapper around fetch
 export const fetchApi = async (
   endpoint: string,
   options: RequestInit | undefined = {}
 ) => {
   // await new Promise((resolve) => setTimeout(resolve, 2000))
-  const response = await fetch(`${baseUrl}${endpoint}`, {
+  const response = await fetch(endpoint, {
     headers: {
       'Content-Type': 'application/json'
     },

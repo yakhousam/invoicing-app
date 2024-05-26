@@ -14,7 +14,7 @@ authRoute.post(
   authController.signin
 )
 
-authRoute.get('/auth/signout', (req, res) => {
+authRoute.post('/auth/signout', (req, res) => {
   authController.signout(req, res)
 })
 

@@ -1,29 +1,29 @@
-export const baseUrl: string = import.meta.env.VITE_APP_API_URL
+export const baseUrl = import.meta.env.VITE_APP_API_URL as string
 
 export const API_URL = {
   auth: {
-    login: '/auth/signin',
-    logout: '/auth/signout'
+    login: `${baseUrl}/auth/signin`,
+    logout: `${baseUrl}/auth/signout`
   },
   clients: {
-    createOne: '/clients',
-    deleteOne: (id: string) => `/clients/${id}`,
-    getMany: '/clients',
-    getOne: (id: string) => `/clients/${id}`,
-    updateOne: (id: string) => `/clients/${id}`
+    createOne: `${baseUrl}/clients`,
+    deleteOne: (id: string) => `${baseUrl}/clients/${id}`,
+    getMany: `${baseUrl}/clients`,
+    getOne: (id: string) => `${baseUrl}/clients/${id}`,
+    updateOne: (id: string) => `${baseUrl}/clients/${id}`
   },
   users: {
-    createOne: '/users',
-    deleteOne: (id: string) => `/users/${id}`,
-    getOne: '/users',
-    updateOne: (id: string) => `/users/${id}`,
-    getProfile: '/users/me'
+    createOne: `${baseUrl}/users`,
+    deleteOne: (id: string) => `${baseUrl}/users/${id}`,
+    getOne: `${baseUrl}/users`,
+    updateOne: (id: string) => `${baseUrl}/users/${id}`,
+    getProfile: `${baseUrl}/users/me`
   },
   invoices: {
-    createOne: '/invoices',
-    deleteOne: (id: string) => `/invoices/${id}`,
-    getMany: '/invoices',
-    getOne: (id: string) => `/invoices/${id}`,
-    update: (id: string) => `/invoices/${id}`
+    createOne: `${baseUrl}/invoices`,
+    deleteOne: (id: string) => `${baseUrl}/invoices/${id}`,
+    getMany: `${baseUrl}/invoices`,
+    getOne: (id: string) => `${baseUrl}/invoices/${id}`,
+    update: (id: string) => `${baseUrl}/invoices/${id}`
   }
-}
+} as const
