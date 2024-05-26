@@ -1,4 +1,5 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { SnackbarProvider } from 'notistack'
 import { StrictMode } from 'react'
 import ReactDOM from 'react-dom/client'
 
@@ -14,9 +15,13 @@ if (!rootElement.innerHTML) {
   root.render(
     <StrictMode>
       <QueryClientProvider client={queryClient}>
-        <AuthProvider>
-          <App />
-        </AuthProvider>
+        <SnackbarProvider
+          anchorOrigin={{ horizontal: 'right', vertical: 'top' }}
+        >
+          <AuthProvider>
+            <App />
+          </AuthProvider>
+        </SnackbarProvider>
       </QueryClientProvider>
     </StrictMode>
   )
