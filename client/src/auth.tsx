@@ -1,5 +1,5 @@
 import * as api from '@/api/auth'
-import { fetchUser } from '@/api/user'
+import { fetchCurrentUser } from '@/api/user'
 import { User } from '@/validations'
 import React, { useEffect } from 'react'
 
@@ -26,7 +26,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       return
     }
     isMounted.current = true
-    fetchUser()
+    fetchCurrentUser()
       .then(setUser)
       .catch(console.error)
       .finally(() => setIsFetching(false))
