@@ -16,6 +16,7 @@ const LoginForm = ({ onLogin }: { onLogin: (user: User) => void }) => {
   const {
     handleSubmit,
     setError,
+    clearErrors,
     formState: { isSubmitting, errors, isSubmitSuccessful }
   } = formMethods
 
@@ -30,14 +31,15 @@ const LoginForm = ({ onLogin }: { onLogin: (user: User) => void }) => {
       const user = await api.login(username, password)
       onLogin(user)
     } catch (error) {
-      setError('username', {
-        type: 'manual',
-        message: 'Username or password invalide'
-      })
-      setError('password', {
-        type: 'manual',
-        message: 'Username or password invalide'
-      })
+      if (error instanceof Response && error.status === 401) {
+        setError('root.error', {
+          message: 'Username or password invalide'
+        })
+      } else {
+        setError('root.error', {
+          message: 'Something went wrong'
+        })
+      }
     }
   }
   return (
@@ -75,15 +77,18 @@ const LoginForm = ({ onLogin }: { onLogin: (user: User) => void }) => {
                 fullWidth
                 variant="contained"
                 color="primary"
+                onClick={() => clearErrors()}
               >
                 Sign In
               </LoadingButton>
             </form>
           </FormProvider>
-          {errors.username && errors.password && (
-            <Typography role="alert" color="error" textAlign="center">
-              {errors.username.message}
-            </Typography>
+          {errors.root?.error && (
+            <Box mt={2}>
+              <Typography role="alert" color="error" textAlign="center">
+                {errors.root.error.message}
+              </Typography>
+            </Box>
           )}
         </Box>
       </Container>
