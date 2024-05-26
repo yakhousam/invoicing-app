@@ -4,9 +4,11 @@ import RHFTextField from '@/components/RHF/RHFTextField'
 import { CreateClient, createClientSchema } from '@/validations'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation } from '@tanstack/react-query'
+import { useSnackbar } from 'notistack'
 import { FormProvider, useForm } from 'react-hook-form'
 
 function ClientForm() {
+  const { enqueueSnackbar } = useSnackbar()
   const formMethods = useForm<CreateClient>({
     defaultValues: {
       name: '',
@@ -25,10 +27,10 @@ function ClientForm() {
     mutationFn: (data: CreateClient) => api.createClient(data),
     onSuccess: () => {
       formMethods.reset()
-      // TODO: show success toast
+      enqueueSnackbar('Client created', { variant: 'success' })
+      console.log('Client created', enqueueSnackbar.toString())
     },
     onError: async (error: Error | Response) => {
-      console.error('on error', error)
       if (error instanceof Response && error.status === 409) {
         const data = (await error.json()) as {
           error: 'DuplicateKeyError'
@@ -39,8 +41,9 @@ function ClientForm() {
         setError(data.field, {
           message: `a client with the same ${data.field} already exists: ${data.value}`
         })
+      } else {
+        enqueueSnackbar('Error creating client', { variant: 'error' })
       }
-      //TODO otherwise show error toast
     }
   })
   const onSubmit = (data: CreateClient) => {

@@ -4,7 +4,7 @@ import { dateToZodDatetime, objectIdToString } from './common'
 export const clientSchema = z.object({
   _id: objectIdToString,
   userId: objectIdToString,
-  name: z.string().min(2),
+  name: z.string().min(1, { message: 'Name is required' }),
   email: z.union([z.string().email(), z.literal(''), z.undefined()]),
   address: z.string().optional(),
   createdAt: dateToZodDatetime,
