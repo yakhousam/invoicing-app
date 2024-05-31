@@ -1,31 +1,29 @@
-import { fetchInvoiceById } from '@/api/invoice'
-import { queryOptions, useSuspenseQuery } from '@tanstack/react-query'
+import { Box, Paper, Stack, Typography } from '@mui/material'
 import { createFileRoute } from '@tanstack/react-router'
-
-const invoiceQuery = (id: string) =>
-  queryOptions({
-    queryKey: ['invoice', id],
-    queryFn: () => fetchInvoiceById(id)
-  })
+import InvoiceByIdForm from './-components/invoiceByIdForm'
+import { invoiceByIdQueryOption } from './-query-options/invoiceByIdQueryOption'
 
 export const Route = createFileRoute('/_auth/_layout/invoices/$id')({
   loader: ({ context, params }) =>
-    context.queryClient.ensureQueryData(invoiceQuery(params.id)),
+    context.queryClient.ensureQueryData(invoiceByIdQueryOption(params.id)),
   component: Invoice
 })
 
 function Invoice() {
-  const { id } = Route.useParams()
-  const { data, isError, isLoading } = useSuspenseQuery(invoiceQuery(id))
   return (
-    <div>
-      {isError ? (
-        'Error loading invoice'
-      ) : isLoading ? (
-        'Loading invoice'
-      ) : (
-        <pre>{JSON.stringify(data, null, 2)}</pre>
-      )}
-    </div>
+    <Stack spacing={4} mt={4}>
+      <Typography variant="h4">Invoice By Id</Typography>
+      <Box
+        sx={{
+          width: (theme) => theme.breakpoints.values.lg,
+          maxWidth: '100%',
+          alignSelf: 'center'
+        }}
+      >
+        <Paper sx={{ p: 4 }}>
+          <InvoiceByIdForm />
+        </Paper>
+      </Box>
+    </Stack>
   )
 }

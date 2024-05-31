@@ -24,6 +24,6 @@ export const API_URL = {
     deleteOne: (id: string) => `${baseUrl}/invoices/${id}`,
     getMany: `${baseUrl}/invoices`,
     getOne: (id: string) => `${baseUrl}/invoices/${id}`,
-    update: (id: string) => `${baseUrl}/invoices/${id}`
+    updateOne: (id: string) => `${baseUrl}/invoices/${id}`
   }
 } as const
