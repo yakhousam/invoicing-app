@@ -21,6 +21,8 @@ export const invoiceSchema = z.object({
   totalAmount: z.number(),
   paid: z.boolean(),
   status: z.enum(['sent', 'paid', 'overdue']),
+  currency: z.enum(['USD', 'EUR', 'GBP']),
+  taxPercentage: z.number().min(0).max(100),
   createdAt: dateToZodDatetime,
   updatedAt: dateToZodDatetime
 })
@@ -43,7 +45,9 @@ export const creatInvoiceSchema = z.object({
     }),
   client: z.object({
     _id: objectIdSchema
-  })
+  }),
+  currency: z.enum(['USD', 'EUR', 'GBP']),
+  taxPercentage: z.number().min(0).max(100).optional().default(0)
 })
 
 export const updateInvoice = creatInvoiceSchema

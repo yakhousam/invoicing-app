@@ -16,6 +16,8 @@ type InvoiceDocument = {
   }>
   totalAmount: number
   paid: boolean
+  currency: string
+  taxPercentage: number
 } & Document
 
 const InvoiceSchema = new Schema<InvoiceDocument>(
@@ -64,6 +66,17 @@ const InvoiceSchema = new Schema<InvoiceDocument>(
     paid: {
       type: Boolean,
       default: false
+    },
+    currency: {
+      type: String,
+      enum: ['USD', 'EUR', 'GBP'],
+      default: 'USD'
+    },
+    taxPercentage: {
+      type: Number,
+      min: 0,
+      max: 100,
+      default: 0
     }
   },
   { timestamps: true, toJSON: { virtuals: true } }
@@ -110,7 +123,11 @@ InvoiceSchema.pre('save', async function (next) {
     (acc, item) => acc + item.itemPrice * (item.itemQuantity ?? 1),
     0
   )
-  this.totalAmount = totalAmount
+  if (this.taxPercentage > 0) {
+    this.totalAmount = totalAmount + (totalAmount * this.taxPercentage) / 100
+  } else {
+    this.totalAmount = totalAmount
+  }
   next()
 })
 

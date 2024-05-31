@@ -15,4 +15,8 @@ invoiceRoute.get('/invoices/:id', (req, res, next) => {
   void invoiceController.findById(req, res, next)
 })
 
+invoiceRoute.put('/invoices/:id', (req, res, next) => {
+  void invoiceController.updateById(req, res, next)
+})
+
 export default invoiceRoute
