@@ -13,6 +13,8 @@ import dayjs from 'dayjs'
 import { FormProvider, useFieldArray, useForm } from 'react-hook-form'
 import { clientQueryOptions } from '../clients/-query-options/clientQueryOption'
 
+const currencies = ['USD', 'EUR', 'GBP']
+
 export const Route = createFileRoute('/_auth/_layout/invoices/create')({
   loader: ({ context }) =>
     context.queryClient.ensureQueryData(clientQueryOptions),
@@ -44,7 +46,9 @@ function CreateInvoiceCmp() {
           itemPrice: 0,
           itemQuantity: 1
         }
-      ]
+      ],
+      currency: 'EUR',
+      taxPercentage: 0
     }
   })
 
@@ -87,6 +91,20 @@ function CreateInvoiceCmp() {
               value: client._id,
               label: client.name
             }))}
+          />
+          <RHFSelect
+            name="currency"
+            label="Currency"
+            options={currencies.map((currency) => ({
+              value: currency,
+              label: currency
+            }))}
+          />
+          <RHFTextField
+            type="number"
+            name="taxPercentage"
+            label="Tax percentage"
+            autoComplete="tax percentage"
           />
 
           {fields.map((field, index) => (
