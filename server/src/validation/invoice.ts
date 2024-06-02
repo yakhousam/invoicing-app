@@ -13,16 +13,19 @@ const itemSchema = z.object({
 export const invoiceSchema = z.object({
   _id: objectIdToString,
   invoiceNo: z.number(),
+  invoiceNoString: z.string(),
   invoiceDate: dateToZodDatetime,
   invoiceDueDays: z.number(),
   user: userShema.omit({ password: true }),
   client: clientSchema.pick({ _id: true, name: true }),
   items: z.array(itemSchema),
-  totalAmount: z.number(),
   paid: z.boolean(),
   status: z.enum(['sent', 'paid', 'overdue']),
   currency: z.enum(['USD', 'EUR', 'GBP']),
   taxPercentage: z.number().min(0).max(100),
+  subTotal: z.number(),
+  taxAmount: z.number(),
+  totalAmount: z.number(),
   createdAt: dateToZodDatetime,
   updatedAt: dateToZodDatetime
 })

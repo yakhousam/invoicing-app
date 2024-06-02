@@ -2,6 +2,7 @@ import { Schema, model, type Document } from 'mongoose'
 
 type InvoiceDocument = {
   invoiceNo: number
+  invoiceNoString: string
   invoiceDate: Date
   invoiceDueDays: number
   user: Schema.Types.ObjectId
@@ -14,16 +15,21 @@ type InvoiceDocument = {
     itemPrice: number
     itemQuantity: number
   }>
-  totalAmount: number
   paid: boolean
   currency: string
+  subTotal: number
   taxPercentage: number
+  taxAmount: number
+  totalAmount: number
 } & Document
 
 const InvoiceSchema = new Schema<InvoiceDocument>(
   {
     invoiceNo: {
       type: Number
+    },
+    invoiceNoString: {
+      type: String
     },
     invoiceDate: {
       type: Date,
@@ -60,9 +66,6 @@ const InvoiceSchema = new Schema<InvoiceDocument>(
         }
       }
     ],
-    totalAmount: {
-      type: Number
-    },
     paid: {
       type: Boolean,
       default: false
@@ -72,11 +75,21 @@ const InvoiceSchema = new Schema<InvoiceDocument>(
       enum: ['USD', 'EUR', 'GBP'],
       default: 'USD'
     },
+    subTotal: {
+      type: Number,
+      default: 0
+    },
     taxPercentage: {
       type: Number,
       min: 0,
       max: 100,
       default: 0
+    },
+    taxAmount: {
+      type: Number
+    },
+    totalAmount: {
+      type: Number
     }
   },
   { timestamps: true, toJSON: { virtuals: true } }
@@ -104,30 +117,48 @@ InvoiceSchema.path('client._id').validate(async (value) => {
 
 InvoiceSchema.pre('save', async function (next) {
   if (this.invoiceNo === undefined) {
-    const currentYear = new Date().getFullYear()
-    const countCurrentYearInvoices = await (
-      this.constructor as typeof InvoiceModel
-    )
+    const fullYear = new Date(this.invoiceDate).getFullYear()
+    const [maxInvoiceNo] = await (this.constructor as typeof InvoiceModel)
       .find({
         user: this.user,
         invoiceDate: {
-          $gte: new Date(currentYear, 0, 1, 0, 0, 0), // Start of the current year
-          $lte: new Date(currentYear, 11, 31, 23, 59, 59) // End of the current year
+          $gte: new Date(fullYear, 0, 1, 0, 0, 0), // Start of the current year
+          $lte: new Date(fullYear, 11, 31, 23, 59, 59) // End of the current year
         }
       })
-      .countDocuments()
+      .sort({ invoiceNo: -1 })
+      .limit(1)
+      .select('invoiceNo')
+      .lean()
 
-    this.invoiceNo = countCurrentYearInvoices + 1
+    const invoiceNumber = (maxInvoiceNo?.invoiceNo ?? 0) + 1
+
+    this.invoiceNo = invoiceNumber
+    this.invoiceNoString = `${fullYear}-${String(invoiceNumber).padStart(
+      4,
+      '0'
+    )}`
   }
-  const totalAmount = this.items.reduce(
-    (acc, item) => acc + item.itemPrice * (item.itemQuantity ?? 1),
-    0
+
+  const subTotal = parseFloat(
+    this.items
+      .reduce(
+        (acc, item) =>
+          acc +
+          parseFloat((item.itemPrice * (item.itemQuantity ?? 1)).toFixed(2)),
+        0
+      )
+      .toFixed(2)
   )
-  if (this.taxPercentage > 0) {
-    this.totalAmount = totalAmount + (totalAmount * this.taxPercentage) / 100
-  } else {
-    this.totalAmount = totalAmount
-  }
+
+  const taxAmount =
+    this.taxPercentage > 0
+      ? parseFloat(((subTotal * this.taxPercentage) / 100).toFixed(2))
+      : 0
+
+  this.subTotal = subTotal
+  this.taxAmount = taxAmount
+  this.totalAmount = parseFloat((subTotal + taxAmount).toFixed(2))
   next()
 })
 
