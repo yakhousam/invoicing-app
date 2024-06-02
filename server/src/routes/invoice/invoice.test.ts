@@ -1,5 +1,5 @@
 import InvoiceModel from '@/model/invoice'
-import { getCredentials, getNewClient } from '@/utils/generate'
+import { getCredentials, getCurrency, getNewClient } from '@/utils/generate'
 import startServer, { type Server } from '@/utils/server'
 import {
   invoiceArraySchema,
@@ -38,6 +38,7 @@ describe('Invoice', () => {
     )
     const invoiceData: CreateInvoice = {
       client: { _id: client._id },
+      currency: getCurrency(),
       items: [
         {
           itemName: 'item1',
@@ -65,6 +66,7 @@ describe('Invoice', () => {
     const client = await api.post<Client>('/clients', getNewClient(null))
     const invoiceData: CreateInvoice = {
       client: { _id: client.data._id },
+      currency: getCurrency(),
       items: [
         {
           itemName: 'item1',

@@ -1,5 +1,10 @@
-import { type CreateClient } from '@/validation/client'
-import { type CreateUser, type Role, type User } from '@/validation/user'
+import {
+  type CreateClient,
+  type CreateUser,
+  type Invoice,
+  type Role,
+  type User
+} from '@/validation'
 import { faker } from '@faker-js/faker'
 import axios from 'axios'
 import { type NextFunction, type Response } from 'express'
@@ -8,6 +13,13 @@ export const getObjectId = (): string => faker.database.mongodbObjectId()
 export const getPassword = (): string => faker.internet.password()
 export const getProductName = (): string => faker.commerce.productName()
 export const getProductPrice = (): number => Number(faker.commerce.price())
+export const getTaxPercentage = (): number =>
+  Number(faker.finance.amount(0, 100, 2))
+export const getCurrency = (): Invoice['currency'] => {
+  const currencies = ['USD', 'EUR', 'GBP'] as const
+  const randomIndex = Math.floor(Math.random() * currencies.length)
+  return currencies[randomIndex]
+}
 
 export function buildRes(overrides = {}): Response {
   const res = {

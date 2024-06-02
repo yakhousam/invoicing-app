@@ -6,6 +6,7 @@ import UserModel from '@/model/user'
 import {
   buildNext,
   buildRes,
+  getCurrency,
   getNewClient,
   getNewUser,
   getObjectId,
@@ -39,6 +40,7 @@ describe('Invoice Controller', () => {
 
       const mockInvoice: CreateInvoice = {
         client: { _id: client._id },
+        currency: getCurrency(),
         items: Array(10)
           .fill(null)
           .map(() => ({
@@ -85,6 +87,7 @@ describe('Invoice Controller', () => {
       const user = { ...getNewUser(), _id: getObjectId() }
       const mockInvoice: CreateInvoice = {
         client: { _id: '12456456' },
+        currency: getCurrency(),
         items: Array(10)
           .fill(null)
           .map(() => ({
@@ -140,6 +143,7 @@ describe('Invoice Controller', () => {
       }
       const mockInvoice: CreateInvoice = {
         client: { _id: getObjectId() },
+        currency: getCurrency(),
         items: Array(10)
           .fill(null)
           .map(() => ({
@@ -171,6 +175,7 @@ describe('Invoice Controller', () => {
 
       const mockInvoice: CreateInvoice = {
         client: { _id: client._id },
+        currency: getCurrency(),
         items: Array(1)
           .fill(null)
           .map(() => ({
@@ -215,6 +220,7 @@ describe('Invoice Controller', () => {
       const mockInvoice: CreateInvoice = {
         client: { _id: client._id },
         invoiceDate: new Date('2021-12-31').toISOString(),
+        currency: getCurrency(),
         items: Array(10)
           .fill(null)
           .map(() => ({
@@ -325,6 +331,7 @@ describe('Invoice Controller', () => {
       )
       const mockInvoice: CreateInvoice = {
         client: { _id: client._id },
+        currency: getCurrency(),
         items: Array(10)
           .fill(null)
           .map(() => ({
@@ -390,6 +397,7 @@ describe('Invoice Controller', () => {
 
       const mockInvoice: CreateInvoice = {
         client: { _id: client._id },
+        currency: getCurrency(),
         items: Array(10)
           .fill(null)
           .map(() => ({
@@ -428,6 +436,7 @@ describe('Invoice Controller', () => {
       )
       const mockInvoice: CreateInvoice = {
         client: { _id: client._id },
+        currency: getCurrency(),
         items: Array(10)
           .fill(null)
           .map(() => ({
@@ -468,6 +477,7 @@ describe('Invoice Controller', () => {
       )
       const mockInvoice: CreateInvoice = {
         client: { _id: client._id },
+        currency: getCurrency(),
         items: Array(10)
           .fill(null)
           .map(() => ({
@@ -509,6 +519,7 @@ describe('Invoice Controller', () => {
       )
       const mockInvoice: CreateInvoice = {
         client: { _id: client._id },
+        currency: getCurrency(),
         items: Array(10)
           .fill(null)
           .map(() => ({
@@ -550,6 +561,7 @@ describe('Invoice Controller', () => {
       )
       const mockInvoice: CreateInvoice = {
         client: { _id: client._id },
+        currency: getCurrency(),
         items: Array(10)
           .fill(null)
           .map(() => ({
@@ -592,6 +604,7 @@ describe('Invoice Controller', () => {
       const mockInvoice: CreateInvoice & { paid: true } = {
         paid: true,
         client: { _id: client._id },
+        currency: getCurrency(),
         items: Array(10)
           .fill(null)
           .map(() => ({
@@ -630,6 +643,7 @@ describe('Invoice Controller', () => {
       )
       const mockInvoice: CreateInvoice = {
         client: { _id: client._id },
+        currency: getCurrency(),
         items: Array(10)
           .fill(null)
           .map(() => ({
@@ -671,6 +685,7 @@ describe('Invoice Controller', () => {
       )
       const mockInvoice: CreateInvoice = {
         client: { _id: client._id },
+        currency: getCurrency(),
         items: Array(10)
           .fill(null)
           .map(() => ({
@@ -713,11 +728,12 @@ describe('Invoice Controller', () => {
       )
       const mockInvoice: CreateInvoice = {
         client: { _id: client._id },
+        currency: getCurrency(),
         items: Array(10)
           .fill(null)
           .map(() => ({
-            itemName: 'test',
-            itemPrice: 10
+            itemName: getProductName(),
+            itemPrice: getProductPrice()
           }))
       }
 
@@ -789,11 +805,12 @@ describe('Invoice Controller', () => {
 
       const mockInvoice: CreateInvoice = {
         client: { _id: client._id },
+        currency: getCurrency(),
         items: Array(10)
           .fill(null)
           .map(() => ({
-            itemName: 'test',
-            itemPrice: 10
+            itemName: getProductName(),
+            itemPrice: getProductPrice()
           }))
       }
 
@@ -831,12 +848,13 @@ describe('Invoice Controller', () => {
         user: string
       } = {
         client: { _id: client._id },
+        currency: getCurrency(),
         user: user._id,
         items: Array(10)
           .fill(null)
           .map(() => ({
-            itemName: 'test',
-            itemPrice: 10
+            itemName: getProductName(),
+            itemPrice: getProductPrice()
           }))
       }
 
@@ -877,12 +895,13 @@ describe('Invoice Controller', () => {
         user: string
       } = {
         client: { _id: client._id },
+        currency: getCurrency(),
         user: user._id,
         items: Array(10)
           .fill(null)
           .map(() => ({
-            itemName: 'test',
-            itemPrice: 10
+            itemName: getProductName(),
+            itemPrice: getProductPrice()
           }))
       }
 
@@ -914,11 +933,12 @@ describe('Invoice Controller', () => {
         client: { _id: client._id },
         user: user._id,
         paid: true,
+        currency: getCurrency(),
         items: Array(10)
           .fill(null)
           .map(() => ({
-            itemName: 'test',
-            itemPrice: 10
+            itemName: getProductName(),
+            itemPrice: getProductPrice()
           }))
       }
 
@@ -969,11 +989,12 @@ describe('Invoice Controller', () => {
       } = {
         client: { _id: client._id },
         user: user1._id,
+        currency: getCurrency(),
         items: Array(10)
           .fill(null)
           .map(() => ({
-            itemName: 'test',
-            itemPrice: 10
+            itemName: getProductName(),
+            itemPrice: getProductPrice()
           }))
       }
 

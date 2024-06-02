@@ -6,6 +6,7 @@ import UserModel from '@/model/user'
 import {
   buildNext,
   buildRes,
+  getCurrency,
   getNewClient,
   getNewUser,
   getObjectId,
@@ -121,6 +122,7 @@ describe('User Controller', () => {
         .map(() => ({
           user: notExpectedUser._id.toString(),
           client: { _id: expectedClient._id.toString() },
+          currency: getCurrency(),
           items: Array(10)
             .fill(null)
             .map(() => ({
@@ -136,6 +138,7 @@ describe('User Controller', () => {
         .map(() => ({
           user: expectedUser._id.toString(),
           client: { _id: expectedClient._id.toString() },
+          currency: getCurrency(),
           items: Array(10)
             .fill(null)
             .map(() => ({
