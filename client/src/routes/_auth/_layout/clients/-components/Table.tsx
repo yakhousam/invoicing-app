@@ -44,6 +44,9 @@ const ClientsTable = () => {
           children: 'Error loading data'
         }
       : undefined,
+    muiTablePaperProps: {
+      elevation: 0
+    },
     enableFilters: false,
     enableDensityToggle: false,
     enableFullScreenToggle: false
