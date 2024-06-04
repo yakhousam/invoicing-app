@@ -4,6 +4,9 @@ import InvoiceByIdForm from './-components/invoiceByIdForm'
 import { invoiceByIdQueryOption } from './-query-options/invoiceByIdQueryOption'
 
 export const Route = createFileRoute('/_auth/_layout/invoices/$id')({
+  beforeLoad: () => ({
+    title: 'Invoice'
+  }),
   loader: ({ context, params }) =>
     context.queryClient.ensureQueryData(invoiceByIdQueryOption(params.id)),
   component: Invoice
@@ -12,7 +15,7 @@ export const Route = createFileRoute('/_auth/_layout/invoices/$id')({
 function Invoice() {
   return (
     <Stack spacing={4} mt={4}>
-      <Typography variant="h4">Invoice By Id</Typography>
+      <Typography variant="h4">Invoice</Typography>
       <Box
         sx={{
           width: (theme) => theme.breakpoints.values.lg,
