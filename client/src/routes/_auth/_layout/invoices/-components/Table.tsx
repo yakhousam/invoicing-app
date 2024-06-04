@@ -1,7 +1,10 @@
 import { fetchInvoices } from '@/api/invoice'
+import { formatCurrency } from '@/helpers'
 import { invoicesQueryOptions } from '@/invoicesQueryOptions'
+import { Chip, Typography } from '@mui/material'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { useNavigate } from '@tanstack/react-router'
+import dayjs from 'dayjs'
 import {
   MaterialReactTable,
   useMaterialReactTable,
@@ -17,7 +20,7 @@ const InvoicesTable = () => {
   const columns = useMemo<MRT_ColumnDef<Columns>[]>(() => {
     return [
       {
-        accessorKey: 'invoiceNo',
+        accessorKey: 'invoiceNoString',
         header: 'N°'
       },
       {
@@ -26,15 +29,40 @@ const InvoicesTable = () => {
       },
       {
         accessorKey: 'invoiceDate',
-        header: 'Date'
+        header: 'Date',
+        accessorFn(originalRow) {
+          return dayjs(originalRow.invoiceDate).format('DD/MM/YYYY')
+        }
       },
       {
         accessorKey: 'status',
-        header: 'Status'
+        header: 'Status',
+        Cell: ({ cell }) => {
+          const status = cell.getValue<Columns['status']>()
+          return (
+            <Chip
+              label={
+                <Typography variant="inherit" textTransform="capitalize">
+                  {status}
+                </Typography>
+              }
+              color={
+                status === 'paid'
+                  ? 'success'
+                  : status === 'sent'
+                    ? 'info'
+                    : 'secondary'
+              }
+            />
+          )
+        }
       },
       {
         accessorKey: 'totalAmount',
-        header: 'Price'
+        header: 'Price',
+        accessorFn(originalRow) {
+          return formatCurrency(originalRow.currency)(originalRow.totalAmount)
+        }
       }
     ]
   }, [])
@@ -63,7 +91,10 @@ const InvoicesTable = () => {
         })
       },
       sx: { cursor: 'pointer' }
-    })
+    }),
+    muiTablePaperProps: {
+      elevation: 0
+    }
   })
 
   return <MaterialReactTable table={table} />
