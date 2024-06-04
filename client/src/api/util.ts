@@ -14,5 +14,6 @@ export const fetchApi = async (
   if (!response.ok) {
     throw response
   }
-  return response.json()
+  // Only parse as JSON if the response has content
+  return response.status === 204 ? null : response.json()
 }
