@@ -19,7 +19,7 @@ import { Route as AuthLayoutInvoicesIndexImport } from './routes/_auth/_layout/i
 import { Route as AuthLayoutClientsIndexImport } from './routes/_auth/_layout/clients/index'
 import { Route as AuthLayoutInvoicesCreateImport } from './routes/_auth/_layout/invoices/create'
 import { Route as AuthLayoutInvoicesIdImport } from './routes/_auth/_layout/invoices/$id'
-import { Route as AuthLayoutClientsNewImport } from './routes/_auth/_layout/clients/new'
+import { Route as AuthLayoutClientsCreateImport } from './routes/_auth/_layout/clients/create'
 
 // Create/Update Routes
 
@@ -65,8 +65,8 @@ const AuthLayoutInvoicesIdRoute = AuthLayoutInvoicesIdImport.update({
   getParentRoute: () => AuthLayoutRoute,
 } as any)
 
-const AuthLayoutClientsNewRoute = AuthLayoutClientsNewImport.update({
-  path: '/clients/new',
+const AuthLayoutClientsCreateRoute = AuthLayoutClientsCreateImport.update({
+  path: '/clients/create',
   getParentRoute: () => AuthLayoutRoute,
 } as any)
 
@@ -90,8 +90,8 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthLayoutIndexRouteImport
       parentRoute: typeof AuthLayoutImport
     }
-    '/_auth/_layout/clients/new': {
-      preLoaderRoute: typeof AuthLayoutClientsNewImport
+    '/_auth/_layout/clients/create': {
+      preLoaderRoute: typeof AuthLayoutClientsCreateImport
       parentRoute: typeof AuthLayoutImport
     }
     '/_auth/_layout/invoices/$id': {
@@ -120,7 +120,7 @@ export const routeTree = rootRoute.addChildren([
   AuthRoute.addChildren([
     AuthLayoutRoute.addChildren([
       AuthLayoutIndexRouteRoute,
-      AuthLayoutClientsNewRoute,
+      AuthLayoutClientsCreateRoute,
       AuthLayoutInvoicesIdRoute,
       AuthLayoutInvoicesCreateRoute,
       AuthLayoutClientsIndexRoute,
