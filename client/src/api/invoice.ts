@@ -32,3 +32,9 @@ export const updateInvoice = async (id: string, data: UpdateInvoice) => {
   })
   return invoiceSchema.parse(invoice) // Use invoiceSchema to parse the invoice
 }
+
+export const deleteInvoice = async (id: string) => {
+  await fetchApi(API_URL.invoices.deleteOne(id), {
+    method: 'DELETE'
+  })
+}
