@@ -19,4 +19,8 @@ invoiceRoute.put('/invoices/:id', (req, res, next) => {
   void invoiceController.updateById(req, res, next)
 })
 
+invoiceRoute.delete('/invoices/:id', (req, res, next) => {
+  void invoiceController.delteById(req, res, next)
+})
+
 export default invoiceRoute

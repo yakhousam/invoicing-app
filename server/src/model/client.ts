@@ -7,13 +7,16 @@ type ClientDocument = Omit<Client, 'userId'> & {
 
 const ClientSchema = new Schema<ClientDocument>(
   {
-    name: { type: String, required: true, unique: true },
-    email: { type: String, required: false, unique: true, sparse: true },
+    name: { type: String, required: true },
+    email: { type: String, required: false, sparse: true },
     address: { type: String, required: false, default: '' },
     userId: { type: Schema.Types.ObjectId, ref: 'User', required: true }
   },
   { timestamps: true }
 )
+
+ClientSchema.index({ name: 1, userId: 1 }, { unique: true })
+ClientSchema.index({ email: 1, userId: 1 }, { unique: true, sparse: true })
 
 // only insert email if it is not empty string
 ClientSchema.pre('save', function (next) {
