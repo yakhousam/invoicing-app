@@ -1,14 +1,14 @@
+import { invoiceByIdOptions } from '@/queries'
 import { Box, Paper, Stack, Typography } from '@mui/material'
 import { createFileRoute } from '@tanstack/react-router'
 import InvoiceByIdForm from './-components/invoiceByIdForm'
-import { invoiceByIdQueryOption } from './-query-options/invoiceByIdQueryOption'
 
 export const Route = createFileRoute('/_auth/_layout/invoices/$id')({
   beforeLoad: () => ({
     title: 'Invoice'
   }),
   loader: ({ context, params }) =>
-    context.queryClient.ensureQueryData(invoiceByIdQueryOption(params.id)),
+    context.queryClient.ensureQueryData(invoiceByIdOptions(params.id)),
   component: Invoice
 })
 

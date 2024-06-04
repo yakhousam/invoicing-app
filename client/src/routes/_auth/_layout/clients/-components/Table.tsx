@@ -1,4 +1,5 @@
 import { fetchClients } from '@/api/clients'
+import { clientsOptions } from '@/queries'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import {
   MaterialReactTable,
@@ -6,13 +7,12 @@ import {
   type MRT_ColumnDef
 } from 'material-react-table'
 import { useMemo } from 'react'
-import { clientQueryOptions } from '../-query-options/clientQueryOption'
 
 type Columns = Awaited<ReturnType<typeof fetchClients>>[0]
 
 const ClientsTable = () => {
   //   const navigate = useNavigate()
-  const { data, isError, isLoading } = useSuspenseQuery(clientQueryOptions)
+  const { data, isError, isLoading } = useSuspenseQuery(clientsOptions)
   const columns = useMemo<MRT_ColumnDef<Columns>[]>(() => {
     return [
       {

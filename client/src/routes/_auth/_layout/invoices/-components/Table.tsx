@@ -1,6 +1,6 @@
 import { fetchInvoices } from '@/api/invoice'
 import { formatCurrency } from '@/helpers'
-import { invoicesQueryOptions } from '@/invoicesQueryOptions'
+import { invoicesOptions } from '@/queries'
 import { Chip, Typography } from '@mui/material'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { useNavigate } from '@tanstack/react-router'
@@ -16,7 +16,7 @@ type Columns = Awaited<ReturnType<typeof fetchInvoices>>[0]
 
 const InvoicesTable = () => {
   const navigate = useNavigate()
-  const { data, isError, isLoading } = useSuspenseQuery(invoicesQueryOptions)
+  const { data, isError, isLoading } = useSuspenseQuery(invoicesOptions)
   const columns = useMemo<MRT_ColumnDef<Columns>[]>(() => {
     return [
       {

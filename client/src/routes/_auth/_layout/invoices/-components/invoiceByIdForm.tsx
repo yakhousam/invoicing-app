@@ -5,6 +5,7 @@ import {
 } from '@/components/LoadingButton'
 import RHFSwitch from '@/components/RHF/RHFSwitch'
 import { formatCurrency } from '@/helpers'
+import { invoiceByIdOptions } from '@/queries'
 import { UpdateInvoice } from '@/validations'
 import {
   Box,
@@ -26,12 +27,11 @@ import { useParams } from '@tanstack/react-router'
 import dayjs from 'dayjs'
 import { useSnackbar } from 'notistack'
 import { FormProvider, useForm } from 'react-hook-form'
-import { invoiceByIdQueryOption } from '../-query-options/invoiceByIdQueryOption'
 import DownloadInvoiceBtn from './DownloadInvoiceBtn'
 
 const InvoiceByIdForm = () => {
   const { id } = useParams({ from: '/_auth/_layout/invoices/$id' })
-  const options = invoiceByIdQueryOption(id)
+  const options = invoiceByIdOptions(id)
 
   const queryClient = useQueryClient()
   const { enqueueSnackbar } = useSnackbar()
