@@ -3,6 +3,7 @@ import LoadingButton from '@/components/LoadingButton'
 import RHFTextField from '@/components/RHF/RHFTextField'
 import { CreateClient, createClientSchema } from '@/validations'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { Box, Grid } from '@mui/material'
 import { useMutation } from '@tanstack/react-query'
 import { useSnackbar } from 'notistack'
 import { FormProvider, useForm } from 'react-hook-form'
@@ -52,37 +53,48 @@ function ClientForm() {
   return (
     <FormProvider {...formMethods}>
       <form onSubmit={handleSubmit(onSubmit)}>
-        <RHFTextField
-          variant="outlined"
-          margin="normal"
-          fullWidth
-          label="Name"
-          name="name"
-          autoFocus
-        />
-        <RHFTextField
-          variant="outlined"
-          margin="normal"
-          fullWidth
-          label="Email"
-          name="email"
-        />
-        <RHFTextField
-          variant="outlined"
-          margin="normal"
-          fullWidth
-          label="Address"
-          name="address"
-        />
-        <LoadingButton
-          type="submit"
-          loading={isSubmitting}
-          fullWidth
-          variant="contained"
-          color="primary"
-        >
-          Create
-        </LoadingButton>
+        <Grid container spacing={2}>
+          <Grid item xs={6}>
+            <RHFTextField
+              variant="standard"
+              margin="normal"
+              fullWidth
+              label="Name"
+              name="name"
+              autoFocus
+            />
+          </Grid>
+          <Grid item xs={6}>
+            <RHFTextField
+              variant="standard"
+              margin="normal"
+              fullWidth
+              label="Email"
+              name="email"
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <RHFTextField
+              variant="standard"
+              margin="normal"
+              fullWidth
+              label="Address"
+              name="address"
+              multiline
+              rows={4}
+            />
+          </Grid>
+        </Grid>
+        <Box sx={{ mt: 6, display: 'flex', justifyContent: 'flex-end' }}>
+          <LoadingButton
+            type="submit"
+            loading={isSubmitting}
+            variant="contained"
+            color="primary"
+          >
+            Create
+          </LoadingButton>
+        </Box>
       </form>
     </FormProvider>
   )
