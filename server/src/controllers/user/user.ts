@@ -1,6 +1,12 @@
 import InvoiceModel from '@/model/invoice'
 import UserModel from '@/model/user'
-import { type UpdateUser } from '@/validation/user'
+import logger from '@/utils/logger'
+import {
+  parseUserSchema,
+  updateUserSchema,
+  type UpdateUser,
+  type User
+} from '@/validation/user'
 import { type NextFunction, type Request, type Response } from 'express'
 
 export type UserUpdateType = Request<
@@ -66,28 +72,48 @@ const findInvoices = async (
   }
 }
 
-// const update = async (req: UserUpdateType, res: Response, next: NextFunction): Promise<void> => {
-//   try {
-//     const { id } = req.params
-//     const { name, email, password } = req.body
-
-//     const user = await UserModel.findById(id)
-
-//     if (user !== null) {
-//       userShema.parse({ name, email, password })
-//       user.name = name
-//       user.email = email
-//       user.password = password
-
-//       const updatedUser = await user.save()
-//       res.status(200).json(updatedUser)
-//     } else {
-//       res.status(404).json({ error: 'Not found', message: `User with id: ${id} doesn't exist` })
-//     }
-//   } catch (error: unknown) {
-//     next(error)
-//   }
-// }
+const updateById = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const { id } = req.params
+    const { name, email, password } = updateUserSchema.parse(req.body)
+    const authenticatedUser = parseUserSchema.parse(req.user)
+    logger.info(authenticatedUser._id, id)
+    if (authenticatedUser._id !== id) {
+      res.status(403).json({
+        error: 'Forbidden',
+        message: 'You can only update your own user'
+      })
+      return
+    }
+    const user = await UserModel.findOneAndUpdate<User>(
+      {
+        _id: id
+      },
+      {
+        name,
+        email,
+        password
+      },
+      {
+        new: true
+      }
+    )
+    if (user !== null) {
+      res.status(200).json(user)
+    } else {
+      res.status(404).json({
+        error: 'Not found',
+        message: `User with id: ${id} doesn't exist`
+      })
+    }
+  } catch (error: unknown) {
+    next(error)
+  }
+}
 
 const deleteById = async (
   req: Request,
@@ -128,7 +154,8 @@ const userController = {
   findById,
   findInvoices,
   deleteById,
-  findMe
+  findMe,
+  updateById
 }
 
 export default userController

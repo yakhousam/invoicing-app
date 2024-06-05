@@ -12,4 +12,8 @@ userRoute.get('/users/me', (req, res, next) => {
   void userController.findMe(req, res, next)
 })
 
+userRoute.put('/users/:id', (req, res, next) => {
+  void userController.updateById(req, res, next)
+})
+
 export default userRoute
