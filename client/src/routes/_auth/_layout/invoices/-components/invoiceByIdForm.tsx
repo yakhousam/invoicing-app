@@ -29,7 +29,11 @@ import { useSnackbar } from 'notistack'
 import { FormProvider, useForm } from 'react-hook-form'
 import DownloadInvoiceBtn from './DownloadInvoiceBtn'
 
-const InvoiceByIdForm = () => {
+const InvoiceByIdForm = ({
+  onDeleteInvoice
+}: {
+  onDeleteInvoice: () => void
+}) => {
   const { id } = useParams({ from: '/_auth/_layout/invoices/$id' })
   const options = invoiceByIdOptions(id)
 
@@ -62,6 +66,7 @@ const InvoiceByIdForm = () => {
         queryKey: options.queryKey,
         refetchType: 'none'
       })
+      onDeleteInvoice()
     },
     onError: (error) => {
       enqueueSnackbar('Error deleting invoice', { variant: 'error' })

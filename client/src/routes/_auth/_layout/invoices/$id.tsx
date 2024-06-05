@@ -1,6 +1,6 @@
 import { invoiceByIdOptions } from '@/queries'
 import { Box, Paper, Stack, Typography } from '@mui/material'
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, useRouter } from '@tanstack/react-router'
 import InvoiceByIdForm from './-components/invoiceByIdForm'
 
 export const Route = createFileRoute('/_auth/_layout/invoices/$id')({
@@ -13,6 +13,10 @@ export const Route = createFileRoute('/_auth/_layout/invoices/$id')({
 })
 
 function Invoice() {
+  const router = useRouter()
+  const onDeleteInvoice = () => {
+    router.invalidate().finally(() => router.navigate({ to: '/invoices' }))
+  }
   return (
     <Stack spacing={4} mt={4}>
       <Typography variant="h4">Invoice</Typography>
@@ -24,7 +28,7 @@ function Invoice() {
         }}
       >
         <Paper sx={{ p: 4 }}>
-          <InvoiceByIdForm />
+          <InvoiceByIdForm onDeleteInvoice={onDeleteInvoice} />
         </Paper>
       </Box>
     </Stack>

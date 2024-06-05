@@ -28,13 +28,12 @@ function CreateInvoiceForm() {
 
   const mutation = useMutation({
     mutationFn: api.createInvoice,
-    onSuccess: (data) => {
+    onSuccess: () => {
       enqueueSnackbar('Invoice created', { variant: 'success' })
       methods.reset()
-      queryClient.setQueryData<Invoice[]>(
-        invoicesOptions.queryKey,
-        (oldData = []) => [...oldData, data]
-      )
+      queryClient.invalidateQueries({
+        queryKey: invoicesOptions.queryKey
+      })
     },
     onError: (error) => {
       enqueueSnackbar(error.message, { variant: 'error' })
