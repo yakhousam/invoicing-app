@@ -1,9 +1,8 @@
 import AppBar from '@/components/AppBar'
+import AppBarMenu from '@/components/AppBarMenu'
 import Breadcrumbs from '@/components/Breadcrumbs'
 import Drawer, { DrawerHeader } from '@/components/Drawer'
 import DrawerNavigation from '@/components/DrawerNavigation'
-import LoadingButton from '@/components/LoadingButton'
-import useLogout from '@/hooks/useLogout'
 
 import { Box, CssBaseline } from '@mui/material'
 import { Outlet, createFileRoute, useRouter } from '@tanstack/react-router'
@@ -40,7 +39,7 @@ function Layout() {
         drawerWidth={drawerWidth}
       >
         <Box ml="auto">
-          <LogoutButton />
+          <AppBarMenu />
         </Box>
       </AppBar>
       <Drawer
@@ -56,19 +55,5 @@ function Layout() {
         <Outlet />
       </Box>
     </Box>
-  )
-}
-
-const LogoutButton = () => {
-  const { handleLogout, status } = useLogout()
-  return (
-    <LoadingButton
-      loading={status === 'pending'}
-      variant="contained"
-      color="secondary"
-      onClick={handleLogout}
-    >
-      Logout
-    </LoadingButton>
   )
 }
