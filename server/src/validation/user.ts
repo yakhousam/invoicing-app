@@ -3,7 +3,7 @@ import { dateToZodDatetime, objectIdToString } from './common'
 
 export const userShema = z.object({
   _id: objectIdToString,
-  name: z.string(),
+  name: z.string().min(2),
   email: z.string().email().optional(),
   password: z.string().min(6),
   role: z
