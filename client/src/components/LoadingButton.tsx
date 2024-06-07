@@ -1,6 +1,6 @@
 import DeleteIcon from '@mui/icons-material/Delete'
 import SaveIcon from '@mui/icons-material/Save'
-import { Box, Button, CircularProgress } from '@mui/material'
+import { Button, CircularProgress } from '@mui/material'
 
 interface LoadingButtonProps extends React.ComponentProps<typeof Button> {
   loading: boolean
@@ -13,10 +13,13 @@ export const LoadingButton = ({
   ...delegated
 }: LoadingButtonProps) => {
   return (
-    <Box sx={{ position: 'relative' }}>
-      <Button variant="contained" disabled={loading} {...delegated}>
-        {children}
-      </Button>
+    <Button
+      variant="contained"
+      disabled={loading}
+      {...delegated}
+      sx={{ position: 'relative', ...(delegated.sx || {}) }}
+    >
+      {children}
       {loading && (
         <CircularProgress
           size={24}
@@ -29,7 +32,7 @@ export const LoadingButton = ({
           }}
         />
       )}
-    </Box>
+    </Button>
   )
 }
 
