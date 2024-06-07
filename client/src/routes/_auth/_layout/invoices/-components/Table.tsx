@@ -37,6 +37,7 @@ const InvoicesTable = () => {
       {
         accessorKey: 'status',
         header: 'Status',
+        size: 50,
         Cell: ({ cell }) => {
           const status = cell.getValue<Columns['status']>()
           return (
@@ -62,6 +63,12 @@ const InvoicesTable = () => {
         header: 'Price',
         accessorFn(originalRow) {
           return formatCurrency(originalRow.currency)(originalRow.totalAmount)
+        },
+        muiTableHeadCellProps: {
+          align: 'right'
+        },
+        muiTableBodyCellProps: {
+          align: 'right'
         }
       }
     ]
