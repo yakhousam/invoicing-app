@@ -1,5 +1,5 @@
 import useLogout from '@/hooks/useLogout'
-import { AccountCircle, LogoutRounded, Person2 } from '@mui/icons-material'
+import { AccountCircle, LogoutRounded, Settings } from '@mui/icons-material'
 import {
   IconButton,
   ListItemIcon,
@@ -49,12 +49,12 @@ const AppBarMenu = () => {
         onClose={handleClose}
         sx={{ '& a': { textDecoration: 'none', color: 'inherit' } }}
       >
-        <RouterLink to="/profile">
+        <RouterLink to="/settings">
           <MenuItem onClick={handleClose}>
             <ListItemIcon>
-              <Person2 fontSize="small" />
+              <Settings fontSize="small" />
             </ListItemIcon>
-            <ListItemText primary="Profile" />
+            <ListItemText primary="Settings" />
           </MenuItem>
         </RouterLink>
         <MenuItem onClick={handleLogout}>

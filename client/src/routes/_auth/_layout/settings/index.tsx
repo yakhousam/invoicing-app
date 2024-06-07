@@ -3,7 +3,7 @@ import { Typography } from '@mui/material'
 import { createFileRoute } from '@tanstack/react-router'
 import ProfileForm from './-components/ProfileForm'
 
-export const Route = createFileRoute('/_auth/_layout/profile/')({
+export const Route = createFileRoute('/_auth/_layout/settings/')({
   component: () => <Profile />
 })
 
