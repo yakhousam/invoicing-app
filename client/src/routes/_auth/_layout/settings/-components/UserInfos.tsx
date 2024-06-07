@@ -56,7 +56,9 @@ function UserInfos({
   }
   return (
     <>
-      <Typography variant="h5">User Information</Typography>
+      <Typography variant="h5" fontWeight="bold">
+        User Information
+      </Typography>
       <Typography variant="body2" gutterBottom>
         Update your personal information
       </Typography>
