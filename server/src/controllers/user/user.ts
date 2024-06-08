@@ -8,6 +8,8 @@ import {
   type User
 } from '@/validation/user'
 import { type NextFunction, type Request, type Response } from 'express'
+import fs from 'fs'
+import path from 'path'
 
 export type UserUpdateType = Request<
   { id: string },
@@ -72,7 +74,7 @@ const findInvoices = async (
   }
 }
 
-const updateById = async (
+const updateUserProfile = async (
   req: Request,
   res: Response,
   next: NextFunction
@@ -97,6 +99,57 @@ const updateById = async (
         name,
         email,
         password
+      },
+      {
+        new: true
+      }
+    )
+    if (user !== null) {
+      res.status(200).json(user)
+    } else {
+      res.status(404).json({
+        error: 'Not found',
+        message: `User with id: ${id} doesn't exist`
+      })
+    }
+  } catch (error: unknown) {
+    next(error)
+  }
+}
+
+const updateUserSignature = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const { id } = req.params
+    const authenticatedUser = parseUserSchema.parse(req.user)
+    if (authenticatedUser._id !== id) {
+      res.status(403).json({
+        error: 'Forbidden',
+        message: 'You can only update your own user'
+      })
+      return
+    }
+
+    // Delete the old user signature image
+    if (authenticatedUser.signatureUrl !== undefined) {
+      const filePath = path.join(process.cwd(), authenticatedUser.signatureUrl)
+      try {
+        await fs.promises.access(filePath, fs.constants.F_OK)
+        await fs.promises.unlink(filePath)
+      } catch (error) {
+        logger.error(error)
+      }
+    }
+
+    const user = await UserModel.findOneAndUpdate<User>(
+      {
+        _id: id
+      },
+      {
+        signatureUrl: req.file?.path
       },
       {
         new: true
@@ -155,7 +208,8 @@ const userController = {
   findInvoices,
   deleteById,
   findMe,
-  updateById
+  updateUserProfile,
+  updateUserSignature
 }
 
 export default userController

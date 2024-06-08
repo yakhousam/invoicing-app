@@ -1,7 +1,8 @@
 import invoiceController from '@/controllers/invoice'
-import { Router } from 'express'
+import { Router, json } from 'express'
 
 const invoiceRoute = Router()
+invoiceRoute.use(json())
 
 invoiceRoute.post('/invoices', (req, res, next) => {
   void invoiceController.create(req, res, next)

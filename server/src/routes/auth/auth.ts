@@ -1,8 +1,9 @@
 import authController from '@/controllers/auth'
-import { Router } from 'express'
+import { Router, json } from 'express'
 import passport from 'passport'
 
 const authRoute = Router()
+authRoute.use(json())
 
 authRoute.post('/auth/signup', (req, res, next) => {
   void authController.signup(req, res, next)

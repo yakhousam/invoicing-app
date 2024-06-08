@@ -14,8 +14,9 @@ app.use(
   })
 )
 app.use(cookieParser())
-app.use(express.json())
 app.use('/api/v1', rootRouter)
+
+app.use('/uploads', express.static('uploads'))
 
 app.use(errorMiddleware)
 

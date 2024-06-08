@@ -1,7 +1,9 @@
 import clientController from '@/controllers/client'
-import { Router } from 'express'
+import { Router, json } from 'express'
 
 const clientRoute = Router()
+
+clientRoute.use(json())
 
 clientRoute.get('/clients', (req, res, next) => {
   void clientController.find(req, res, next)

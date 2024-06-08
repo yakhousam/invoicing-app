@@ -10,6 +10,7 @@ export const userShema = z.object({
     .union([z.literal('admin'), z.literal('user')])
     .optional()
     .default('user'),
+  signatureUrl: z.string().optional(),
   createdAt: dateToZodDatetime,
   updatedAt: dateToZodDatetime
 })
@@ -22,7 +23,15 @@ export const createUserSchema = userShema.omit({
 
 export const parseUserSchema = userShema.omit({ password: true })
 
-export const updateUserSchema = createUserSchema.omit({ role: true }).partial()
+export const updateUserSchema = createUserSchema
+  .omit({
+    _id: true,
+    role: true,
+    signatureUrl: true,
+    createdAt: true,
+    updatedAt: true
+  })
+  .partial()
 
 export type User = z.infer<typeof parseUserSchema>
 

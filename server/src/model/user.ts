@@ -6,6 +6,7 @@ type UserDocument = {
   email: string
   password: string
   role: 'admin' | 'user'
+  signatureUrl: string
 } & Document
 
 export const UserSchema = new Schema<UserDocument>(
@@ -17,7 +18,8 @@ export const UserSchema = new Schema<UserDocument>(
       unique: true
     },
     password: { type: String, required: true },
-    role: { type: String, enum: ['admin', 'user'], default: 'user' }
+    role: { type: String, enum: ['admin', 'user'], default: 'user' },
+    signatureUrl: { type: String, required: false }
   },
   { timestamps: true }
 )
