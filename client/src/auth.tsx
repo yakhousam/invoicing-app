@@ -7,7 +7,7 @@ export type AuthContextType = {
   isAuthenticated: boolean
   user: User | null
   logout: () => Promise<void>
-  setUser: (user: User) => void
+  setUser: React.Dispatch<React.SetStateAction<User | null>>
   isFetching: boolean
 }
 

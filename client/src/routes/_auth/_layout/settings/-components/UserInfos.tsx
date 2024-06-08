@@ -30,9 +30,9 @@ function UserInfos({
 
   const mutation = useMutation({
     mutationFn: ({ data, userId }: { data: UpdateUser; userId: string }) =>
-      api.updateUser(data, userId),
+      api.updateUserProfile(data, userId),
     onSuccess: (data) => {
-      enqueueSnackbar('User updated', { variant: 'success' })
+      enqueueSnackbar('Profile updated', { variant: 'success' })
       onUpdateUser(data)
     },
     onError: async (error: Error | Response) => {
@@ -47,7 +47,7 @@ function UserInfos({
         //   message: `a client with the same ${data.field} already exists: ${data.value}`
         // })
       } else {
-        enqueueSnackbar('Error creating client', { variant: 'error' })
+        enqueueSnackbar('Error updating profile', { variant: 'error' })
       }
     }
   })

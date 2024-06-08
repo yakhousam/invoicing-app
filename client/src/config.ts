@@ -1,29 +1,34 @@
-export const baseUrl = import.meta.env.VITE_APP_API_URL as string
+export const apiUrl = import.meta.env.VITE_APP_API_URL as string
+
+const url = new URL('http://localhost:3005/api/v1')
+export const baseUrl = `${url.protocol}//${url.host}`
 
 export const API_URL = {
   auth: {
-    login: `${baseUrl}/auth/signin`,
-    logout: `${baseUrl}/auth/signout`
+    login: `${apiUrl}/auth/signin`,
+    logout: `${apiUrl}/auth/signout`
   },
   clients: {
-    createOne: `${baseUrl}/clients`,
-    deleteOne: (id: string) => `${baseUrl}/clients/${id}`,
-    getMany: `${baseUrl}/clients`,
-    getOne: (id: string) => `${baseUrl}/clients/${id}`,
-    updateOne: (id: string) => `${baseUrl}/clients/${id}`
+    createOne: `${apiUrl}/clients`,
+    deleteOne: (id: string) => `${apiUrl}/clients/${id}`,
+    getMany: `${apiUrl}/clients`,
+    getOne: (id: string) => `${apiUrl}/clients/${id}`,
+    updateOne: (id: string) => `${apiUrl}/clients/${id}`
   },
   users: {
-    createOne: `${baseUrl}/users`,
-    deleteOne: (id: string) => `${baseUrl}/users/${id}`,
-    getOne: `${baseUrl}/users`,
-    updateOne: (id: string) => `${baseUrl}/users/${id}`,
-    getProfile: `${baseUrl}/users/me`
+    createOne: `${apiUrl}/users`,
+    deleteOne: (id: string) => `${apiUrl}/users/${id}`,
+    getOne: `${apiUrl}/users`,
+    getProfile: `${apiUrl}/users/me`,
+    updateProfile: (id: string) => `${apiUrl}/users/${id}/profile`,
+    updateSignature: (id: string) => `${apiUrl}/users/${id}/signature`,
+    updatePassword: (id: string) => `${apiUrl}/users/${id}/password`
   },
   invoices: {
-    createOne: `${baseUrl}/invoices`,
-    deleteOne: (id: string) => `${baseUrl}/invoices/${id}`,
-    getMany: `${baseUrl}/invoices`,
-    getOne: (id: string) => `${baseUrl}/invoices/${id}`,
-    updateOne: (id: string) => `${baseUrl}/invoices/${id}`
+    createOne: `${apiUrl}/invoices`,
+    deleteOne: (id: string) => `${apiUrl}/invoices/${id}`,
+    getMany: `${apiUrl}/invoices`,
+    getOne: (id: string) => `${apiUrl}/invoices/${id}`,
+    updateOne: (id: string) => `${apiUrl}/invoices/${id}`
   }
 } as const

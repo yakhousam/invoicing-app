@@ -1,3 +1,4 @@
+import { baseUrl } from '@/config'
 import { formatCurrency } from '@/helpers'
 import { Invoice } from '@/validations'
 import {
@@ -9,7 +10,6 @@ import {
   View
 } from '@react-pdf/renderer'
 import dayjs from 'dayjs'
-import signature from './signature.png'
 
 // Create styles
 const styles = StyleSheet.create({
@@ -73,6 +73,9 @@ const styles = StyleSheet.create({
 
 const InvoiceByIdPdf = (invoice: Invoice) => {
   const amountToCurrency = formatCurrency(invoice.currency)
+  const signature = invoice.user.signatureUrl
+    ? `${baseUrl}/${invoice.user.signatureUrl}`
+    : undefined
   return (
     <>
       <Document>
@@ -210,16 +213,18 @@ const InvoiceByIdPdf = (invoice: Invoice) => {
               </Text>
             </View>
           </View>
-          <View
-            style={{
-              display: 'flex',
-              flexDirection: 'row',
-              justifyContent: 'flex-end',
-              marginTop: 20
-            }}
-          >
-            <Image style={{ maxWidth: 200 }} src={signature} />
-          </View>
+          {signature && (
+            <View
+              style={{
+                display: 'flex',
+                flexDirection: 'row',
+                justifyContent: 'flex-end',
+                marginTop: 20
+              }}
+            >
+              <Image style={{ maxWidth: 200 }} src={signature} />
+            </View>
+          )}
           <View
             style={{
               marginTop: 'auto'
