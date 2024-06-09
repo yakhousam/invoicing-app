@@ -30,7 +30,7 @@ function UserInfos({
 
   const mutation = useMutation({
     mutationFn: ({ data, userId }: { data: UpdateUser; userId: string }) =>
-      api.updateUserProfile(data, userId),
+      api.updateMyProfile(data, userId),
     onSuccess: (data) => {
       enqueueSnackbar('Profile updated', { variant: 'success' })
       onUpdateUser(data)

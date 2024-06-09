@@ -13,6 +13,7 @@ import {
   getProductName,
   getProductPrice
 } from '@/utils/generate'
+import { parseUserSchema, type UpdateUserPassword } from '@/validation'
 import { type CreateInvoice, type Invoice } from '@/validation/invoice'
 import { type Request } from 'express'
 import { Error as MongooseError } from 'mongoose'
@@ -173,76 +174,66 @@ describe('User Controller', () => {
     })
   })
 
-  // describe.skip('Update', () => {
-  //   it('should update user', async () => {
-  //     const mockUser = getNewUser()
+  describe('Update Profile', () => {
+    it('should update user profile', async () => {
+      const expectedUser = parseUserSchema.parse(
+        (await UserModel.create(getNewUser())).toJSON()
+      )
 
-  //     const { _id } = await UserModel.create(mockUser)
+      const userUpdate = {
+        name: getNewUser().name,
+        email: getNewUser().email
+      }
 
-  //     const req = {
-  //       params: {
-  //         id: _id
-  //       },
-  //       body: {
-  //         ...mockUser,
-  //         name: 'new name'
-  //       }
-  //     } as unknown as UserUpdateType
+      const req = {
+        body: userUpdate,
+        user: expectedUser
+      } as unknown as Request
 
-  //     const res = buildRes()
-  //     const next = buildNext()
+      const res = buildRes()
+      const next = buildNext()
 
-  //     await userController.update(req, res, next)
+      await userController.updateMyProfile(req, res, next)
 
-  //     expect(res.status).toHaveBeenCalledWith(200)
+      expect(res.status).toHaveBeenCalledWith(201)
 
-  //     expect(res.json).toHaveBeenCalledWith(
-  //       expect.objectContaining(
-  //         expect.objectContaining({
-  //           ...mockUser,
-  //           name: 'new name'
-  //         })
-  //       )
-  //     )
+      expect(res.json).toHaveBeenCalledWith(expect.objectContaining(userUpdate))
 
-  //     expect(next).not.toHaveBeenCalled()
-  //   }
-  //   )
+      expect(next).not.toHaveBeenCalled()
+    })
+  })
 
-  //   it('should return status 404, user not found', async () => {
-  //     const req = {
-  //       params: {
-  //         id: 'invalid id'
-  //       }
-  //     } as unknown as UserUpdateType
+  describe('Update password', () => {
+    it('should update user password', async () => {
+      const mockUser = getNewUser()
 
-  //     const res = buildRes()
-  //     const next = buildNext()
+      const expectedUser = parseUserSchema.parse(
+        (await UserModel.create(mockUser)).toJSON()
+      )
 
-  //     await userController.update(req, res, next)
+      const password = getNewUser().password
 
-  //     expect(next).toHaveBeenCalledTimes(1)
-  //     expect(next).toHaveBeenCalledWith(expect.any(MongooseError))
-  //   }
-  //   )
+      const userUpdate: UpdateUserPassword = {
+        oldPassword: mockUser.password,
+        newPassword: password,
+        confirmNewPassword: password
+      }
 
-  //   it('should call next with mongoose error, invalid id', async () => {
-  //     const req = {
-  //       params: {
-  //         id: 'invalid id'
-  //       }
-  //     } as unknown as UserUpdateType
+      const req = {
+        body: userUpdate,
+        user: expectedUser
+      } as unknown as Request
 
-  //     const res = buildRes()
-  //     const next = buildNext()
+      const res = buildRes()
+      const next = buildNext()
 
-  //     await userController.update(req, res, next)
+      await userController.updateMyPassword(req, res, next)
 
-  //     expect(next).toHaveBeenCalledTimes(1)
-  //     expect(next).toHaveBeenCalledWith(expect.any(MongooseError))
-  //   }
-  //   )
-  // })
+      expect(res.status).toHaveBeenCalledWith(201)
+      expect(res.cookie).not.toHaveBeenCalledWith('token', expect.any(String))
+      expect(next).not.toHaveBeenCalled()
+    })
+  })
 
   describe('Delete', () => {
     it('should delete user', async () => {
@@ -259,7 +250,7 @@ describe('User Controller', () => {
       const res = buildRes()
       const next = buildNext()
 
-      await userController.deleteUserAccount(req, res, next)
+      await userController.deleteMyAccount(req, res, next)
 
       expect(res.status).toHaveBeenCalledWith(200)
 
@@ -281,7 +272,7 @@ describe('User Controller', () => {
       const res = buildRes()
       const next = buildNext()
 
-      await userController.deleteUserAccount(req, res, next)
+      await userController.deleteMyAccount(req, res, next)
 
       expect(res.status).toHaveBeenCalledWith(404)
       expect(res.json).toHaveBeenCalledWith(
@@ -302,7 +293,7 @@ describe('User Controller', () => {
       const res = buildRes()
       const next = buildNext()
 
-      await userController.deleteUserAccount(req, res, next)
+      await userController.deleteMyAccount(req, res, next)
 
       expect(next).toHaveBeenCalledTimes(1)
       expect(next).toHaveBeenCalledWith(expect.any(MongooseError))

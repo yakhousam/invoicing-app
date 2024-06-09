@@ -36,20 +36,14 @@ const Signature = ({
     preview = URL.createObjectURL(fileList[0])
   }
 
-  const onSubmit = ({ signature }: { signature: FileList | undefined }) => {
-    if (signature) {
-      mutation.mutate({ data: { signature }, userId: user._id })
+  const onSubmit = (data: { signature: FileList | undefined }) => {
+    if (data.signature) {
+      mutation.mutate({ signature: data.signature })
     }
   }
 
   const mutation = useMutation({
-    mutationFn: ({
-      data,
-      userId
-    }: {
-      data: { signature: FileList }
-      userId: string
-    }) => api.updateUserSignature(data, userId),
+    mutationFn: api.updateMySignature,
     onSuccess: (data) => {
       console.log('on success', data)
       enqueueSnackbar('Signature updated', { variant: 'success' })

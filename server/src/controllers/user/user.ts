@@ -1,8 +1,9 @@
 import InvoiceModel from '@/model/invoice'
-import UserModel from '@/model/user'
+import UserModel, { hashPassword } from '@/model/user'
 import logger from '@/utils/logger'
 import {
   parseUserSchema,
+  updateUserPasswordSchema,
   updateUserSchema,
   type UpdateUser,
   type User
@@ -74,64 +75,40 @@ const findUserInvoices = async (
   }
 }
 
-const updateUserProfile = async (
+const updateMyProfile = async (
   req: Request,
   res: Response,
   next: NextFunction
 ): Promise<void> => {
   try {
-    const { id } = req.params
-    const { name, email, password } = updateUserSchema.parse(req.body)
+    const { name, email } = updateUserSchema.parse(req.body)
     const authenticatedUser = parseUserSchema.parse(req.user)
-    logger.info(authenticatedUser._id, id)
-    if (authenticatedUser._id !== id) {
-      res.status(403).json({
-        error: 'Forbidden',
-        message: 'You can only update your own user'
-      })
-      return
-    }
+
     const user = await UserModel.findOneAndUpdate<User>(
       {
-        _id: id
+        _id: authenticatedUser._id
       },
       {
         name,
-        email,
-        password
+        email
       },
       {
         new: true
       }
     )
-    if (user !== null) {
-      res.status(200).json(user)
-    } else {
-      res.status(404).json({
-        error: 'Not found',
-        message: `User with id: ${id} doesn't exist`
-      })
-    }
+    res.status(201).json(user)
   } catch (error: unknown) {
     next(error)
   }
 }
 
-const updateUserSignature = async (
+const updateMySignature = async (
   req: Request,
   res: Response,
   next: NextFunction
 ): Promise<void> => {
   try {
-    const { id } = req.params
     const authenticatedUser = parseUserSchema.parse(req.user)
-    if (authenticatedUser._id !== id) {
-      res.status(403).json({
-        error: 'Forbidden',
-        message: 'You can only update your own user'
-      })
-      return
-    }
 
     // Delete the old user signature image
     if (authenticatedUser.signatureUrl !== undefined) {
@@ -146,7 +123,7 @@ const updateUserSignature = async (
 
     const user = await UserModel.findOneAndUpdate<User>(
       {
-        _id: id
+        _id: authenticatedUser._id
       },
       {
         signatureUrl: req.file?.path
@@ -155,20 +132,65 @@ const updateUserSignature = async (
         new: true
       }
     )
-    if (user !== null) {
-      res.status(200).json(user)
-    } else {
-      res.status(404).json({
-        error: 'Not found',
-        message: `User with id: ${id} doesn't exist`
-      })
-    }
+    const updatedUser = parseUserSchema.parse(user)
+    res.status(201).json(updatedUser)
   } catch (error: unknown) {
     next(error)
   }
 }
 
-const deleteUserAccount = async (
+const updateMyPassword = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const { _id: userId } = parseUserSchema.parse(req.user)
+    const { oldPassword, newPassword } = updateUserPasswordSchema.parse(
+      req.body
+    )
+    const user = await UserModel.findById(userId)
+    if (user === null) {
+      res.status(404).json({
+        error: 'Not found',
+        message: `User with id: ${userId} doesn't exist`
+      })
+      return
+    }
+    const isOldPasswordMatchUserPassword =
+      await user.isValidPassword(oldPassword)
+
+    if (!isOldPasswordMatchUserPassword) {
+      res
+        .status(403)
+        .json({ filed: 'oldPassword', message: 'Old password does not match.' })
+      return
+    }
+
+    const hashedPassword = await hashPassword(newPassword)
+    await UserModel.findOneAndUpdate<User>(
+      {
+        _id: userId
+      },
+      {
+        password: hashedPassword
+      },
+      {
+        new: true
+      }
+    )
+
+    res
+      .clearCookie('token')
+      .status(201)
+      .json({ message: 'Password updated successfully. Please log in again.' })
+  } catch (error) {
+    next(error)
+  }
+}
+
+// TODO: remove param id: use authenticated user
+const deleteMyAccount = async (
   req: Request,
   res: Response,
   next: NextFunction
@@ -207,9 +229,10 @@ const userController = {
   findOne,
   findMe,
   findUserInvoices,
-  deleteUserAccount,
-  updateUserProfile,
-  updateUserSignature
+  deleteMyAccount,
+  updateMyProfile,
+  updateMySignature,
+  updateMyPassword
 }
 
 export default userController

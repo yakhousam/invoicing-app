@@ -1,4 +1,5 @@
 import { useAuth } from '@/hooks/useAuth'
+import useLogout from '@/hooks/useLogout'
 import { Box, Paper, Typography } from '@mui/material'
 import { createFileRoute } from '@tanstack/react-router'
 import PasswordUpdate from './-components/PasswordUpdate'
@@ -11,6 +12,7 @@ export const Route = createFileRoute('/_auth/_layout/settings/')({
 
 function Settings() {
   const { user, setUser } = useAuth()
+  const { handleLogout } = useLogout()
 
   if (!user) return <Typography variant="h4">Loading...</Typography>
   return (
@@ -24,7 +26,7 @@ function Settings() {
       </Wrapper>
       <Box sx={{ mt: 4 }} />
       <Wrapper>
-        <PasswordUpdate />
+        <PasswordUpdate onUpdatePassword={handleLogout} />
       </Wrapper>
     </>
   )

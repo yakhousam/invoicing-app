@@ -13,14 +13,19 @@ userRoute.get('/users/me', (req, res, next) => {
   void userController.findMe(req, res, next)
 })
 
-userRoute.put('/users/:id/profile', json(), (req, res, next) => {
-  void userController.updateUserProfile(req, res, next)
+userRoute.put('/users/me/profile', json(), (req, res, next) => {
+  void userController.updateMyProfile(req, res, next)
 })
+
+userRoute.put('/users/me/password', json(), (req, res, next) => {
+  void userController.updateMyPassword(req, res, next)
+})
+
 userRoute.put(
   '/users/:id/signature',
   upload.single('signature'),
   (req, res, next) => {
-    void userController.updateUserSignature(req, res, next)
+    void userController.updateMySignature(req, res, next)
   }
 )
 

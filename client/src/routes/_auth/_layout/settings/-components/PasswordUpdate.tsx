@@ -1,39 +1,55 @@
+import * as api from '@/api/user'
 import { LoadingButtonSave } from '@/components/LoadingButton'
 import RHFTextField from '@/components/RHF/RHFTextField'
+import { UpdateUserPassword, updateUserPasswordSchema } from '@/validations'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Stack, Typography } from '@mui/material'
+import { useMutation } from '@tanstack/react-query'
+import { useSnackbar } from 'notistack'
 import { FormProvider, useForm } from 'react-hook-form'
-import z from 'zod'
 
-const updatePasswordSchema = z
-  .object({
-    currentPassword: z.string().min(6),
-    newPassword: z.string().min(6),
-    confirmNewPassword: z.string().min(6)
-  })
-  .refine((data) => data.newPassword === data.confirmNewPassword, {
-    message: "Passwords don't match",
-    path: ['confirmNewPassword']
-  })
+const PasswordUpdate = ({
+  onUpdatePassword
+}: {
+  onUpdatePassword: () => void
+}) => {
+  const { enqueueSnackbar } = useSnackbar()
 
-type UpdatePassword = z.infer<typeof updatePasswordSchema>
-
-const PasswordUpdate = () => {
-  const formMethods = useForm<UpdatePassword>({
+  const formMethods = useForm<UpdateUserPassword>({
     defaultValues: {
-      currentPassword: '',
+      oldPassword: '',
       newPassword: '',
       confirmNewPassword: ''
     },
-    resolver: zodResolver(updatePasswordSchema)
+    resolver: zodResolver(updateUserPasswordSchema)
   })
   const {
     handleSubmit,
+    setError,
     formState: { isSubmitting, isDirty }
   } = formMethods
 
-  const onSubmit = (data: UpdatePassword) => {
-    console.log(data)
+  const { mutate: updateUserPassword } = useMutation({
+    mutationKey: ['updateUserPassword'],
+    mutationFn: api.updateMyPassword,
+    onSuccess: () => {
+      enqueueSnackbar('Password updated successfully', { variant: 'success' })
+      onUpdatePassword()
+    },
+    onError: (error: Error | Response) => {
+      if (error instanceof Response && error.status) {
+        setError('oldPassword', {
+          message: 'wrong password'
+        })
+      } else {
+        console.error(error)
+        enqueueSnackbar('Error updating password', { variant: 'error' })
+      }
+    }
+  })
+
+  const onSubmit = (data: UpdateUserPassword) => {
+    updateUserPassword(data)
   }
 
   return (
@@ -49,8 +65,8 @@ const PasswordUpdate = () => {
           <Stack spacing={6} mt={3}>
             <RHFTextField
               variant="standard"
-              label="Current password"
-              name="currentPassword"
+              label="Old password"
+              name="oldPassword"
               type="password"
             />
             <RHFTextField

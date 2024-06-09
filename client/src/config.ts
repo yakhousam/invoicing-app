@@ -16,13 +16,10 @@ export const API_URL = {
     updateOne: (id: string) => `${apiUrl}/clients/${id}`
   },
   users: {
-    createOne: `${apiUrl}/users`,
-    deleteOne: (id: string) => `${apiUrl}/users/${id}`,
-    getOne: `${apiUrl}/users`,
     getProfile: `${apiUrl}/users/me`,
-    updateProfile: (id: string) => `${apiUrl}/users/${id}/profile`,
-    updateSignature: (id: string) => `${apiUrl}/users/${id}/signature`,
-    updatePassword: (id: string) => `${apiUrl}/users/${id}/password`
+    updateProfile: `${apiUrl}/users/me/profile`,
+    updateSignature: `${apiUrl}/users/me/signature`,
+    updatePassword: `${apiUrl}/users/me/password`
   },
   invoices: {
     createOne: `${apiUrl}/invoices`,

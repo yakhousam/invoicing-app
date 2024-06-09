@@ -34,16 +34,29 @@ UserSchema.path('email').validate(async (value: string) => {
   return user === null
 }, 'Duplicated email')
 
-UserSchema.pre('save', function (next) {
-  if (this.isModified('password')) {
-    bcrypt.hash(this.password, 12, (err, hashedPassword) => {
+// eslint-disable-next-line @typescript-eslint/promise-function-async
+export function hashPassword(password: string): Promise<string> {
+  return new Promise((resolve, reject) => {
+    bcrypt.hash(password, 12, (err, hashedPassword) => {
       if (err !== undefined) {
-        next(err)
+        reject(err)
       } else {
-        this.password = hashedPassword
-        next()
+        resolve(hashedPassword)
       }
     })
+  })
+}
+
+UserSchema.pre('save', function (next) {
+  if (this.isModified('password')) {
+    hashPassword(this.password)
+      .then((hashedPassword) => {
+        this.password = hashedPassword
+        next()
+      })
+      .catch((e) => {
+        next(e)
+      })
   }
 })
 

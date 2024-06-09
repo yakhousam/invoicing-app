@@ -91,7 +91,7 @@ describe('Auth Controller', () => {
     })
   })
 
-  describe('singin', () => {
+  describe('Login', () => {
     it('should sign a token and return user object', async () => {
       // The authController.login function is invoked by passport.js upon successful sign-in.
       // Its sole responsibility is to generate a token, place it in a cookie, and send the user in JSON format.

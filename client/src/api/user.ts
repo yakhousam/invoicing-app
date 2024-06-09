@@ -1,5 +1,5 @@
 import { API_URL } from '@/config'
-import { UpdateUser, parseUserSchema } from '@/validations'
+import { UpdateUser, UpdateUserPassword, parseUserSchema } from '@/validations'
 import { fetchApi } from './util'
 
 export const fetchCurrentUser = async () => {
@@ -7,22 +7,19 @@ export const fetchCurrentUser = async () => {
   return parseUserSchema.parse(user)
 }
 
-export const updateUserProfile = async (data: UpdateUser, userId: string) => {
-  const user = await fetchApi(API_URL.users.updateProfile(userId), {
+export const updateMyProfile = async (data: UpdateUser) => {
+  const user = await fetchApi(API_URL.users.updateProfile, {
     method: 'PUT',
     body: JSON.stringify(data)
   })
   return parseUserSchema.parse(user)
 }
 
-export const updateUserSignature = async (
-  data: { signature: FileList },
-  userId: string
-) => {
+export const updateMySignature = async (data: { signature: FileList }) => {
   const formData = new FormData()
   const file = data.signature[0]
   formData.append('signature', file)
-  const response = await fetch(API_URL.users.updateSignature(userId), {
+  const response = await fetch(API_URL.users.updateSignature, {
     method: 'PUT',
     body: formData,
     credentials: 'include'
@@ -32,4 +29,11 @@ export const updateUserSignature = async (
   }
   const user = await response.json()
   return parseUserSchema.parse(user)
+}
+
+export const updateMyPassword = async (data: UpdateUserPassword) => {
+  return await fetchApi(API_URL.users.updatePassword, {
+    method: 'PUT',
+    body: JSON.stringify(data)
+  })
 }

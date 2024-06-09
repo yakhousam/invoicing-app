@@ -33,6 +33,17 @@ export const updateUserSchema = createUserSchema
   })
   .partial()
 
+export const updateUserPasswordSchema = z
+  .object({
+    oldPassword: z.string().min(6),
+    newPassword: z.string().min(6),
+    confirmNewPassword: z.string().min(6)
+  })
+  .refine((data) => data.newPassword === data.confirmNewPassword, {
+    message: "Passwords don't match",
+    path: ['confirmNewPassword']
+  })
+
 export type User = z.infer<typeof parseUserSchema>
 
 export type Role = User['role']
@@ -40,3 +51,5 @@ export type Role = User['role']
 export type CreateUser = z.input<typeof createUserSchema>
 
 export type UpdateUser = z.infer<typeof updateUserSchema>
+
+export type UpdateUserPassword = z.infer<typeof updateUserPasswordSchema>
