@@ -307,7 +307,7 @@ describe('Invoice Controller', () => {
       const res = buildRes()
       const next = buildNext()
 
-      await invoiceController.find(req, res, next)
+      await invoiceController.findAll(req, res, next)
 
       expect(res.status).toHaveBeenCalledWith(200)
 
@@ -355,7 +355,7 @@ describe('Invoice Controller', () => {
       const res = buildRes()
       const next = buildNext()
 
-      await invoiceController.findById(req, res, next)
+      await invoiceController.findOne(req, res, next)
       expect(res.status).toHaveBeenCalledWith(200)
       const jsonResponse = invoiceSchema.parse(
         (res.json as jest.Mock).mock.calls[0][0]
@@ -378,7 +378,7 @@ describe('Invoice Controller', () => {
       const res = buildRes()
       const next = buildNext()
 
-      await invoiceController.findById(req, res, next)
+      await invoiceController.findOne(req, res, next)
 
       expect(next).toHaveBeenCalledTimes(1)
       expect(next).toHaveBeenCalledWith(expect.any(MongooseError))
@@ -421,7 +421,7 @@ describe('Invoice Controller', () => {
       const res = buildRes()
       const next = buildNext()
 
-      await invoiceController.findById(req, res, next)
+      await invoiceController.findOne(req, res, next)
 
       expect(res.status).toHaveBeenCalledWith(404)
     })
@@ -460,7 +460,7 @@ describe('Invoice Controller', () => {
         user
       } as unknown as Request
 
-      await invoiceController.findById(req, res, next)
+      await invoiceController.findOne(req, res, next)
       expect(res.status).toHaveBeenCalledWith(200)
       const jsonResponse = invoiceSchema.parse(
         (res.json as jest.Mock).mock.calls[0][0]
@@ -502,7 +502,7 @@ describe('Invoice Controller', () => {
         user
       } as unknown as Request
 
-      await invoiceController.findById(req, res, next)
+      await invoiceController.findOne(req, res, next)
       expect(res.status).toHaveBeenCalledWith(200)
       const jsonResponse = invoiceSchema.parse(
         (res.json as jest.Mock).mock.calls[0][0]
@@ -543,7 +543,7 @@ describe('Invoice Controller', () => {
         user
       } as unknown as Request
 
-      await invoiceController.findById(req, res, next)
+      await invoiceController.findOne(req, res, next)
       expect(res.status).toHaveBeenCalledWith(200)
       const jsonResponse = invoiceSchema.parse(
         (res.json as jest.Mock).mock.calls[0][0]
@@ -586,7 +586,7 @@ describe('Invoice Controller', () => {
         user
       } as unknown as Request
 
-      await invoiceController.updateById(req, res, next)
+      await invoiceController.updateOne(req, res, next)
       expect(res.status).toHaveBeenCalledWith(200)
       const jsonResponse = invoiceSchema.parse(
         (res.json as jest.Mock).mock.calls[0][0]
@@ -629,7 +629,7 @@ describe('Invoice Controller', () => {
         user
       } as unknown as Request
 
-      await invoiceController.updateById(req, res, next)
+      await invoiceController.updateOne(req, res, next)
       expect(next).toHaveBeenCalledTimes(1)
       expect(next).toHaveBeenCalledWith(expect.any(ZodError))
     })
@@ -668,7 +668,7 @@ describe('Invoice Controller', () => {
         user
       } as unknown as Request
 
-      await invoiceController.updateById(req, res, next)
+      await invoiceController.updateOne(req, res, next)
       expect(res.status).toHaveBeenCalledWith(200)
       const jsonResponse = invoiceSchema.parse(
         (res.json as jest.Mock).mock.calls[0][0]
@@ -711,7 +711,7 @@ describe('Invoice Controller', () => {
         user
       } as unknown as Request
 
-      await invoiceController.updateById(req, res, next)
+      await invoiceController.updateOne(req, res, next)
       expect(res.status).toHaveBeenCalledWith(200)
       const jsonResponse = invoiceSchema.parse(
         (res.json as jest.Mock).mock.calls[0][0]
@@ -758,7 +758,7 @@ describe('Invoice Controller', () => {
         user
       } as unknown as Request
 
-      await invoiceController.updateById(req, res, next)
+      await invoiceController.updateOne(req, res, next)
       expect(res.status).toHaveBeenCalledWith(200)
       const jsonResponse = invoiceSchema.parse(
         (res.json as jest.Mock).mock.calls[0][0]
@@ -786,7 +786,7 @@ describe('Invoice Controller', () => {
       const res = buildRes()
       const next = buildNext()
 
-      await invoiceController.updateById(req, res, next)
+      await invoiceController.updateOne(req, res, next)
 
       expect(next).toHaveBeenCalledTimes(1)
       expect(next).toHaveBeenCalledWith(expect.any(MongooseError))
@@ -832,7 +832,7 @@ describe('Invoice Controller', () => {
       const res = buildRes()
       const next = buildNext()
 
-      await invoiceController.updateById(req, res, next)
+      await invoiceController.updateOne(req, res, next)
 
       expect(res.status).toHaveBeenCalledWith(404)
     })
@@ -873,7 +873,7 @@ describe('Invoice Controller', () => {
         user
       } as unknown as Request
 
-      await invoiceController.updateById(req, res, next)
+      await invoiceController.updateOne(req, res, next)
       expect(res.status).toHaveBeenCalledWith(200)
       const jsonResponse = invoiceSchema.parse(
         (res.json as jest.Mock).mock.calls[0][0]
@@ -915,11 +915,11 @@ describe('Invoice Controller', () => {
         user
       } as unknown as Request
 
-      await invoiceController.delteById(req, res, next)
+      await invoiceController.deleteOne(req, res, next)
       expect(res.sendStatus).toHaveBeenCalledWith(204)
     })
 
-    it('should not delete paied invoice', async () => {
+    it('should not delete paid invoice', async () => {
       const user = parseUserSchema.parse(
         (await UserModel.create(getNewUser())).toJSON()
       )
@@ -952,7 +952,7 @@ describe('Invoice Controller', () => {
         user
       } as unknown as Request
 
-      await invoiceController.delteById(req, res, next)
+      await invoiceController.deleteOne(req, res, next)
       expect(res.status).toHaveBeenCalledWith(400)
     })
 
@@ -970,7 +970,7 @@ describe('Invoice Controller', () => {
         user
       } as unknown as Request
 
-      await invoiceController.delteById(req, res, next)
+      await invoiceController.deleteOne(req, res, next)
       expect(res.status).toHaveBeenCalledWith(404)
     })
 
@@ -1008,7 +1008,7 @@ describe('Invoice Controller', () => {
         user: user2
       } as unknown as Request
 
-      await invoiceController.delteById(req, res, next)
+      await invoiceController.deleteOne(req, res, next)
       expect(res.status).toHaveBeenCalledWith(404)
     })
   })

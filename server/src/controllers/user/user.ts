@@ -17,7 +17,7 @@ export type UserUpdateType = Request<
   UpdateUser
 >
 
-const find = async (
+const findAll = async (
   req: Request,
   res: Response,
   next: NextFunction
@@ -30,7 +30,7 @@ const find = async (
   }
 }
 
-const findById = async (
+const findOne = async (
   req: Request,
   res: Response,
   next: NextFunction
@@ -51,7 +51,7 @@ const findById = async (
   }
 }
 
-const findInvoices = async (
+const findUserInvoices = async (
   req: Request,
   res: Response,
   next: NextFunction
@@ -168,7 +168,7 @@ const updateUserSignature = async (
   }
 }
 
-const deleteById = async (
+const deleteUserAccount = async (
   req: Request,
   res: Response,
   next: NextFunction
@@ -203,11 +203,11 @@ const findMe = async (
 }
 
 const userController = {
-  find,
-  findById,
-  findInvoices,
-  deleteById,
+  findAll,
+  findOne,
   findMe,
+  findUserInvoices,
+  deleteUserAccount,
   updateUserProfile,
   updateUserSignature
 }

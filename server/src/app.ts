@@ -1,4 +1,4 @@
-import errorMiddleware from '@/middlewars/error'
+import errorMiddleware from '@/middlewares/error'
 import rootRouter from '@/routes'
 import cookieParser from 'cookie-parser'
 import cors from 'cors'

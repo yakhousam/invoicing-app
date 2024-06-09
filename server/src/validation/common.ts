@@ -14,7 +14,7 @@ export const objectIdToString = z.preprocess((val: any) => {
   return val
 }, z.string())
 
-export const dateToZodDatetime = z.preprocess(
+export const dateToZodDate = z.preprocess(
   (val: any) => {
     if (val instanceof Date) {
       return val.toISOString()

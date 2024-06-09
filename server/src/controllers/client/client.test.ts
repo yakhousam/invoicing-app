@@ -91,7 +91,7 @@ describe('Client Controller', () => {
       const next = buildNext()
       const req = { user } as unknown as Request
 
-      await clientController.find(req, res, next)
+      await clientController.findAll(req, res, next)
 
       expect(res.status).toHaveBeenCalledWith(200)
 
@@ -120,7 +120,7 @@ describe('Client Controller', () => {
         user
       } as unknown as Request
 
-      await clientController.findById(req, res, next)
+      await clientController.findOne(req, res, next)
 
       expect(res.status).toHaveBeenCalledWith(200)
 
@@ -139,7 +139,7 @@ describe('Client Controller', () => {
         user
       } as unknown as Request
 
-      await clientController.findById(req, res, next)
+      await clientController.findOne(req, res, next)
 
       expect(res.status).toHaveBeenCalledWith(404)
       expect(res.json).toHaveBeenCalledWith({
@@ -148,7 +148,7 @@ describe('Client Controller', () => {
       })
     })
 
-    it('should call next with mongoose error, ivalid id', async () => {
+    it('should call next with mongoose error, invalid id', async () => {
       const res = buildRes()
       const next = buildNext()
       const req = {
@@ -158,7 +158,7 @@ describe('Client Controller', () => {
         user
       } as unknown as Request
 
-      await clientController.findById(req, res, next)
+      await clientController.findOne(req, res, next)
 
       expect(next).toHaveBeenCalledTimes(1)
       expect(next).toHaveBeenCalledWith(expect.any(MongooseError))
@@ -183,7 +183,7 @@ describe('Client Controller', () => {
         user
       } as unknown as Request
 
-      await clientController.update(req, res, next)
+      await clientController.updateOne(req, res, next)
 
       expect(res.status).toHaveBeenCalledWith(200)
       expect(res.json).toHaveBeenCalledWith(expect.objectContaining(updates))
@@ -200,7 +200,7 @@ describe('Client Controller', () => {
         user
       } as unknown as Request
 
-      await clientController.update(req, res, next)
+      await clientController.updateOne(req, res, next)
 
       expect(res.status).toHaveBeenCalledWith(404)
       expect(res.json).toHaveBeenCalledWith({
@@ -220,7 +220,7 @@ describe('Client Controller', () => {
         user
       } as unknown as Request
 
-      await clientController.update(req, res, next)
+      await clientController.updateOne(req, res, next)
 
       expect(next).toHaveBeenCalledTimes(1)
       expect(next).toHaveBeenCalledWith(expect.any(MongooseError))
@@ -262,7 +262,7 @@ describe('Client Controller', () => {
         user
       } as unknown as Request
 
-      await clientController.deleteById(req, res, next)
+      await clientController.deleteOne(req, res, next)
 
       expect(res.status).toHaveBeenCalledWith(200)
     })
@@ -277,7 +277,7 @@ describe('Client Controller', () => {
         user
       } as unknown as Request
 
-      await clientController.deleteById(req, res, next)
+      await clientController.deleteOne(req, res, next)
 
       expect(res.status).toHaveBeenCalledWith(404)
       expect(res.json).toHaveBeenCalledWith({
@@ -296,7 +296,7 @@ describe('Client Controller', () => {
         user
       } as unknown as Request
 
-      await clientController.deleteById(req, res, next)
+      await clientController.deleteOne(req, res, next)
 
       expect(next).toHaveBeenCalledTimes(1)
       expect(next).toHaveBeenCalledWith(expect.any(MongooseError))

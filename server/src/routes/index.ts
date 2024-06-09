@@ -1,4 +1,4 @@
-import { jwtAuthMiddleware } from '@/middlewars/auth'
+import { jwtAuthMiddleware } from '@/middlewares/auth'
 import { Router } from 'express'
 import authRoute from './auth'
 import clientRoute from './client'

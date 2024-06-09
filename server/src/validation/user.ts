@@ -1,7 +1,7 @@
 import { z } from 'zod'
-import { dateToZodDatetime, objectIdToString } from './common'
+import { dateToZodDate, objectIdToString } from './common'
 
-export const userShema = z.object({
+export const userSchema = z.object({
   _id: objectIdToString,
   name: z.string().min(2),
   email: z.string().email().optional(),
@@ -11,17 +11,17 @@ export const userShema = z.object({
     .optional()
     .default('user'),
   signatureUrl: z.string().optional(),
-  createdAt: dateToZodDatetime,
-  updatedAt: dateToZodDatetime
+  createdAt: dateToZodDate,
+  updatedAt: dateToZodDate
 })
 
-export const createUserSchema = userShema.omit({
+export const createUserSchema = userSchema.omit({
   _id: true,
   createdAt: true,
   updatedAt: true
 })
 
-export const parseUserSchema = userShema.omit({ password: true })
+export const parseUserSchema = userSchema.omit({ password: true })
 
 export const updateUserSchema = createUserSchema
   .omit({

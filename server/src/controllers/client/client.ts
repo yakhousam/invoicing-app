@@ -18,15 +18,15 @@ const create = async (
 
     const newClient = await client.save()
 
-    const returedClient = clientSchema.parse(newClient.toJSON())
+    const returnedClient = clientSchema.parse(newClient.toJSON())
 
-    res.status(201).json(returedClient)
+    res.status(201).json(returnedClient)
   } catch (error: unknown) {
     next(error)
   }
 }
 
-const find = async (
+const findAll = async (
   req: Request,
   res: Response,
   next: NextFunction
@@ -40,7 +40,7 @@ const find = async (
   }
 }
 
-const findById = async (
+const findOne = async (
   req: Request,
   res: Response,
   next: NextFunction
@@ -65,7 +65,7 @@ const findById = async (
   }
 }
 
-const update = async (
+const updateOne = async (
   req: Request,
   res: Response,
   next: NextFunction
@@ -99,7 +99,7 @@ const update = async (
   }
 }
 
-const deleteById = async (
+const deleteOne = async (
   req: Request,
   res: Response,
   next: NextFunction
@@ -126,10 +126,10 @@ const deleteById = async (
 
 const clientController = {
   create,
-  find,
-  findById,
-  update,
-  deleteById
+  findAll,
+  findOne,
+  updateOne,
+  deleteOne
 }
 
 export default clientController

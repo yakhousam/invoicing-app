@@ -9,7 +9,7 @@ import { ZodError } from 'zod'
 
 describe('Auth Controller', () => {
   describe('Signup', () => {
-    it('should signup a new user', async () => {
+    it('should register a new user', async () => {
       const mockUser = getNewUser()
       const req = {
         body: mockUser
@@ -18,7 +18,7 @@ describe('Auth Controller', () => {
       const res = buildRes()
       const next = buildNext()
 
-      await authController.signup(req, res, next)
+      await authController.register(req, res, next)
 
       expect(res.status).toHaveBeenCalledWith(201)
       expect(res.cookie).toHaveBeenCalledWith('token', expect.any(String), {
@@ -48,7 +48,7 @@ describe('Auth Controller', () => {
       const res = buildRes()
       const next = buildNext()
 
-      await authController.signup(req, res, next)
+      await authController.register(req, res, next)
 
       expect(next).toHaveBeenCalledTimes(1)
       expect(next).toHaveBeenCalledWith(expect.any(ZodError))
@@ -65,7 +65,7 @@ describe('Auth Controller', () => {
       const res = buildRes()
       const next = buildNext()
 
-      await authController.signup(req, res, next)
+      await authController.register(req, res, next)
 
       expect(next).toHaveBeenCalledTimes(1)
       expect(next).toHaveBeenCalledWith(expect.any(ZodError))
@@ -84,7 +84,7 @@ describe('Auth Controller', () => {
       const res = buildRes()
       const next = buildNext()
 
-      await authController.signup(req, res, next)
+      await authController.register(req, res, next)
 
       expect(next).toHaveBeenCalledTimes(1)
       expect(next).toHaveBeenCalledWith(expect.any(MongooseError))
@@ -93,7 +93,7 @@ describe('Auth Controller', () => {
 
   describe('singin', () => {
     it('should sign a token and return user object', async () => {
-      // The authController.signin function is invoked by passport.js upon successful sign-in.
+      // The authController.login function is invoked by passport.js upon successful sign-in.
       // Its sole responsibility is to generate a token, place it in a cookie, and send the user in JSON format.
 
       const mockUser = getNewUser()
@@ -106,7 +106,7 @@ describe('Auth Controller', () => {
       const res = buildRes()
       const next = buildNext()
 
-      authController.signin(req, res, next)
+      authController.login(req, res, next)
 
       expect(res.status).toHaveBeenCalledWith(200)
       expect(res.cookie).toHaveBeenCalledWith('token', expect.any(String), {

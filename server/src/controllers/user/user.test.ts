@@ -31,7 +31,7 @@ describe('User Controller', () => {
       const res = buildRes()
       const next = buildNext()
 
-      await userController.find(req, res, next)
+      await userController.findAll(req, res, next)
       expect(res.status).toHaveBeenCalledWith(200)
 
       expect(res.json).toHaveBeenCalledWith(
@@ -60,7 +60,7 @@ describe('User Controller', () => {
       const res = buildRes()
       const next = buildNext()
 
-      await userController.findById(req, res, next)
+      await userController.findOne(req, res, next)
 
       expect(res.status).toHaveBeenCalledWith(200)
 
@@ -82,7 +82,7 @@ describe('User Controller', () => {
       const res = buildRes()
       const next = buildNext()
 
-      await userController.findById(req, res, next)
+      await userController.findOne(req, res, next)
 
       expect(res.status).toHaveBeenCalledWith(404)
       expect(res.json).toHaveBeenCalledWith(
@@ -103,7 +103,7 @@ describe('User Controller', () => {
       const res = buildRes()
       const next = buildNext()
 
-      await userController.findById(req, res, next)
+      await userController.findOne(req, res, next)
 
       expect(next).toHaveBeenCalledTimes(1)
       expect(next).toHaveBeenCalledWith(expect.any(MongooseError))
@@ -158,7 +158,7 @@ describe('User Controller', () => {
       const res = buildRes()
       const next = buildNext()
 
-      await userController.findInvoices(req, res, next)
+      await userController.findUserInvoices(req, res, next)
 
       expect(res.status).toHaveBeenCalledWith(200)
 
@@ -226,7 +226,7 @@ describe('User Controller', () => {
   //   }
   //   )
 
-  //   it('should call next with mongoose error, ivalid id', async () => {
+  //   it('should call next with mongoose error, invalid id', async () => {
   //     const req = {
   //       params: {
   //         id: 'invalid id'
@@ -259,7 +259,7 @@ describe('User Controller', () => {
       const res = buildRes()
       const next = buildNext()
 
-      await userController.deleteById(req, res, next)
+      await userController.deleteUserAccount(req, res, next)
 
       expect(res.status).toHaveBeenCalledWith(200)
 
@@ -281,7 +281,7 @@ describe('User Controller', () => {
       const res = buildRes()
       const next = buildNext()
 
-      await userController.deleteById(req, res, next)
+      await userController.deleteUserAccount(req, res, next)
 
       expect(res.status).toHaveBeenCalledWith(404)
       expect(res.json).toHaveBeenCalledWith(
@@ -292,7 +292,7 @@ describe('User Controller', () => {
       )
     })
 
-    it('should call next with mongoose error, ivalid id', async () => {
+    it('should call next with mongoose error, invalid id', async () => {
       const req = {
         params: {
           id: 'invalid id'
@@ -302,7 +302,7 @@ describe('User Controller', () => {
       const res = buildRes()
       const next = buildNext()
 
-      await userController.deleteById(req, res, next)
+      await userController.deleteUserAccount(req, res, next)
 
       expect(next).toHaveBeenCalledTimes(1)
       expect(next).toHaveBeenCalledWith(expect.any(MongooseError))

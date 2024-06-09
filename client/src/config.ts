@@ -5,8 +5,8 @@ export const baseUrl = `${url.protocol}//${url.host}`
 
 export const API_URL = {
   auth: {
-    login: `${apiUrl}/auth/signin`,
-    logout: `${apiUrl}/auth/signout`
+    login: `${apiUrl}/auth/login`,
+    logout: `${apiUrl}/auth/logout`
   },
   clients: {
     createOne: `${apiUrl}/clients`,

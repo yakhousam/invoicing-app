@@ -5,18 +5,18 @@ import passport from 'passport'
 const authRoute = Router()
 authRoute.use(json())
 
-authRoute.post('/auth/signup', (req, res, next) => {
-  void authController.signup(req, res, next)
+authRoute.post('/auth/register', (req, res, next) => {
+  void authController.register(req, res, next)
 })
 
 authRoute.post(
-  '/auth/signin',
+  '/auth/login',
   passport.authenticate('local', { session: false }),
-  authController.signin
+  authController.login
 )
 
-authRoute.post('/auth/signout', (req, res) => {
-  authController.signout(req, res)
+authRoute.post('/auth/logout', (req, res) => {
+  authController.logout(req, res)
 })
 
 export default authRoute

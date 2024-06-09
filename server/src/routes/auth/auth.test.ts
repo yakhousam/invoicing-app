@@ -22,11 +22,11 @@ describe('auth', () => {
 
   const baseURL = `http://localhost:${PORT}/api/v1`
 
-  describe('signup', () => {
-    it('should signup a new user and return the user object', async () => {
+  describe('register', () => {
+    it('should register a new user and return the user object', async () => {
       const api = axios.create({ baseURL })
       const user = getNewUser()
-      const response = await api.post<User>('/auth/signup', user)
+      const response = await api.post<User>('/auth/register', user)
       expect(response.status).toBe(201)
       const returnedUser = response.data
       expect(returnedUser).toHaveProperty('_id')
@@ -35,10 +35,10 @@ describe('auth', () => {
       expect(returnedUser).not.toHaveProperty('password')
     })
 
-    it('should signup a new user and return a cookie with a token', async () => {
+    it('should register a new user and return a cookie with a token', async () => {
       const api = axios.create({ baseURL })
       const user = getNewUser()
-      const response = await api.post('/auth/signup', user)
+      const response = await api.post('/auth/register', user)
       expect(response.status).toBe(201)
       const cookies = response.headers['set-cookie']
       const containsToken = cookies?.some((cookie) => cookie.includes('token'))
@@ -46,13 +46,13 @@ describe('auth', () => {
     })
   })
 
-  describe('Signin', () => {
-    it('should signin a user and return the user object', async () => {
+  describe('Login', () => {
+    it('should login a user and return the user object', async () => {
       const api = axios.create({ baseURL })
       const user = getNewUser()
-      // await api.post('/auth/signup', user)
+      // await api.post('/auth/register', user)
       await userModel.create(user)
-      const response = await api.post<User>('/auth/signin', {
+      const response = await api.post<User>('/auth/login', {
         name: user.name,
         password: user.password
       })
@@ -64,11 +64,11 @@ describe('auth', () => {
       expect(returnedUser).not.toHaveProperty('password')
     })
 
-    it('should signin a user and return a cookie with a token', async () => {
+    it('should login a user and return a cookie with a token', async () => {
       const api = axios.create({ baseURL })
       const user = getNewUser()
-      await api.post('/auth/signup', user)
-      const response = await api.post('/auth/signin', {
+      await api.post('/auth/register', user)
+      const response = await api.post('/auth/login', {
         name: user.name,
         password: user.password
       })

@@ -4,7 +4,7 @@ import RHFSelect from '@/components/RHF/RHFSelect'
 import RHFTextField from '@/components/RHF/RHFTextField'
 import { formatCurrency } from '@/helpers'
 import { clientsOptions, invoicesOptions } from '@/queries'
-import { CreateInvoice, Invoice, creatInvoiceSchema } from '@/validations'
+import { CreateInvoice, Invoice, createInvoiceSchema } from '@/validations'
 import { zodResolver } from '@hookform/resolvers/zod'
 import AddCircleIcon from '@mui/icons-material/AddCircle'
 import DeleteIcon from '@mui/icons-material/Delete'
@@ -41,7 +41,7 @@ function CreateInvoiceForm() {
     }
   })
   const methods = useForm<CreateInvoice>({
-    resolver: zodResolver(creatInvoiceSchema),
+    resolver: zodResolver(createInvoiceSchema),
     defaultValues: {
       invoiceDueDays: 7,
       invoiceDate: dayjs().startOf('day').hour(1).toISOString(),

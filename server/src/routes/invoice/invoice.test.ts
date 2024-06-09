@@ -19,8 +19,8 @@ describe('Invoice', () => {
   const api = axios.create({ baseURL: `http://localhost:${PORT}/api/v1` })
   beforeAll(async () => {
     server = await startServer(PORT)
-    const { cookie, user: returedUser } = await getCredentials(PORT)
-    user = returedUser
+    const { cookie, user: returnedUser } = await getCredentials(PORT)
+    user = returnedUser
     api.defaults.headers.Cookie = cookie
   })
 

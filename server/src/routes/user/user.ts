@@ -1,13 +1,13 @@
 import userController from '@/controllers/user'
-import { upload } from '@/middlewars/multer'
-import { isAdmin } from '@/middlewars/role'
+import { upload } from '@/middlewares/multer'
+import { isAdmin } from '@/middlewares/role'
 
 import { Router, json } from 'express'
 
 const userRoute = Router()
 
 userRoute.get('/users', isAdmin, (req, res, next) => {
-  void userController.find(req, res, next)
+  void userController.findAll(req, res, next)
 })
 userRoute.get('/users/me', (req, res, next) => {
   void userController.findMe(req, res, next)

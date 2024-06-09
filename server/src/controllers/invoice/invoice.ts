@@ -1,6 +1,6 @@
 import InvoiceModel from '@/model/invoice'
 import {
-  creatInvoiceSchema,
+  createInvoiceSchema,
   invoiceArraySchema,
   invoiceSchema,
   updateInvoice,
@@ -16,7 +16,7 @@ const create = async (
 ): Promise<void> => {
   try {
     const authenticatedUser = parseUserSchema.parse(req.user)
-    const parsedInvoiceData = creatInvoiceSchema.parse(req.body)
+    const parsedInvoiceData = createInvoiceSchema.parse(req.body)
     const newInvoice = new InvoiceModel({
       ...parsedInvoiceData,
       user: authenticatedUser._id
@@ -37,7 +37,7 @@ const create = async (
   }
 }
 
-const find = async (
+const findAll = async (
   req: Request,
   res: Response,
   next: NextFunction
@@ -56,7 +56,7 @@ const find = async (
   }
 }
 
-const findById = async (
+const findOne = async (
   req: Request,
   res: Response,
   next: NextFunction
@@ -83,7 +83,7 @@ const findById = async (
   }
 }
 
-const updateById = async (
+const updateOne = async (
   req: Request,
   res: Response,
   next: NextFunction
@@ -117,7 +117,7 @@ const updateById = async (
   }
 }
 
-const delteById = async (
+const deleteOne = async (
   req: Request,
   res: Response,
   next: NextFunction
@@ -156,10 +156,10 @@ const delteById = async (
 
 const invoiceController = {
   create,
-  find,
-  findById,
-  updateById,
-  delteById
+  findAll,
+  findOne,
+  updateOne,
+  deleteOne
 }
 
 export default invoiceController

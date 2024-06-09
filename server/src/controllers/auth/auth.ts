@@ -24,7 +24,7 @@ const cookieExtractor = (req: {
   return token
 }
 
-const signup = async (
+const register = async (
   req: Request,
   res: Response,
   next: NextFunction
@@ -46,7 +46,7 @@ const signup = async (
   }
 }
 
-const signin = (req: Request, res: Response, next: NextFunction): void => {
+const login = (req: Request, res: Response, next: NextFunction): void => {
   try {
     const user = parseUserSchema.parse(req.user)
     const token = generateToken({ sub: user._id })
@@ -61,7 +61,7 @@ const signin = (req: Request, res: Response, next: NextFunction): void => {
   }
 }
 
-const signout = (req: Request, res: Response): void => {
+const logout = (req: Request, res: Response): void => {
   res.clearCookie('token')
   res.status(200).json({ message: 'Logged out' })
 }
@@ -133,9 +133,9 @@ async function localStrategyVerifyFunction(
 }
 
 const authController = {
-  signin,
-  signup,
-  signout
+  login,
+  register,
+  logout
 }
 
 export default authController

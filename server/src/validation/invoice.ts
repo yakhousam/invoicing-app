@@ -1,7 +1,7 @@
 import { z } from 'zod'
 import { clientSchema } from './client'
-import { dateToZodDatetime, objectIdSchema, objectIdToString } from './common'
-import { userShema } from './user'
+import { dateToZodDate, objectIdSchema, objectIdToString } from './common'
+import { userSchema } from './user'
 
 const itemSchema = z.object({
   _id: objectIdToString,
@@ -14,9 +14,9 @@ export const invoiceSchema = z.object({
   _id: objectIdToString,
   invoiceNo: z.number(),
   invoiceNoString: z.string(),
-  invoiceDate: dateToZodDatetime,
+  invoiceDate: dateToZodDate,
   invoiceDueDays: z.number(),
-  user: userShema.omit({ password: true }),
+  user: userSchema.omit({ password: true }),
   client: clientSchema.pick({ _id: true, name: true }),
   items: z.array(itemSchema),
   paid: z.boolean(),
@@ -26,15 +26,15 @@ export const invoiceSchema = z.object({
   subTotal: z.number(),
   taxAmount: z.number(),
   totalAmount: z.number(),
-  createdAt: dateToZodDatetime,
-  updatedAt: dateToZodDatetime
+  createdAt: dateToZodDate,
+  updatedAt: dateToZodDate
 })
 
 export const invoiceArraySchema = z.array(
   invoiceSchema.omit({ user: true }).merge(z.object({ user: objectIdToString }))
 )
 
-export const creatInvoiceSchema = z.object({
+export const createInvoiceSchema = z.object({
   invoiceDate: z
     .string()
     .datetime()
@@ -53,7 +53,7 @@ export const creatInvoiceSchema = z.object({
   taxPercentage: z.number().min(0).max(100).optional().default(0)
 })
 
-export const updateInvoice = creatInvoiceSchema
+export const updateInvoice = createInvoiceSchema
   .omit({ client: true })
   .partial()
   .extend({
@@ -68,6 +68,6 @@ export const updateInvoice = creatInvoiceSchema
 
 export type Invoice = z.infer<typeof invoiceSchema>
 
-export type CreateInvoice = z.input<typeof creatInvoiceSchema>
+export type CreateInvoice = z.input<typeof createInvoiceSchema>
 
 export type UpdateInvoice = z.infer<typeof updateInvoice>
