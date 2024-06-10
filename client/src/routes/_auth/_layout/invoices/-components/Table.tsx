@@ -14,7 +14,10 @@ import { useMemo } from 'react'
 
 type Columns = Awaited<ReturnType<typeof fetchInvoices>>[0]
 
-const InvoicesTable = () => {
+type TableProps = Parameters<typeof useMaterialReactTable>['0']
+type Props = Pick<TableProps, 'enablePagination' | 'enableSorting'>
+
+const InvoicesTable = ({ ...props }: Props) => {
   const navigate = useNavigate()
   const { data, isError, isLoading } = useSuspenseQuery(invoicesOptions)
   const columns = useMemo<MRT_ColumnDef<Columns>[]>(() => {
@@ -101,7 +104,8 @@ const InvoicesTable = () => {
     }),
     muiTablePaperProps: {
       elevation: 0
-    }
+    },
+    ...props
   })
 
   return <MaterialReactTable table={table} />

@@ -1,10 +1,10 @@
 import { createLazyFileRoute } from '@tanstack/react-router'
-import DashboardTable from './-components/Table'
+import InvoicesTable from '../invoices/-components/Table'
 
 export const Route = createLazyFileRoute('/_auth/_layout/')({
   component: Dashboard
 })
 
 function Dashboard() {
-  return <DashboardTable />
+  return <InvoicesTable enablePagination={false} enableSorting={false} />
 }

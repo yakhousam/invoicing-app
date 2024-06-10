@@ -1,6 +1,7 @@
 import useLogout from '@/hooks/useLogout'
 import { AccountCircle, LogoutRounded, Settings } from '@mui/icons-material'
 import {
+  Divider,
   IconButton,
   ListItemIcon,
   ListItemText,
@@ -57,6 +58,7 @@ const AppBarMenu = () => {
             <ListItemText primary="Settings" />
           </MenuItem>
         </RouterLink>
+        <Divider />
         <MenuItem onClick={handleLogout}>
           <ListItemIcon>
             <LogoutRounded fontSize="small" />
