@@ -22,10 +22,10 @@ export const API_URL = {
     updatePassword: `${apiUrl}/users/me/password`
   },
   invoices: {
-    createOne: `${apiUrl}/invoices`,
-    deleteOne: (id: string) => `${apiUrl}/invoices/${id}`,
-    getMany: `${apiUrl}/invoices`,
-    getOne: (id: string) => `${apiUrl}/invoices/${id}`,
-    updateOne: (id: string) => `${apiUrl}/invoices/${id}`
+    createOne: `${apiUrl}/invoices/me`,
+    deleteOne: (id: string) => `${apiUrl}/invoices/me/${id}`,
+    getMany: `${apiUrl}/invoices/me`,
+    getOne: (id: string) => `${apiUrl}/invoices/me/${id}`,
+    updateOne: (id: string) => `${apiUrl}/invoices/me/${id}`
   }
 } as const
