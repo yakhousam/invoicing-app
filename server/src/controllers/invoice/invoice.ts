@@ -8,6 +8,7 @@ import {
 } from '@/validation'
 import { parseUserSchema, type User } from '@/validation/user'
 import { type NextFunction, type Request, type Response } from 'express'
+import { ObjectId } from 'mongodb'
 
 const create = async (
   req: Request,
@@ -154,12 +155,119 @@ const deleteOne = async (
   }
 }
 
+const getSummary = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const authenticatedUser = parseUserSchema.parse(req.user)
+
+    const totals = await InvoiceModel.aggregate([
+      {
+        $match: {
+          user: new ObjectId(authenticatedUser._id)
+        }
+      },
+      {
+        $group: {
+          _id: '$currency',
+          total: { $sum: '$totalAmount' },
+          paid: { $sum: { $cond: ['$paid', '$totalAmount', 0] } },
+          unpaid: { $sum: { $cond: ['$paid', 0, '$totalAmount'] } }
+        }
+      },
+      {
+        $project: {
+          _id: 0,
+          currency: '$_id',
+          total: 1,
+          paid: 1,
+          unpaid: 1
+        }
+      }
+    ])
+
+    if (totals.length === 0) {
+      res.status(200).json({
+        total: 0,
+        paid: 0,
+        unpaid: 0
+      })
+      return
+    }
+
+    res.status(200).json(totals)
+  } catch (error) {
+    next(error)
+  }
+}
+
+const getTotalsByMonth = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const authenticatedUser = parseUserSchema.parse(req.user)
+
+    const totals = await InvoiceModel.aggregate([
+      {
+        $match: {
+          user: new ObjectId(authenticatedUser._id)
+        }
+      },
+      {
+        $group: {
+          _id: {
+            month: { $month: '$invoiceDate' },
+            year: { $year: '$invoiceDate' }
+          },
+          total: { $sum: '$totalAmount' },
+          paid: { $sum: { $cond: ['$paid', '$totalAmount', 0] } },
+          unpaid: { $sum: { $cond: ['$paid', 0, '$totalAmount'] } }
+        }
+      },
+      {
+        $sort: {
+          '_id.year': 1,
+          '_id.month': 1
+        }
+      },
+      {
+        $project: {
+          _id: 0,
+          date: '$_id',
+          total: 1,
+          paid: 1,
+          unpaid: 1
+        }
+      }
+    ])
+
+    if (totals.length === 0) {
+      res.status(200).json({
+        total: 0,
+        paid: 0,
+        unpaid: 0
+      })
+      return
+    }
+
+    res.status(200).json(totals)
+  } catch (error) {
+    next(error)
+  }
+}
+
 const invoiceController = {
   create,
   findAll,
   findOne,
   updateOne,
-  deleteOne
+  deleteOne,
+  getSummary,
+  getTotalsByMonth
 }
 
 export default invoiceController
