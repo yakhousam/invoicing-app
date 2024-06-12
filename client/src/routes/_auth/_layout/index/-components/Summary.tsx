@@ -33,7 +33,7 @@ export const Summary = () => {
                 {numberToCurrency(unpaid)}
               </Typography>
             </Stack>
-            {index !== 2 && <Divider />}
+            {index !== data.length - 1 && <Divider />}
           </Stack>
         )
       })}

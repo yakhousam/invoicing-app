@@ -1,5 +1,8 @@
 import { API_URL } from '@/config'
-import { invoicesSummarySchema } from '@/validations'
+import {
+  invoicesSummarySchema,
+  invoicesTotalsByMonthSchema
+} from '@/validations'
 import { fetchApi } from './util'
 
 export const fetchSummary = async () => {
@@ -8,5 +11,6 @@ export const fetchSummary = async () => {
 }
 
 export const fetchTotalsByMonth = async () => {
-  return await fetchApi(API_URL.dashboard.getTotalsByMonth)
+  const totals = await fetchApi(API_URL.dashboard.getTotalsByMonth)
+  return invoicesTotalsByMonthSchema.parse(totals)
 }

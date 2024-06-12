@@ -31,6 +31,7 @@ const Breadcrumbs = ({
       <RouterLink to="/">
         <Typography sx={{ textTransform: 'capitalize' }}>{rootName}</Typography>
       </RouterLink>
+
       {pathList.slice(0, -1).map((path) => {
         return (
           <RouterLink key={path} to={`/${path}`}>
