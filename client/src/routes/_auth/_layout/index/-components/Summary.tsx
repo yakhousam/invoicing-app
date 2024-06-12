@@ -1,10 +1,10 @@
 import { formatCurrency } from '@/helpers'
-import { invoicesSummaryOptions } from '@/queries/invoices'
+import { summaryOptions } from '@/queries'
 import { Divider, Stack, Typography } from '@mui/material'
 import { useSuspenseQuery } from '@tanstack/react-query'
 
 export const Summary = () => {
-  const { data = [] } = useSuspenseQuery(invoicesSummaryOptions)
+  const { data = [] } = useSuspenseQuery(summaryOptions)
 
   return (
     <Stack spacing={2}>
