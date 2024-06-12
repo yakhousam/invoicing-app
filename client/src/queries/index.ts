@@ -1,2 +1,2 @@
-export { clientsOptions } from './clients'
-export { invoiceByIdOptions, invoicesOptions } from './invoices'
+export * from './clients'
+export * from './invoices'

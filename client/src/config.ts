@@ -27,5 +27,9 @@ export const API_URL = {
     getMany: `${apiUrl}/invoices/me`,
     getOne: (id: string) => `${apiUrl}/invoices/me/${id}`,
     updateOne: (id: string) => `${apiUrl}/invoices/me/${id}`
+  },
+  dashboard: {
+    getSummary: `${apiUrl}/invoices/me/summary`,
+    getTotalsByMonth: `${apiUrl}/invoices/me/totals-by-month`
   }
 } as const
