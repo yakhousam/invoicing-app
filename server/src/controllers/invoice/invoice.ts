@@ -3,6 +3,7 @@ import {
   createInvoiceSchema,
   invoiceArraySchema,
   invoiceSchema,
+  invoicesSummarySchema,
   updateInvoice,
   type Invoice
 } from '@/validation'
@@ -188,16 +189,9 @@ const getSummary = async (
       }
     ])
 
-    if (totals.length === 0) {
-      res.status(200).json({
-        total: 0,
-        paid: 0,
-        unpaid: 0
-      })
-      return
-    }
+    const jsonResponse = invoicesSummarySchema.parse(totals)
 
-    res.status(200).json(totals)
+    res.status(200).json(jsonResponse)
   } catch (error) {
     next(error)
   }

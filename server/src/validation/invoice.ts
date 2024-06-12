@@ -66,6 +66,27 @@ export const updateInvoice = createInvoiceSchema
       })
   })
 
+export const invoicesSummarySchema = z.array(
+  z.object({
+    currency: createInvoiceSchema.shape.currency,
+    total: z.number(),
+    paid: z.number(),
+    unpaid: z.number()
+  })
+)
+
+export const invoicesTotalsByMonthSchema = z.array(
+  z.object({
+    date: z.object({
+      month: z.number(),
+      year: z.number()
+    }),
+    total: z.number(),
+    paid: z.number(),
+    unpaid: z.number()
+  })
+)
+
 export type Invoice = z.infer<typeof invoiceSchema>
 
 export type CreateInvoice = z.input<typeof createInvoiceSchema>
