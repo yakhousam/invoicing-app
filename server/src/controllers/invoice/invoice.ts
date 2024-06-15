@@ -3,6 +3,7 @@ import {
   createInvoiceSchema,
   invoiceArraySchema,
   invoiceSchema,
+  invoicesSearchSchema,
   invoicesSummarySchema,
   updateInvoice,
   type Invoice
@@ -46,14 +47,30 @@ const findAll = async (
 ): Promise<void> => {
   try {
     const authenticatedUser = parseUserSchema.parse(req.user)
+    const searchQuery = invoicesSearchSchema.parse(req.query)
+    const { page, limit, sortBy, orderBy, ...others } = searchQuery
+
+    let filters: Record<string, any> = { ...others }
+
+    if (filters?.clientName !== undefined) {
+      filters = {
+        ...filters,
+        'client.name': { $regex: filters.clientName, $options: 'i' }
+      }
+      delete filters.clientName
+    }
+
     const invoices = await InvoiceModel.find({
-      user: authenticatedUser._id
+      user: authenticatedUser._id,
+      ...filters
     })
+      .sort({ [sortBy]: orderBy })
+      .skip(page * limit)
+      .limit(limit)
 
     const jsonResponse = invoiceArraySchema.parse(invoices)
     res.status(200).json(jsonResponse)
   } catch (error: unknown) {
-    // console.error(error)
     next(error)
   }
 }
