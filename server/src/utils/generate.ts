@@ -1,7 +1,6 @@
 import {
   type CreateClient,
   type CreateUser,
-  type Invoice,
   type Role,
   type User
 } from '@/validation'
@@ -15,7 +14,7 @@ export const getProductName = (): string => faker.commerce.productName()
 export const getProductPrice = (): number => Number(faker.commerce.price())
 export const getTaxPercentage = (): number =>
   Number(faker.finance.amount(0, 100, 2))
-export const getCurrency = (): Invoice['currency'] => {
+export const getCurrency = (): 'USD' | 'EUR' | 'GBP' => {
   const currencies = ['USD', 'EUR', 'GBP'] as const
   const randomIndex = Math.floor(Math.random() * currencies.length)
   return currencies[randomIndex]

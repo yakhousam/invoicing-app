@@ -303,7 +303,7 @@ describe('Invoice Controller', () => {
           }))
       )
 
-      const req = { user: user1 } as unknown as Request
+      const req = { user: user1, query: {} } as unknown as Request
       const res = buildRes()
       const next = buildNext()
 
