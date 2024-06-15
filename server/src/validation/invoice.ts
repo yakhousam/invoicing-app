@@ -87,6 +87,16 @@ export const invoicesTotalsByMonthSchema = z.array(
   })
 )
 
+export const invoicesSearchSchema = z.object({
+  page: z.number().int().nonnegative().optional().default(0),
+  limit: z.number().int().positive().optional().default(10),
+  sortBy: z.string().optional().default('invoiceDate'),
+  orderBy: z.enum(['asc', 'desc']).optional().default('desc'),
+  clientName: z.string().optional(),
+  status: z.enum(['sent', 'paid', 'overdue']).optional(),
+  currency: z.enum(['USD', 'EUR', 'GBP']).optional()
+})
+
 export type Invoice = z.infer<typeof invoiceSchema>
 
 export type CreateInvoice = z.input<typeof createInvoiceSchema>
