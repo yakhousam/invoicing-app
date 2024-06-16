@@ -93,7 +93,6 @@ export const invoicesSearchSchema = z.object({
   sortBy: z.string().optional().default('invoiceDate'),
   orderBy: z.enum(['asc', 'desc']).optional().default('desc'),
   clientName: z.string().optional(),
-  status: z.enum(['sent', 'paid', 'overdue']).optional(),
   currency: z.enum(['USD', 'EUR', 'GBP']).optional()
 })
 
