@@ -321,6 +321,187 @@ describe('Invoice Controller', () => {
       })
     })
 
+    it('should find all user invoices with pagination', async () => {
+      const user = parseUserSchema.parse(
+        (await UserModel.create(getNewUser())).toJSON()
+      )
+
+      const client = clientSchema.parse(
+        (await ClientModel.create(getNewClient(user._id))).toJSON()
+      )
+
+      const expectedInvoices = await InvoiceModel.create(
+        Array(10)
+          .fill(null)
+          .map(() => ({
+            user: user._id,
+            client: { _id: client._id },
+            items: Array(10)
+              .fill(null)
+              .map(() => ({
+                itemName: getProductName(),
+                itemPrice: getProductPrice()
+              }))
+          }))
+      )
+
+      const req = {
+        user,
+        query: {
+          page: 1,
+          limit: 5
+        }
+      } as unknown as Request
+      const res = buildRes()
+      const next = buildNext()
+
+      await invoiceController.findAll(req, res, next)
+
+      expect(res.status).toHaveBeenCalledWith(200)
+
+      const jsonResponse = invoiceArraySchema.parse(
+        (res.json as jest.Mock).mock.calls[0][0]
+      )
+      expect(jsonResponse.length).toBe(5)
+      jsonResponse.forEach((invoice, index) => {
+        expect(invoice.user).toBe(user._id)
+        if (index === 0) {
+          const findInvoice = expectedInvoices.find(
+            (invoice) => invoice._id.toString() === jsonResponse[index]._id
+          )
+          expect(findInvoice).toBeDefined()
+        }
+      })
+    })
+
+    it('should find all user invoices with search query, client name', async () => {
+      const user = parseUserSchema.parse(
+        (await UserModel.create(getNewUser())).toJSON()
+      )
+
+      const client = clientSchema.parse(
+        (await ClientModel.create(getNewClient(user._id))).toJSON()
+      )
+
+      await InvoiceModel.create(
+        Array(10)
+          .fill(null)
+          .map(() => ({
+            user: user._id,
+            client: { _id: client._id },
+            items: Array(10)
+              .fill(null)
+              .map(() => ({
+                itemName: getProductName(),
+                itemPrice: getProductPrice()
+              }))
+          }))
+      )
+
+      const req = {
+        user,
+        query: {
+          clientName: client.name
+        }
+      } as unknown as Request
+      const res = buildRes()
+      const next = buildNext()
+
+      await invoiceController.findAll(req, res, next)
+
+      expect(res.status).toHaveBeenCalledWith(200)
+
+      const jsonResponse = invoiceArraySchema.parse(
+        (res.json as jest.Mock).mock.calls[0][0]
+      )
+      expect(jsonResponse.length).toBe(10)
+      jsonResponse.forEach((invoice) => {
+        expect(invoice.user).toBe(user._id)
+        expect(invoice.client.name).toBe(client.name)
+      })
+    })
+
+    it('should find all user invoices with search query, currency', async () => {
+      const user = parseUserSchema.parse(
+        (await UserModel.create(getNewUser())).toJSON()
+      )
+
+      const client = clientSchema.parse(
+        (await ClientModel.create(getNewClient(user._id))).toJSON()
+      )
+
+      await InvoiceModel.create(
+        Array(10)
+          .fill(null)
+          .map(() => ({
+            user: user._id,
+            client: { _id: client._id },
+            currency: 'USD',
+            items: Array(10)
+              .fill(null)
+              .map(() => ({
+                itemName: getProductName(),
+                itemPrice: getProductPrice()
+              }))
+          }))
+      )
+      await InvoiceModel.create(
+        Array(10)
+          .fill(null)
+          .map(() => ({
+            user: user._id,
+            client: { _id: client._id },
+            currency: 'EUR',
+            items: Array(10)
+              .fill(null)
+              .map(() => ({
+                itemName: getProductName(),
+                itemPrice: getProductPrice()
+              }))
+          }))
+      )
+
+      await InvoiceModel.create(
+        Array(10)
+          .fill(null)
+          .map(() => ({
+            user: user._id,
+            client: { _id: client._id },
+            currency: 'GBP',
+            items: Array(10)
+              .fill(null)
+              .map(() => ({
+                itemName: getProductName(),
+                itemPrice: getProductPrice()
+              }))
+          }))
+      )
+
+      const randomCurrency = getCurrency()
+
+      const req = {
+        user,
+        query: {
+          currency: randomCurrency
+        }
+      } as unknown as Request
+      const res = buildRes()
+      const next = buildNext()
+
+      await invoiceController.findAll(req, res, next)
+
+      expect(res.status).toHaveBeenCalledWith(200)
+
+      const jsonResponse = invoiceArraySchema.parse(
+        (res.json as jest.Mock).mock.calls[0][0]
+      )
+      expect(jsonResponse.length).toBe(10)
+      jsonResponse.forEach((invoice) => {
+        expect(invoice.user).toBe(user._id)
+        expect(invoice.currency).toBe(randomCurrency)
+      })
+    })
+
     it('should find invoice by id', async () => {
       const user = parseUserSchema.parse(
         (await UserModel.create(getNewUser())).toJSON()
