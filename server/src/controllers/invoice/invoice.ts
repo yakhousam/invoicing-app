@@ -48,7 +48,7 @@ const findAll = async (
   try {
     const authenticatedUser = parseUserSchema.parse(req.user)
     const searchQuery = invoicesSearchSchema.parse(req.query)
-    const { page, limit, sortBy, orderBy, ...others } = searchQuery
+    const { page, limit, sortBy, orderDirection, ...others } = searchQuery
 
     let filters: Record<string, any> = { ...others }
 
@@ -64,7 +64,7 @@ const findAll = async (
       user: authenticatedUser._id,
       ...filters
     })
-      .sort({ [sortBy]: orderBy })
+      .sort({ [sortBy]: orderDirection })
       .skip(page * limit)
       .limit(limit)
 
