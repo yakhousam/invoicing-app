@@ -32,7 +32,7 @@ function CreateInvoiceForm() {
       enqueueSnackbar('Invoice created', { variant: 'success' })
       methods.reset()
       queryClient.invalidateQueries({
-        queryKey: invoicesOptions.queryKey
+        queryKey: invoicesOptions().queryKey
       })
     },
     onError: (error) => {

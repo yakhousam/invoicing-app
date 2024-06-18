@@ -1,9 +1,15 @@
+import { invoicesOptions } from '@/queries'
+import { invoicesSearchSchema } from '@/validations'
 import AddIcon from '@mui/icons-material/Add'
 import { Box, Button, Paper, Typography } from '@mui/material'
 import { Link as RouterLink, createFileRoute } from '@tanstack/react-router'
 import InvoicesTable from './-components/Table'
 
 export const Route = createFileRoute('/_auth/_layout/invoices/')({
+  validateSearch: invoicesSearchSchema,
+  loaderDeps: ({ search }) => search,
+  loader: ({ context: { queryClient }, deps }) =>
+    queryClient.ensureQueryData(invoicesOptions(deps)),
   component: Invoices
 })
 
