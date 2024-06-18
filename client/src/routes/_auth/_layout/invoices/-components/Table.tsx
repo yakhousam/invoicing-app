@@ -3,44 +3,73 @@ import { formatCurrency } from '@/helpers'
 import { invoicesOptions } from '@/queries'
 import { Chip, Typography } from '@mui/material'
 import { useSuspenseQuery } from '@tanstack/react-query'
-import { useNavigate } from '@tanstack/react-router'
+import { useNavigate, useSearch } from '@tanstack/react-router'
 import dayjs from 'dayjs'
 import {
+  MRT_ColumnFiltersState,
   MaterialReactTable,
   useMaterialReactTable,
   type MRT_ColumnDef
 } from 'material-react-table'
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 
 type Columns = Awaited<ReturnType<typeof fetchInvoices>>[0]
 
 type TableProps = Parameters<typeof useMaterialReactTable>['0']
-type Props = Pick<TableProps, 'enablePagination' | 'enableSorting'>
+type Props = Pick<
+  TableProps,
+  'enablePagination' | 'enableSorting' | 'enableFilters'
+>
 
 const InvoicesTable = ({ ...props }: Props) => {
+  const [columnFilters, setColumnFilters] = useState<MRT_ColumnFiltersState>([])
   const navigate = useNavigate()
-  const { data, isError, isLoading } = useSuspenseQuery(invoicesOptions)
+  const looseSearch = useSearch({ strict: false })
+  const searchParams = 'redirect' in looseSearch ? {} : looseSearch
+  console.log('searchParams', searchParams)
+  const queryOptions = invoicesOptions(searchParams)
+  const { data, isError, isLoading } = useSuspenseQuery(queryOptions)
+
+  function handleFilterChange(filters: MRT_ColumnFiltersState) {
+    console.log('handle change columnFilters', filters)
+    setColumnFilters(filters)
+    const searchParams = filters.reduce((acc, filter) => {
+      const { id, value } = filter
+      return { ...acc, [id]: value }
+    }, {})
+    navigate({
+      search: searchParams
+    })
+  }
+
   const columns = useMemo<MRT_ColumnDef<Columns>[]>(() => {
     return [
       {
         accessorKey: 'invoiceNoString',
-        header: 'N°'
+        header: 'N°',
+        enableColumnFilter: false
       },
       {
-        accessorKey: 'client.name',
-        header: 'Client'
+        accessorKey: 'clientName',
+        header: 'Client',
+        accessorFn(originalRow) {
+          return originalRow.client.name
+        },
+        filterFn: 'customFilterFn'
       },
       {
         accessorKey: 'invoiceDate',
         header: 'Date',
         accessorFn(originalRow) {
           return dayjs(originalRow.invoiceDate).format('DD/MM/YYYY')
-        }
+        },
+        enableColumnFilter: false
       },
       {
         accessorKey: 'status',
         header: 'Status',
         size: 50,
+        enableColumnFilter: true,
         Cell: ({ cell }) => {
           const status = cell.getValue<Columns['status']>()
           return (
@@ -64,6 +93,7 @@ const InvoicesTable = ({ ...props }: Props) => {
       {
         accessorKey: 'totalAmount',
         header: 'Price',
+        enableColumnFilter: false,
         accessorFn(originalRow) {
           return formatCurrency(originalRow.currency)(originalRow.totalAmount)
         },
@@ -82,7 +112,8 @@ const InvoicesTable = ({ ...props }: Props) => {
     data,
     state: {
       isLoading,
-      showAlertBanner: isError
+      showAlertBanner: isError,
+      columnFilters
     },
     muiToolbarAlertBannerProps: isError
       ? {
@@ -90,9 +121,20 @@ const InvoicesTable = ({ ...props }: Props) => {
           children: 'Error loading data'
         }
       : undefined,
-    enableFilters: false,
     enableDensityToggle: false,
     enableFullScreenToggle: false,
+    enableGlobalFilter: false,
+    enableRowSelection: false,
+    manualFiltering: true,
+    manualPagination: true,
+    manualSorting: true,
+    onColumnFiltersChange: (newColumnFilters) => {
+      const data =
+        typeof newColumnFilters === 'function'
+          ? newColumnFilters(columnFilters)
+          : newColumnFilters
+      handleFilterChange(data)
+    },
     muiTableBodyRowProps: ({ row }) => ({
       onClick: () => {
         navigate({
