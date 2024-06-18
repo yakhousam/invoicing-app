@@ -3,12 +3,23 @@ import {
   CreateInvoice,
   invoiceArraySchema,
   invoiceSchema,
+  InvoicesSearchParams,
+  invoicesSearchSchema,
   UpdateInvoice
 } from '@/validations'
 import { fetchApi } from './util'
 
-export const fetchInvoices = async () => {
-  const invoices = await fetchApi(API_URL.invoices.getMany)
+export const fetchInvoices = async (search: InvoicesSearchParams) => {
+  console.log('fetch invoices search', search)
+  const parsedSearch = invoicesSearchSchema.parse(search) // Use invoicesSearchSchema to parse the search
+  const searchParams = {
+    ...parsedSearch,
+    page: parsedSearch.page.toString(),
+    limit: parsedSearch.limit.toString()
+  }
+  const invoices = await fetchApi(
+    `${API_URL.invoices.getMany}?${new URLSearchParams(searchParams).toString()}`
+  )
   return invoiceArraySchema.parse(invoices) // Use invoiceArraySchema to parse the invoices
 }
 
