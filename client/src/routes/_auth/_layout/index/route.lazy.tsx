@@ -1,7 +1,7 @@
 import { Box, Grid, Paper } from '@mui/material'
 import { createLazyFileRoute } from '@tanstack/react-router'
-import InvoicesTable from '../invoices/-components/Table'
 import { Chart } from './-components/Chart'
+import DashboardTable from './-components/DashboardTable'
 import { Summary } from './-components/Summary'
 
 export const Route = createLazyFileRoute('/_auth/_layout/')({
@@ -9,6 +9,7 @@ export const Route = createLazyFileRoute('/_auth/_layout/')({
 })
 
 function Dashboard() {
+  const data = Route.useLoaderData()
   return (
     <Box
       sx={{
@@ -29,11 +30,7 @@ function Dashboard() {
       </Grid>
       <Box mt={3}>
         <Paper sx={{ p: 4 }}>
-          <InvoicesTable
-            enableFilters={false}
-            enablePagination={false}
-            enableSorting={false}
-          />
+          <DashboardTable data={data} />
         </Paper>
       </Box>
     </Box>

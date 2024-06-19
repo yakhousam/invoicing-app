@@ -100,6 +100,8 @@ export const invoicesSearchSchema = z.object({
 
 export type Invoice = z.infer<typeof invoiceSchema>
 
+export type InvoiceArray = z.infer<typeof invoiceArraySchema>
+
 export type CreateInvoice = z.input<typeof createInvoiceSchema>
 
 export type UpdateInvoice = z.infer<typeof updateInvoice>
