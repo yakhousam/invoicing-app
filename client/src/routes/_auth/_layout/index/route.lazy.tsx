@@ -29,7 +29,11 @@ function Dashboard() {
       </Grid>
       <Box mt={3}>
         <Paper sx={{ p: 4 }}>
-          <InvoicesTable />
+          <InvoicesTable
+            enableFilters={false}
+            enablePagination={false}
+            enableSorting={false}
+          />
         </Paper>
       </Box>
     </Box>
