@@ -1,12 +1,14 @@
 import { fetchInvoices } from '@/api/invoice'
 import { formatCurrency } from '@/helpers'
 import { invoicesOptions } from '@/queries'
+import { invoicesSearchSchema } from '@/validations'
 import { Chip, Typography } from '@mui/material'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { useNavigate, useSearch } from '@tanstack/react-router'
 import dayjs from 'dayjs'
 import {
   MRT_ColumnFiltersState,
+  MRT_Updater,
   MaterialReactTable,
   useMaterialReactTable,
   type MRT_ColumnDef
@@ -25,20 +27,27 @@ const InvoicesTable = ({ ...props }: Props) => {
   const [columnFilters, setColumnFilters] = useState<MRT_ColumnFiltersState>([])
   const navigate = useNavigate()
   const looseSearch = useSearch({ strict: false })
-  const searchParams = 'redirect' in looseSearch ? {} : looseSearch
-  console.log('searchParams', searchParams)
+  const searchParams =
+    'redirect' in looseSearch ? {} : invoicesSearchSchema.parse(looseSearch)
+
   const queryOptions = invoicesOptions(searchParams)
   const { data, isError, isLoading } = useSuspenseQuery(queryOptions)
 
-  function handleFilterChange(filters: MRT_ColumnFiltersState) {
+  function handleFilterChange(
+    newColumnFilters: MRT_Updater<MRT_ColumnFiltersState>
+  ) {
+    const filters =
+      typeof newColumnFilters === 'function'
+        ? newColumnFilters(columnFilters)
+        : newColumnFilters
     console.log('handle change columnFilters', filters)
     setColumnFilters(filters)
-    const searchParams = filters.reduce((acc, filter) => {
+    const search = filters.reduce((acc, filter) => {
       const { id, value } = filter
       return { ...acc, [id]: value }
     }, {})
     navigate({
-      search: searchParams
+      search: invoicesSearchSchema.parse(search)
     })
   }
 
@@ -128,13 +137,7 @@ const InvoicesTable = ({ ...props }: Props) => {
     manualFiltering: true,
     manualPagination: true,
     manualSorting: true,
-    onColumnFiltersChange: (newColumnFilters) => {
-      const data =
-        typeof newColumnFilters === 'function'
-          ? newColumnFilters(columnFilters)
-          : newColumnFilters
-      handleFilterChange(data)
-    },
+    onColumnFiltersChange: handleFilterChange,
     muiTableBodyRowProps: ({ row }) => ({
       onClick: () => {
         navigate({
