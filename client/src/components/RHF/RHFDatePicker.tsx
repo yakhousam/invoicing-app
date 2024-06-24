@@ -24,9 +24,7 @@ const RHFDatePicker = ({ name, label, ...delegated }: RHFDatePickerProps) => {
           fullWidth
           value={dayjs(field.value).format('YYYY-MM-DD')}
           onChange={(e) => {
-            field.onChange(
-              dayjs(e.target.value).startOf('day').hour(1).toISOString()
-            )
+            field.onChange(dayjs(e.target.value).toISOString())
           }}
           {...delegated}
         />

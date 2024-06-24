@@ -31,6 +31,9 @@ function CreateInvoiceForm() {
     onSuccess: () => {
       enqueueSnackbar('Invoice created', { variant: 'success' })
       methods.reset()
+      // this is a hack to reset the date (time) field so it doesn't keep the previous value.
+      // otherwise if you create a new invoice the date will be the same as the previous one when you don't refresh the page
+      methods.setValue('invoiceDate', dayjs().toISOString())
       queryClient.invalidateQueries({
         queryKey: invoicesOptions().queryKey
       })
@@ -44,7 +47,7 @@ function CreateInvoiceForm() {
     resolver: zodResolver(createInvoiceSchema),
     defaultValues: {
       invoiceDueDays: 7,
-      invoiceDate: dayjs().startOf('day').hour(1).toISOString(),
+      invoiceDate: dayjs().toISOString(),
       client: {
         _id: ''
       },
