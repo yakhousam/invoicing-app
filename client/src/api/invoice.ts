@@ -10,17 +10,19 @@ import {
 import { fetchApi } from './util'
 
 export const fetchInvoices = async (search: InvoicesSearchParams) => {
-  console.log('fetch invoices search', search)
   const parsedSearch = invoicesSearchSchema.parse(search) // Use invoicesSearchSchema to parse the search
   const searchParams = {
     ...parsedSearch,
     page: parsedSearch.page.toString(),
     limit: parsedSearch.limit.toString()
   }
-  const invoices = await fetchApi(
+  const result = await fetchApi(
     `${API_URL.invoices.getMany}?${new URLSearchParams(searchParams).toString()}`
   )
-  return invoiceArraySchema.parse(invoices) // Use invoiceArraySchema to parse the invoices
+  return {
+    invoices: invoiceArraySchema.parse(result.invoices), // Use invoiceArraySchema to parse the invoices
+    totalInvoices: result.totalInvoices as number
+  }
 }
 
 export const fetchInvoiceById = async (id: string) => {

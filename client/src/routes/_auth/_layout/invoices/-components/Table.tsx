@@ -8,30 +8,32 @@ import { useNavigate, useSearch } from '@tanstack/react-router'
 import dayjs from 'dayjs'
 import {
   MRT_ColumnFiltersState,
+  MRT_PaginationState,
+  MRT_SortingState,
   MRT_Updater,
   MaterialReactTable,
   useMaterialReactTable,
   type MRT_ColumnDef
 } from 'material-react-table'
-import { useMemo, useState } from 'react'
+import { useMemo } from 'react'
 
-type Columns = Awaited<ReturnType<typeof fetchInvoices>>[0]
+type Columns = Awaited<ReturnType<typeof fetchInvoices>>['invoices'][0]
 
-type TableProps = Parameters<typeof useMaterialReactTable>['0']
-type Props = Pick<
-  TableProps,
-  'enablePagination' | 'enableSorting' | 'enableFilters'
->
-
-const InvoicesTable = ({ ...props }: Props) => {
-  const [columnFilters, setColumnFilters] = useState<MRT_ColumnFiltersState>([])
+const InvoicesTable = () => {
   const navigate = useNavigate()
   const looseSearch = useSearch({ strict: false })
-  const searchParams =
-    'redirect' in looseSearch ? {} : invoicesSearchSchema.parse(looseSearch)
+  const searchParams = invoicesSearchSchema.parse(looseSearch)
 
   const queryOptions = invoicesOptions(searchParams)
   const { data, isError, isLoading } = useSuspenseQuery(queryOptions)
+
+  const columnFilters = (['clientName', 'status'] as const).reduce(
+    (acc, id) => {
+      const value = searchParams[id]
+      return value ? [...acc, { id, value }] : acc
+    },
+    [] as MRT_ColumnFiltersState
+  )
 
   function handleFilterChange(
     newColumnFilters: MRT_Updater<MRT_ColumnFiltersState>
@@ -40,14 +42,44 @@ const InvoicesTable = ({ ...props }: Props) => {
       typeof newColumnFilters === 'function'
         ? newColumnFilters(columnFilters)
         : newColumnFilters
-    console.log('handle change columnFilters', filters)
-    setColumnFilters(filters)
+
     const search = filters.reduce((acc, filter) => {
       const { id, value } = filter
       return { ...acc, [id]: value }
     }, {})
     navigate({
       search: invoicesSearchSchema.parse(search)
+    })
+  }
+
+  function handlePaginationChange(
+    changePage: MRT_Updater<MRT_PaginationState>
+  ) {
+    const pagination =
+      typeof changePage === 'function'
+        ? changePage({
+            pageIndex: searchParams.page,
+            pageSize: searchParams.limit
+          })
+        : changePage
+    navigate({
+      search: (prev) => ({
+        ...prev,
+        page: pagination.pageIndex,
+        limit: pagination.pageSize
+      })
+    })
+  }
+
+  function handleSortingChange(changeSorting: MRT_Updater<MRT_SortingState>) {
+    const sorting =
+      typeof changeSorting === 'function' ? changeSorting([]) : changeSorting
+    navigate({
+      search: (prev) => ({
+        ...prev,
+        sortBy: sorting[0]?.id,
+        orderDirection: sorting[0]?.desc ? 'desc' : 'asc'
+      })
     })
   }
 
@@ -64,7 +96,8 @@ const InvoicesTable = ({ ...props }: Props) => {
         accessorFn(originalRow) {
           return originalRow.client.name
         },
-        filterFn: 'customFilterFn'
+        filterFn: 'customFilterFn',
+        enableSorting: false
       },
       {
         accessorKey: 'invoiceDate',
@@ -79,6 +112,8 @@ const InvoicesTable = ({ ...props }: Props) => {
         header: 'Status',
         size: 50,
         enableColumnFilter: true,
+        filterVariant: 'select',
+        filterSelectOptions: ['sent', 'paid', 'overdue'],
         Cell: ({ cell }) => {
           const status = cell.getValue<Columns['status']>()
           return (
@@ -118,12 +153,28 @@ const InvoicesTable = ({ ...props }: Props) => {
 
   const table = useMaterialReactTable({
     columns,
-    data,
+    data: data?.invoices ?? [],
+    initialState: {
+      showColumnFilters:
+        [searchParams.clientName, searchParams.status].filter(Boolean).length >
+        0
+    },
     state: {
       isLoading,
       showAlertBanner: isError,
-      columnFilters
+      columnFilters,
+      pagination: {
+        pageIndex: searchParams.page,
+        pageSize: searchParams.limit
+      },
+      sorting: [
+        {
+          id: searchParams.sortBy,
+          desc: searchParams.orderDirection === 'desc'
+        }
+      ]
     },
+    rowCount: data?.totalInvoices ?? 0,
     muiToolbarAlertBannerProps: isError
       ? {
           color: 'error',
@@ -138,6 +189,8 @@ const InvoicesTable = ({ ...props }: Props) => {
     manualPagination: true,
     manualSorting: true,
     onColumnFiltersChange: handleFilterChange,
+    onPaginationChange: handlePaginationChange,
+    onSortingChange: handleSortingChange,
     muiTableBodyRowProps: ({ row }) => ({
       onClick: () => {
         navigate({
@@ -150,7 +203,9 @@ const InvoicesTable = ({ ...props }: Props) => {
     muiTablePaperProps: {
       elevation: 0
     },
-    ...props
+    muiPaginationProps: {
+      rowsPerPageOptions: [2, 10, 25, 50]
+    }
   })
 
   return <MaterialReactTable table={table} />

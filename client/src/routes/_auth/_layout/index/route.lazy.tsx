@@ -30,7 +30,7 @@ function Dashboard() {
       </Grid>
       <Box mt={3}>
         <Paper sx={{ p: 4 }}>
-          <DashboardTable data={data} />
+          <DashboardTable data={data.invoices} />
         </Paper>
       </Box>
     </Box>
