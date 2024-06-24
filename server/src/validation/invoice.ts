@@ -35,11 +35,7 @@ export const invoiceArraySchema = z.array(
 )
 
 export const createInvoiceSchema = z.object({
-  invoiceDate: z
-    .string()
-    .datetime()
-    .optional()
-    .default(new Date().toISOString()),
+  invoiceDate: z.string().datetime().optional(),
   invoiceDueDays: z.number().min(1).optional().default(7),
   items: z
     .array(itemSchema.omit({ _id: true }))

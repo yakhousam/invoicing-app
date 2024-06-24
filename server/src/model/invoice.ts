@@ -139,7 +139,10 @@ InvoiceSchema.pre('save', async function (next) {
       '0'
     )}`
   }
+  const invoiceDate =
+    this.invoiceDate !== undefined ? new Date(this.invoiceDate) : new Date()
 
+  this.invoiceDate = invoiceDate
   const subTotal = parseFloat(
     this.items
       .reduce(
