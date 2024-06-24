@@ -47,30 +47,93 @@ const findAll = async (
 ): Promise<void> => {
   try {
     const authenticatedUser = parseUserSchema.parse(req.user)
-    const searchQuery = invoicesSearchSchema.parse(req.query)
-    const { page, limit, sortBy, orderDirection, ...others } = searchQuery
+    const searchQuery = invoicesSearchSchema.parse({
+      ...req.query,
+      page: Number(req.query.page),
+      limit: Number(req.query.limit)
+    })
+    const {
+      page,
+      limit,
+      sortBy,
+      orderDirection,
+      status,
+      clientName,
+      currency
+    } = searchQuery
 
-    let filters: Record<string, any> = { ...others }
+    const aggregationPipeline: any[] = [
+      { $match: { user: new ObjectId(authenticatedUser._id) } }
+    ]
 
-    if (filters?.clientName !== undefined) {
-      filters = {
-        ...filters,
-        'client.name': { $regex: filters.clientName, $options: 'i' }
-      }
-      delete filters.clientName
+    if (currency !== undefined) {
+      aggregationPipeline.push({ $match: { currency } })
     }
 
-    const invoices = await InvoiceModel.find({
-      user: authenticatedUser._id,
-      ...filters
-    })
-      .sort({ [sortBy]: orderDirection })
-      .skip(page * limit)
-      .limit(limit)
+    if (clientName !== undefined) {
+      aggregationPipeline.push({
+        $match: {
+          'client.name': { $regex: clientName, $options: 'i' }
+        }
+      })
+    }
 
-    const jsonResponse = invoiceArraySchema.parse(invoices)
-    res.status(200).json(jsonResponse)
+    aggregationPipeline.push({
+      $addFields: {
+        status: {
+          $cond: [
+            { $eq: ['$paid', true] },
+            'paid',
+            {
+              $cond: [
+                {
+                  $lt: [
+                    {
+                      $add: [
+                        { $toDate: '$invoiceDate' },
+                        {
+                          $multiply: ['$invoiceDueDays', 24 * 60 * 60 * 1000]
+                        }
+                      ]
+                    },
+                    new Date()
+                  ]
+                },
+                'overdue',
+                'sent'
+              ]
+            }
+          ]
+        }
+      }
+    })
+
+    if (status !== undefined) {
+      aggregationPipeline.push({ $match: { status } })
+    }
+
+    aggregationPipeline.push({
+      $facet: {
+        paginatedResults: [
+          { $sort: { [sortBy]: orderDirection === 'asc' ? 1 : -1 } },
+          { $skip: page * limit },
+          { $limit: limit }
+        ],
+        totalCount: [{ $count: 'count' }]
+      }
+    })
+
+    const aggregation = await InvoiceModel.aggregate(aggregationPipeline)
+
+    const invoices = invoiceArraySchema.parse(aggregation[0].paginatedResults)
+    const totalInvoices = aggregation[0].totalCount[0]?.count ?? 0
+
+    res.status(200).json({
+      invoices,
+      totalInvoices
+    })
   } catch (error: unknown) {
+    // console.log(error)
     next(error)
   }
 }

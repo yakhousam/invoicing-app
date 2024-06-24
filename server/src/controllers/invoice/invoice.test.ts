@@ -14,9 +14,9 @@ import {
   getProductPrice
 } from '@/utils/generate'
 import {
-  invoiceArraySchema,
   invoiceSchema,
-  type CreateInvoice
+  type CreateInvoice,
+  type InvoiceArray
 } from '@/validation'
 import { clientSchema } from '@/validation/client'
 import { parseUserSchema } from '@/validation/user'
@@ -257,7 +257,7 @@ describe('Invoice Controller', () => {
     })
   })
 
-  describe('Find', () => {
+  describe('FindAll', () => {
     it('should find all user invoices', async () => {
       const user1 = parseUserSchema.parse(
         (await UserModel.create(getNewUser())).toJSON()
@@ -311,12 +311,15 @@ describe('Invoice Controller', () => {
 
       expect(res.status).toHaveBeenCalledWith(200)
 
-      const jsonResponse = invoiceArraySchema.parse(
-        (res.json as jest.Mock).mock.calls[0][0]
-      )
-      expect(jsonResponse.length).toBe(expectedInvoices.length)
+      const { invoices, totalInvoices } = (res.json as jest.Mock).mock
+        .calls[0][0] as {
+        invoices: InvoiceArray
+        totalInvoices: number
+      }
+
+      expect(totalInvoices).toBe(expectedInvoices.length)
       // all returned invoices should belong to the user
-      jsonResponse.forEach((invoice) => {
+      invoices.forEach((invoice) => {
         expect(invoice.user).toBe(user1._id)
       })
     })
@@ -359,15 +362,20 @@ describe('Invoice Controller', () => {
 
       expect(res.status).toHaveBeenCalledWith(200)
 
-      const jsonResponse = invoiceArraySchema.parse(
-        (res.json as jest.Mock).mock.calls[0][0]
-      )
-      expect(jsonResponse.length).toBe(5)
-      jsonResponse.forEach((invoice, index) => {
+      const { invoices, totalInvoices } = (res.json as jest.Mock).mock
+        .calls[0][0] as {
+        invoices: InvoiceArray
+        totalInvoices: number
+      }
+
+      expect(invoices.length).toBe(5)
+      expect(totalInvoices).toBe(expectedInvoices.length)
+
+      invoices.forEach((invoice, index) => {
         expect(invoice.user).toBe(user._id)
         if (index === 0) {
           const findInvoice = expectedInvoices.find(
-            (invoice) => invoice._id.toString() === jsonResponse[index]._id
+            (invoice) => invoice._id.toString() === invoices[index]._id
           )
           expect(findInvoice).toBeDefined()
         }
@@ -411,11 +419,15 @@ describe('Invoice Controller', () => {
 
       expect(res.status).toHaveBeenCalledWith(200)
 
-      const jsonResponse = invoiceArraySchema.parse(
-        (res.json as jest.Mock).mock.calls[0][0]
-      )
-      expect(jsonResponse.length).toBe(10)
-      jsonResponse.forEach((invoice) => {
+      const { invoices, totalInvoices } = (res.json as jest.Mock).mock
+        .calls[0][0] as {
+        invoices: InvoiceArray
+        totalInvoices: number
+      }
+
+      expect(totalInvoices).toBe(10)
+
+      invoices.forEach((invoice) => {
         expect(invoice.user).toBe(user._id)
         expect(invoice.client.name).toBe(client.name)
       })
@@ -492,16 +504,20 @@ describe('Invoice Controller', () => {
 
       expect(res.status).toHaveBeenCalledWith(200)
 
-      const jsonResponse = invoiceArraySchema.parse(
-        (res.json as jest.Mock).mock.calls[0][0]
-      )
-      expect(jsonResponse.length).toBe(10)
-      jsonResponse.forEach((invoice) => {
+      const { invoices, totalInvoices } = (res.json as jest.Mock).mock
+        .calls[0][0] as {
+        invoices: InvoiceArray
+        totalInvoices: number
+      }
+      expect(totalInvoices).toBe(10)
+      invoices.forEach((invoice) => {
         expect(invoice.user).toBe(user._id)
         expect(invoice.currency).toBe(randomCurrency)
       })
     })
+  })
 
+  describe('FindOne', () => {
     it('should find invoice by id', async () => {
       const user = parseUserSchema.parse(
         (await UserModel.create(getNewUser())).toJSON()
@@ -607,6 +623,7 @@ describe('Invoice Controller', () => {
       expect(res.status).toHaveBeenCalledWith(404)
     })
   })
+
   describe('Invoice Status', () => {
     it('should return sent status', async () => {
       const user = parseUserSchema.parse(

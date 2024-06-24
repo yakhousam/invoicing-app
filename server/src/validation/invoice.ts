@@ -87,11 +87,12 @@ export const invoicesSearchSchema = z.object({
   page: z.number().int().nonnegative().catch(0),
   limit: z.number().int().positive().catch(10),
   sortBy: z
-    .enum(['invoiceDate', 'invoiceNoString', 'totalAmount'])
+    .enum(['invoiceDate', 'invoiceNoString', 'totalAmount', 'status'])
     .catch('invoiceDate'),
   orderDirection: z.enum(['asc', 'desc']).catch('desc'),
   clientName: z.string().optional(),
-  currency: z.enum(['USD', 'EUR', 'GBP']).optional()
+  currency: z.enum(['USD', 'EUR', 'GBP']).optional(),
+  status: z.enum(['sent', 'paid', 'overdue']).optional()
 })
 
 export type Invoice = z.infer<typeof invoiceSchema>

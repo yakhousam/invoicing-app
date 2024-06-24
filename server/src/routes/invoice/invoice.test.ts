@@ -84,7 +84,8 @@ describe('Invoice', () => {
 
     const response = await api.get('/invoices/me')
     expect(response.status).toBe(200)
-    const parsedInvoices = invoiceArraySchema.parse(response.data)
+    const parsedInvoices = invoiceArraySchema.parse(response.data.invoices)
     expect(parsedInvoices.length).toBe(2)
+    expect(response.data.totalInvoices).toBe(2)
   })
 })
