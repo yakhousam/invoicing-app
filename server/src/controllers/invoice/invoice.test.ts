@@ -375,7 +375,7 @@ describe('Invoice Controller', () => {
         expect(invoice.user).toBe(user._id)
         if (index === 0) {
           const findInvoice = expectedInvoices.find(
-            (invoice) => invoice._id.toString() === invoices[index]._id
+            (invoice) => String(invoice._id) === invoices[index]._id
           )
           expect(findInvoice).toBeDefined()
         }
@@ -557,7 +557,7 @@ describe('Invoice Controller', () => {
       const jsonResponse = invoiceSchema.parse(
         (res.json as jest.Mock).mock.calls[0][0]
       )
-      expect(jsonResponse._id).toBe(expectedInvoice._id.toString())
+      expect(jsonResponse._id).toBe(String(expectedInvoice._id))
     })
 
     it('should call next with error, invalid invoice id', async () => {

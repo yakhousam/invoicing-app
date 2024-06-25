@@ -27,11 +27,9 @@ export const parseUserSchema = userSchema.omit({ password: true })
 
 export const updateUserSchema = createUserSchema
   .omit({
-    _id: true,
     role: true,
     signatureUrl: true,
-    createdAt: true,
-    updatedAt: true
+    password: true
   })
   .partial()
 

@@ -121,7 +121,7 @@ describe('User Controller', () => {
       const notExpectedUserInvoices: CreateInvoice[] = Array(10)
         .fill(null)
         .map(() => ({
-          user: notExpectedUser._id.toString(),
+          user: notExpectedUser._id,
           client: { _id: expectedClient._id.toString() },
           currency: getCurrency(),
           items: Array(10)
@@ -137,7 +137,7 @@ describe('User Controller', () => {
       const expectedUserInvoices: CreateInvoice[] = Array(10)
         .fill(null)
         .map(() => ({
-          user: expectedUser._id.toString(),
+          user: expectedUser._id,
           client: { _id: expectedClient._id.toString() },
           currency: getCurrency(),
           items: Array(10)
@@ -152,7 +152,7 @@ describe('User Controller', () => {
 
       const req = {
         params: {
-          id: expectedUser._id.toString()
+          id: expectedUser._id
         }
       } as unknown as Request
 
@@ -168,7 +168,7 @@ describe('User Controller', () => {
       >
       expect(jsonResponse.length).toBe(expectedInvoices.length)
       jsonResponse.forEach((invoice) => {
-        expect(invoice.user._id.toString()).toBe(expectedUser._id.toString())
+        expect(invoice.user._id.toString()).toBe(String(expectedUser._id))
       })
       expect(next).not.toHaveBeenCalled()
     })
