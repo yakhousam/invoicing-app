@@ -44,7 +44,9 @@ export const getNewClient = <T>(userId: T): CreateClient & { userId: T } => ({
 })
 
 export const getNewUser = (role?: Role): CreateUser => ({
-  name: faker.person.fullName(),
+  userName: faker.person.fullName(),
+  firstName: faker.person.firstName(),
+  lastName: faker.person.lastName(),
   email: faker.internet.email(),
   password: faker.internet.password(),
   role: role ?? 'user'

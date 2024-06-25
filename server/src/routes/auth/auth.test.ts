@@ -30,7 +30,7 @@ describe('auth', () => {
       expect(response.status).toBe(201)
       const returnedUser = response.data
       expect(returnedUser).toHaveProperty('_id')
-      expect(returnedUser.name).toBe(user.name)
+      expect(returnedUser.userName).toBe(user.userName)
       expect(returnedUser.email).toBe(user.email)
       expect(returnedUser).not.toHaveProperty('password')
     })
@@ -53,13 +53,13 @@ describe('auth', () => {
       // await api.post('/auth/register', user)
       await userModel.create(user)
       const response = await api.post<User>('/auth/login', {
-        name: user.name,
+        userName: user.userName,
         password: user.password
       })
       expect(response.status).toBe(200)
       const returnedUser = response.data
       expect(returnedUser).toHaveProperty('_id')
-      expect(returnedUser.name).toBe(user.name)
+      expect(returnedUser.userName).toBe(user.userName)
       expect(returnedUser.email).toBe(user.email)
       expect(returnedUser).not.toHaveProperty('password')
     })
@@ -69,7 +69,7 @@ describe('auth', () => {
       const user = getNewUser()
       await api.post('/auth/register', user)
       const response = await api.post('/auth/login', {
-        name: user.name,
+        userName: user.userName,
         password: user.password
       })
       expect(response.status).toBe(200)

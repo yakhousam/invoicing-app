@@ -181,7 +181,7 @@ describe('User Controller', () => {
       )
 
       const userUpdate = {
-        name: getNewUser().name,
+        userName: getNewUser().userName,
         email: getNewUser().email
       }
 

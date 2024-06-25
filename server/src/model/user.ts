@@ -2,32 +2,34 @@ import bcrypt from 'bcrypt'
 import { Schema, model, type Document, type Model } from 'mongoose'
 
 type UserDocument = {
-  name: string
-  email: string
+  userName: string
   password: string
+  firstName: string
+  lastName: string
+  email: string
   role: 'admin' | 'user'
   signatureUrl: string
 } & Document
 
 export const UserSchema = new Schema<UserDocument>(
   {
-    name: { type: String, required: true, unique: true },
-    email: {
-      type: String,
-      required: true,
-      unique: true
-    },
+    userName: { type: String, required: true, unique: true },
     password: { type: String, required: true },
+    email: {
+      type: String
+    },
+    firstName: { type: String },
+    lastName: { type: String },
     role: { type: String, enum: ['admin', 'user'], default: 'user' },
     signatureUrl: { type: String, required: false }
   },
   { timestamps: true }
 )
 
-UserSchema.path('name').validate(async (value: string) => {
-  const user = await model<UserDocument>('User').findOne({ name: value })
+UserSchema.path('userName').validate(async (value: string) => {
+  const user = await model<UserDocument>('User').findOne({ userName: value })
   return user === null
-}, 'Duplicated name')
+}, 'Duplicated userName')
 
 UserSchema.path('email').validate(async (value: string) => {
   const user = await model<UserDocument>('User').findOne({ email: value })

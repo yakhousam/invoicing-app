@@ -30,18 +30,18 @@ describe('Auth Controller', () => {
       const user = parseUserSchema.parse(
         (res.json as jest.Mock).mock.calls[0][0]
       )
-      expect(user.name).toBe(mockUser.name)
+      expect(user.userName).toBe(mockUser.userName)
       expect(user.email).toBe(mockUser.email)
       expect(user).not.toHaveProperty('password')
 
       expect(next).not.toHaveBeenCalled()
     })
 
-    it('should call next with ZodError error, required name', async () => {
+    it('should call next with ZodError error, required userName', async () => {
       const req = {
         body: {
           ...getNewUser(),
-          name: undefined
+          userName: undefined
         }
       } as unknown as Request
 
@@ -119,7 +119,7 @@ describe('Auth Controller', () => {
         (res.json as jest.Mock).mock.calls[0][0]
       )
 
-      expect(user.name).toBe(mockUser.name)
+      expect(user.userName).toBe(mockUser.userName)
       expect(user.email).toBe(mockUser.email)
       expect(user).not.toHaveProperty('password')
 

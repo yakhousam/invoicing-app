@@ -81,7 +81,7 @@ const updateMyProfile = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    const { name, email } = updateUserSchema.parse(req.body)
+    const updates = updateUserSchema.parse(req.body)
     const authenticatedUser = parseUserSchema.parse(req.user)
 
     const user = await UserModel.findOneAndUpdate<User>(
@@ -89,8 +89,7 @@ const updateMyProfile = async (
         _id: authenticatedUser._id
       },
       {
-        name,
-        email
+        ...updates
       },
       {
         new: true

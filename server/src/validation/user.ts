@@ -3,7 +3,9 @@ import { dateToZodDate, objectIdToString } from './common'
 
 export const userSchema = z.object({
   _id: objectIdToString,
-  name: z.string().min(2),
+  userName: z.string().min(2),
+  firstName: z.string().optional(),
+  lastName: z.string().optional(),
   email: z.string().email().optional(),
   password: z.string().min(6),
   role: z

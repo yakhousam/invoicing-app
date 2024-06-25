@@ -70,11 +70,11 @@ const logout = (req: Request, res: Response): void => {
 passport.use(
   new LocalStrategy(
     {
-      usernameField: 'name',
+      usernameField: 'userName',
       passwordField: 'password'
     },
-    function (name, password, done) {
-      void localStrategyVerifyFunction(name, password, done)
+    function (userName, password, done) {
+      void localStrategyVerifyFunction(userName, password, done)
     }
   )
 )
@@ -110,12 +110,12 @@ async function jwtStrategyVerifyFunction(
 }
 
 async function localStrategyVerifyFunction(
-  name: string,
+  userName: string,
   password: string,
   done: VerifiedCallback
 ): Promise<void> {
   try {
-    const user = await UserModel.findOne({ name })
+    const user = await UserModel.findOne({ userName })
     if (user === null) {
       done(null, false, { message: 'Incorrect credentials.' })
       return
