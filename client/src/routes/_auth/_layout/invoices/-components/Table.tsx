@@ -27,13 +27,12 @@ const InvoicesTable = () => {
   const queryOptions = invoicesOptions(searchParams)
   const { data, isError, isLoading } = useSuspenseQuery(queryOptions)
 
-  const columnFilters = (['clientName', 'status'] as const).reduce(
-    (acc, id) => {
-      const value = searchParams[id]
-      return value ? [...acc, { id, value }] : acc
-    },
-    [] as MRT_ColumnFiltersState
-  )
+  const columnFilters = (
+    ['clientName', 'status'] as const
+  ).reduce<MRT_ColumnFiltersState>((acc, id) => {
+    const value = searchParams[id]
+    return value ? [...acc, { id, value }] : acc
+  }, [])
 
   function handleFilterChange(
     newColumnFilters: MRT_Updater<MRT_ColumnFiltersState>
