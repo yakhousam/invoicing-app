@@ -2,7 +2,7 @@ import { invoicesOptions } from '@/queries'
 import { invoicesSearchSchema } from '@/validations'
 import { createFileRoute } from '@tanstack/react-router'
 
-export const Route = createFileRoute('/_auth/_layout/')({
+export const Route = createFileRoute('/_auth/_layout/dashboard')({
   loader: ({ context: { queryClient } }) => {
     const search = invoicesSearchSchema.parse({})
     return queryClient.ensureQueryData(invoicesOptions(search))

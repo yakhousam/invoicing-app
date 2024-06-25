@@ -2,20 +2,11 @@ import { Breadcrumbs as MuiBreadcrumbs, Typography } from '@mui/material'
 import { Link as RouterLink } from '@tanstack/react-router'
 
 const Breadcrumbs = ({
-  pathList,
-  rootName = 'Dashboard'
+  pathList
 }: {
   pathList: Array<string>
   rootName?: string
 }) => {
-  if (pathList.length < 1) {
-    return (
-      <MuiBreadcrumbs>
-        <Typography sx={{ textTransform: 'capitalize' }}>{rootName}</Typography>
-      </MuiBreadcrumbs>
-    )
-  }
-
   return (
     <MuiBreadcrumbs
       sx={{
@@ -28,10 +19,6 @@ const Breadcrumbs = ({
         }
       }}
     >
-      <RouterLink to="/">
-        <Typography sx={{ textTransform: 'capitalize' }}>{rootName}</Typography>
-      </RouterLink>
-
       {pathList.slice(0, -1).map((path) => {
         return (
           <RouterLink key={path} to={`/${path}`}>

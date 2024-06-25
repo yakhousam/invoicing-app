@@ -1,10 +1,10 @@
+import LoginForm from '@/components/login/LoginForm'
 import { useAuth } from '@/hooks/useAuth'
 import { User } from '@/validations'
 import { createFileRoute, redirect, useRouter } from '@tanstack/react-router'
 import { z } from 'zod'
-import LoginForm from './-components/LoginForm'
 
-const fallback = '/' as const
+const fallback = '/dashboard' as const
 
 export const Route = createFileRoute('/login')({
   validateSearch: z.object({
@@ -12,7 +12,7 @@ export const Route = createFileRoute('/login')({
   }),
   beforeLoad: ({ context }) => {
     if (context.auth.isAuthenticated) {
-      throw redirect({ to: '/' })
+      throw redirect({ to: '/dashboard' })
     }
   },
   component: LoginPage

@@ -1,12 +1,12 @@
+import PasswordUpdate from '@/components/settings/PasswordUpdate'
+import Signature from '@/components/settings/Signature'
+import UserInfos from '@/components/settings/UserInfos'
 import { useAuth } from '@/hooks/useAuth'
 import useLogout from '@/hooks/useLogout'
 import { Box, Paper, Typography } from '@mui/material'
 import { createFileRoute } from '@tanstack/react-router'
-import PasswordUpdate from './-components/PasswordUpdate'
-import Signature from './-components/Signature'
-import UserInfos from './-components/UserInfos'
 
-export const Route = createFileRoute('/_auth/_layout/settings/')({
+export const Route = createFileRoute('/_auth/_layout/settings')({
   component: () => <Settings />
 })
 

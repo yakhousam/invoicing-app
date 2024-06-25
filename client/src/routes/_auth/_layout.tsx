@@ -17,7 +17,7 @@ const drawerWidth = 240
 function Layout() {
   const router = useRouter()
 
-  const [open, setOpen] = React.useState(false)
+  const [open, setOpen] = React.useState(true)
 
   const handleDrawerOpen = () => {
     setOpen(true)

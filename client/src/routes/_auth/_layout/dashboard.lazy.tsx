@@ -1,10 +1,10 @@
+import { Chart } from '@/components/dashboard/Chart'
+import DashboardTable from '@/components/dashboard/DashboardTable'
+import { Summary } from '@/components/dashboard/Summary'
 import { Box, Grid, Paper } from '@mui/material'
 import { createLazyFileRoute } from '@tanstack/react-router'
-import { Chart } from './-components/Chart'
-import DashboardTable from './-components/DashboardTable'
-import { Summary } from './-components/Summary'
 
-export const Route = createLazyFileRoute('/_auth/_layout/')({
+export const Route = createLazyFileRoute('/_auth/_layout/dashboard')({
   component: Dashboard
 })
 

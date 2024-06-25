@@ -2,7 +2,7 @@ import { createFileRoute } from '@tanstack/react-router'
 
 import { clientsOptions } from '@/queries'
 import { Box, Paper, Typography } from '@mui/material'
-import CreateInvoiceForm from './-components/CreateInvoiceForm'
+import CreateInvoiceForm from '../../../components/invoice/CreateInvoiceForm'
 
 export const Route = createFileRoute('/_auth/_layout/invoices/create')({
   loader: ({ context }) => context.queryClient.ensureQueryData(clientsOptions),
