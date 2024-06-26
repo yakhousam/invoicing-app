@@ -4,15 +4,15 @@ import { User } from '@/validations'
 import { createFileRoute, redirect, useRouter } from '@tanstack/react-router'
 import { z } from 'zod'
 
-const fallback = '/dashboard' as const
+const fallback = '/' as const
 
 export const Route = createFileRoute('/login')({
   validateSearch: z.object({
-    redirect: z.string().optional().catch('')
+    redirect: z.string().optional()
   }),
   beforeLoad: ({ context }) => {
     if (context.auth.isAuthenticated) {
-      throw redirect({ to: '/dashboard' })
+      throw redirect({ to: '/' })
     }
   },
   component: LoginPage
@@ -28,12 +28,13 @@ function LoginPage() {
     router.update({
       context: {
         ...router.options.context,
-        auth: { ...router.options.context.auth, isAuthenticated: true, user }
+        auth: { ...auth, isAuthenticated: true, user }
       }
     })
     router.invalidate().finally(() =>
       router.navigate({
-        to: search.redirect || fallback
+        to: search.redirect || fallback,
+        search: undefined
       })
     )
   }

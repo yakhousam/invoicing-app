@@ -3,9 +3,11 @@ import LoadingButton from '@/components/LoadingButton'
 import RHFTextField from '@/components/RHF/RHFTextField'
 import { User } from '@/validations'
 import { Box, Container, CssBaseline, Typography } from '@mui/material'
+import { useRouter } from '@tanstack/react-router'
 import { FormProvider, useForm } from 'react-hook-form'
 
 const LoginForm = ({ onLogin }: { onLogin: (user: User) => void }) => {
+  const router = useRouter()
   const formMethods = useForm({
     defaultValues: {
       username: '',
@@ -17,7 +19,7 @@ const LoginForm = ({ onLogin }: { onLogin: (user: User) => void }) => {
     handleSubmit,
     setError,
     clearErrors,
-    formState: { isSubmitting, errors, isSubmitSuccessful }
+    formState: { isSubmitting, errors }
   } = formMethods
 
   const onSubmit = async ({
@@ -60,6 +62,7 @@ const LoginForm = ({ onLogin }: { onLogin: (user: User) => void }) => {
                 label="Username"
                 name="username"
                 autoFocus
+                autoComplete="username"
               />
               <RHFTextField
                 variant="outlined"
@@ -69,11 +72,12 @@ const LoginForm = ({ onLogin }: { onLogin: (user: User) => void }) => {
                 name="password"
                 label="Password"
                 type="password"
+                autoComplete="current-password"
               />
               <Box mt={2} />
               <LoadingButton
                 type="submit"
-                loading={isSubmitting || isSubmitSuccessful}
+                loading={isSubmitting || router.state.isLoading}
                 fullWidth
                 variant="contained"
                 color="primary"

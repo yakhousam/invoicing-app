@@ -16,7 +16,6 @@ import { Route as AuthImport } from './routes/_auth'
 import { Route as AuthLayoutImport } from './routes/_auth/_layout'
 import { Route as AuthLayoutIndexImport } from './routes/_auth/_layout/index'
 import { Route as AuthLayoutSettingsImport } from './routes/_auth/_layout/settings'
-import { Route as AuthLayoutDashboardImport } from './routes/_auth/_layout/dashboard'
 import { Route as AuthLayoutInvoicesIndexImport } from './routes/_auth/_layout/invoices.index'
 import { Route as AuthLayoutClientsIndexImport } from './routes/_auth/_layout/clients.index'
 import { Route as AuthLayoutInvoicesCreateImport } from './routes/_auth/_layout/invoices.create'
@@ -49,13 +48,6 @@ const AuthLayoutSettingsRoute = AuthLayoutSettingsImport.update({
   path: '/settings',
   getParentRoute: () => AuthLayoutRoute,
 } as any)
-
-const AuthLayoutDashboardRoute = AuthLayoutDashboardImport.update({
-  path: '/dashboard',
-  getParentRoute: () => AuthLayoutRoute,
-} as any).lazy(() =>
-  import('./routes/_auth/_layout/dashboard.lazy').then((d) => d.Route),
-)
 
 const AuthLayoutInvoicesIndexRoute = AuthLayoutInvoicesIndexImport.update({
   path: '/invoices/',
@@ -106,13 +98,6 @@ declare module '@tanstack/react-router' {
       fullPath: ''
       preLoaderRoute: typeof AuthLayoutImport
       parentRoute: typeof AuthImport
-    }
-    '/_auth/_layout/dashboard': {
-      id: '/_auth/_layout/dashboard'
-      path: '/dashboard'
-      fullPath: '/dashboard'
-      preLoaderRoute: typeof AuthLayoutDashboardImport
-      parentRoute: typeof AuthLayoutImport
     }
     '/_auth/_layout/settings': {
       id: '/_auth/_layout/settings'
@@ -171,7 +156,6 @@ declare module '@tanstack/react-router' {
 export const routeTree = rootRoute.addChildren({
   AuthRoute: AuthRoute.addChildren({
     AuthLayoutRoute: AuthLayoutRoute.addChildren({
-      AuthLayoutDashboardRoute,
       AuthLayoutSettingsRoute,
       AuthLayoutIndexRoute,
       AuthLayoutClientsCreateRoute,
@@ -209,7 +193,6 @@ export const routeTree = rootRoute.addChildren({
       "filePath": "_auth/_layout.tsx",
       "parent": "/_auth",
       "children": [
-        "/_auth/_layout/dashboard",
         "/_auth/_layout/settings",
         "/_auth/_layout/",
         "/_auth/_layout/clients/create",
@@ -218,10 +201,6 @@ export const routeTree = rootRoute.addChildren({
         "/_auth/_layout/clients/",
         "/_auth/_layout/invoices/"
       ]
-    },
-    "/_auth/_layout/dashboard": {
-      "filePath": "_auth/_layout/dashboard.tsx",
-      "parent": "/_auth/_layout"
     },
     "/_auth/_layout/settings": {
       "filePath": "_auth/_layout/settings.tsx",

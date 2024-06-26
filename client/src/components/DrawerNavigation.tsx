@@ -23,7 +23,7 @@ type Link = {
 }
 
 const links: Array<Link> = [
-  { id: 1, label: 'Dashboard', icon: <LineAxisIcon />, href: '/dashboard' },
+  { id: 1, label: 'Dashboard', icon: <LineAxisIcon />, href: '/' },
   { id: 2, label: 'Invoices', icon: <ReceiptIcon />, href: '/invoices' },
   { id: 3, label: 'Clients', icon: <PeopleIcon />, href: '/clients' }
 ]
