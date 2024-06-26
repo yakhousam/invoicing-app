@@ -33,7 +33,7 @@ const LoginForm = ({ onLogin }: { onLogin: (user: User) => void }) => {
     } catch (error) {
       if (error instanceof Response && error.status === 401) {
         setError('root.error', {
-          message: 'Username or password invalide'
+          message: 'Username or password invalid'
         })
       } else {
         setError('root.error', {

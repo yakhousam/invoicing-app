@@ -1,6 +1,5 @@
 import InvoiceByIdForm from '@/components/invoice/invoiceByIdForm'
 import { invoiceByIdOptions } from '@/queries'
-import { invoicesSearchSchema } from '@/validations'
 import { Box, Paper, Stack, Typography } from '@mui/material'
 import { createFileRoute, useRouter } from '@tanstack/react-router'
 
@@ -17,8 +16,7 @@ function Invoice() {
   const router = useRouter()
   const onDeleteInvoice = () => {
     router.invalidate().finally(() => {
-      const search = invoicesSearchSchema.parse({})
-      return router.navigate({ to: '/invoices', search })
+      return router.navigate({ to: '/invoices' })
     })
   }
   return (
