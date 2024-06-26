@@ -7,8 +7,9 @@ export const Route = createFileRoute('/_auth/_layout/invoices/$id')({
   beforeLoad: () => ({
     title: 'Invoice'
   }),
-  loader: ({ context, params }) =>
-    context.queryClient.ensureQueryData(invoiceByIdOptions(params.id)),
+  loader: ({ context, params }) => {
+    return context.queryClient.ensureQueryData(invoiceByIdOptions(params.id))
+  },
   component: Invoice
 })
 
