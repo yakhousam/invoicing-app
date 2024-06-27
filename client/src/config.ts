@@ -1,6 +1,7 @@
-export const apiUrl = import.meta.env.VITE_APP_API_URL as string
+export const apiUrl =
+  (import.meta.env.VITE_APP_API_URL as string) || 'http://localhost:3005/api/v1'
 
-const url = new URL('http://localhost:3005/api/v1')
+const url = new URL(apiUrl)
 export const baseUrl = `${url.protocol}//${url.host}`
 
 export const API_URL = {

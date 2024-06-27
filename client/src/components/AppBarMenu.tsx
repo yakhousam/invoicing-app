@@ -12,7 +12,7 @@ import { Link as RouterLink } from '@tanstack/react-router'
 import React from 'react'
 
 const AppBarMenu = () => {
-  const { handleLogout } = useLogout()
+  const { handleLogout, status } = useLogout()
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null)
 
   const handleMenu = (event: React.MouseEvent<HTMLElement>) => {
@@ -59,7 +59,7 @@ const AppBarMenu = () => {
           </MenuItem>
         </RouterLink>
         <Divider />
-        <MenuItem onClick={handleLogout}>
+        <MenuItem onClick={handleLogout} disabled={status === 'pending'}>
           <ListItemIcon>
             <LogoutRounded fontSize="small" />
           </ListItemIcon>

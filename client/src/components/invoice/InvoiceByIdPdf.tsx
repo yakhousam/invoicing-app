@@ -81,7 +81,7 @@ const InvoiceByIdPdf = (invoice: Invoice) => {
       <Document>
         <Page size="A4" style={styles.page}>
           <View style={{ ...styles.flexRow, marginBottom: 80 }}>
-            <Text style={styles.header}>{invoice.user.name}</Text>
+            <Text style={styles.header}>{invoice.user.userName}</Text>
             <Text style={styles.header}>INVOICE</Text>
           </View>
           <View style={styles.flexRow}>

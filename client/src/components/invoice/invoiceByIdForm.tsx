@@ -111,7 +111,9 @@ const InvoiceByIdForm = ({
               <Grid item xs={6}>
                 <Box display="flex" flexWrap="wrap" gap="0.5em">
                   <Typography variant="body2">Invoice n°:</Typography>
-                  <Typography variant="body1">{data?.invoiceNo}</Typography>
+                  <Typography variant="body1">
+                    {data?.invoiceNoString}
+                  </Typography>
                 </Box>
               </Grid>
               <Grid item xs={6}>
