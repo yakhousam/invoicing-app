@@ -53,13 +53,7 @@ export const updateInvoice = createInvoiceSchema
   .omit({ client: true })
   .partial()
   .extend({
-    paid: z
-      .boolean()
-      .optional()
-      .refine((value) => value === true || value === undefined, {
-        message: 'Paid status can only be set to true.',
-        path: ['paid']
-      })
+    paid: z.boolean().optional()
   })
 
 export const invoicesSummarySchema = z.array(

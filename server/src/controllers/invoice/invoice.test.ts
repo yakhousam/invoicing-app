@@ -792,46 +792,6 @@ describe('Invoice Controller', () => {
       expect(jsonResponse.paid).toBe(true)
     })
 
-    it('should not allow to mark the invoice unpaid once it was paid', async () => {
-      const user = parseUserSchema.parse(
-        (await UserModel.create(getNewUser())).toJSON()
-      )
-      const client = clientSchema.parse(
-        (await ClientModel.create(getNewClient(user._id))).toJSON()
-      )
-      const mockInvoice: CreateInvoice & { paid: true } = {
-        paid: true,
-        client: { _id: client._id },
-        currency: getCurrency(),
-        items: Array(10)
-          .fill(null)
-          .map(() => ({
-            itemName: getProductName(),
-            itemPrice: getProductPrice()
-          }))
-      }
-
-      const invoice = await InvoiceModel.create({
-        ...mockInvoice,
-        user: user._id
-      })
-      const res = buildRes()
-      const next = buildNext()
-      const req = {
-        params: {
-          id: invoice._id
-        },
-        body: {
-          paid: false
-        },
-        user
-      } as unknown as Request
-
-      await invoiceController.updateOne(req, res, next)
-      expect(next).toHaveBeenCalledTimes(1)
-      expect(next).toHaveBeenCalledWith(expect.any(ZodError))
-    })
-
     it('should update invoice due days', async () => {
       const user = parseUserSchema.parse(
         (await UserModel.create(getNewUser())).toJSON()
