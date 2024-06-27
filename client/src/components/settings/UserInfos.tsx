@@ -18,7 +18,9 @@ function UserInfos({
   const { enqueueSnackbar } = useSnackbar()
   const formMethods = useForm<UpdateUser>({
     defaultValues: {
-      name: user?.name || '',
+      userName: user?.userName || '',
+      firstName: user?.firstName || '',
+      lastName: user?.lastName || '',
       email: user?.email || ''
     },
     resolver: zodResolver(updateUserSchema)
@@ -29,8 +31,7 @@ function UserInfos({
   } = formMethods
 
   const mutation = useMutation({
-    mutationFn: ({ data, userId }: { data: UpdateUser; userId: string }) =>
-      api.updateMyProfile(data, userId),
+    mutationFn: api.updateMyProfile,
     onSuccess: (data) => {
       enqueueSnackbar('Profile updated', { variant: 'success' })
       onUpdateUser(data)
@@ -52,7 +53,7 @@ function UserInfos({
     }
   })
   const onSubmit = (data: UpdateUser) => {
-    mutation.mutate({ data, userId: user._id })
+    mutation.mutate(data)
   }
   return (
     <>
@@ -69,9 +70,23 @@ function UserInfos({
               variant="standard"
               margin="normal"
               fullWidth
-              label="Name"
-              name="name"
+              label="Username"
+              name="userName"
               autoFocus
+            />
+            <RHFTextField
+              variant="standard"
+              margin="normal"
+              fullWidth
+              label="First Name"
+              name="firstName"
+            />
+            <RHFTextField
+              variant="standard"
+              margin="normal"
+              fullWidth
+              label="Last Name"
+              name="lastName"
             />
 
             <RHFTextField

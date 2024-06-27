@@ -4,11 +4,14 @@ import { faker } from '@faker-js/faker'
 export function generateUser(): Required<User> {
   return {
     _id: faker.database.mongodbObjectId(),
-    name: faker.internet.userName(),
+    userName: faker.internet.userName(),
+    firstName: faker.name.firstName(),
+    lastName: faker.name.lastName(),
     email: faker.internet.email(),
     role: 'user',
     createdAt: faker.date.recent().toISOString(),
-    updatedAt: faker.date.recent().toISOString()
+    updatedAt: faker.date.recent().toISOString(),
+    signatureUrl: faker.image.url()
   }
 }
 
