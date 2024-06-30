@@ -1,19 +1,14 @@
 import { Chart } from '@/components/dashboard/Chart'
 import DashboardTable from '@/components/dashboard/DashboardTable'
 import { Summary } from '@/components/dashboard/Summary'
-import { invoicesOptions } from '@/queries'
 import { Box, Grid, Paper } from '@mui/material'
 import { createFileRoute } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/_auth/_layout/')({
-  loader: ({ context: { queryClient } }) => {
-    return queryClient.ensureQueryData(invoicesOptions())
-  },
   component: Dashboard
 })
 
 function Dashboard() {
-  const data = Route.useLoaderData()
   return (
     <Box
       sx={{
@@ -34,7 +29,7 @@ function Dashboard() {
       </Grid>
       <Box mt={3}>
         <Paper sx={{ p: 4 }}>
-          <DashboardTable data={data.invoices} />
+          <DashboardTable />
         </Paper>
       </Box>
     </Box>

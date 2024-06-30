@@ -1,10 +1,10 @@
 import { formatCurrency } from '@/helpers'
 import { summaryOptions } from '@/queries'
 import { Divider, Stack, Typography } from '@mui/material'
-import { useSuspenseQuery } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 
 export const Summary = () => {
-  const { data = [] } = useSuspenseQuery(summaryOptions)
+  const { data = [] } = useQuery(summaryOptions)
 
   return (
     <Stack spacing={2}>

@@ -1,5 +1,6 @@
 import { formatCurrency } from '@/helpers'
-import { InvoiceArray } from '@/validations'
+import { invoicesOptions } from '@/queries'
+import { invoicesSearchSchema } from '@/validations'
 import {
   Chip,
   Table,
@@ -10,10 +11,14 @@ import {
   TableRow,
   Typography
 } from '@mui/material'
+import { useQuery } from '@tanstack/react-query'
 import { useNavigate } from '@tanstack/react-router'
 import dayjs from 'dayjs'
 
-const DashboardTable = ({ data }: { data: InvoiceArray }) => {
+const DashboardTable = () => {
+  const searchParams = invoicesSearchSchema.parse({})
+  const queryOptions = invoicesOptions(searchParams)
+  const { data } = useQuery(queryOptions)
   const navigate = useNavigate()
   return (
     <TableContainer>
@@ -28,7 +33,7 @@ const DashboardTable = ({ data }: { data: InvoiceArray }) => {
           </TableRow>
         </TableHead>
         <TableBody>
-          {data?.map((invoice) => (
+          {data?.invoices?.map((invoice) => (
             <TableRow
               key={invoice._id}
               sx={{

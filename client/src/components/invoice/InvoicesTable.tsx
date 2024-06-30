@@ -3,7 +3,7 @@ import { formatCurrency } from '@/helpers'
 import { invoicesOptions } from '@/queries'
 import { invoicesSearchSchema } from '@/validations'
 import { Chip, Typography } from '@mui/material'
-import { useSuspenseQuery } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import { useNavigate, useSearch } from '@tanstack/react-router'
 import dayjs from 'dayjs'
 import {
@@ -25,7 +25,8 @@ const InvoicesTable = () => {
   const searchParams = invoicesSearchSchema.parse(looseSearch)
 
   const queryOptions = invoicesOptions(searchParams)
-  const { data, isError, isLoading } = useSuspenseQuery(queryOptions)
+
+  const { data, isError, isLoading } = useQuery(queryOptions)
 
   const columnFilters = (
     ['clientName', 'status'] as const
@@ -46,6 +47,7 @@ const InvoicesTable = () => {
       const { id, value } = filter
       return { ...acc, [id]: value }
     }, {})
+
     navigate({
       search: invoicesSearchSchema.parse(search)
     })
@@ -159,7 +161,7 @@ const InvoicesTable = () => {
         0
     },
     state: {
-      isLoading,
+      showSkeletons: isLoading,
       showAlertBanner: isError,
       columnFilters,
       pagination: {
