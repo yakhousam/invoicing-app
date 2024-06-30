@@ -12,7 +12,7 @@ const useLogout = () => {
     try {
       setStatus('pending')
       await auth.logout()
-      router.invalidate().finally(() => router.navigate({ to: '/login' }))
+      router.navigate({ to: '/login' })
       setStatus('idle')
     } catch (error) {
       setStatus('error')

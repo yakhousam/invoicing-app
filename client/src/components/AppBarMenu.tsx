@@ -59,7 +59,13 @@ const AppBarMenu = () => {
           </MenuItem>
         </RouterLink>
         <Divider />
-        <MenuItem onClick={handleLogout} disabled={status === 'pending'}>
+        <MenuItem
+          onClick={async () => {
+            await handleLogout()
+            handleClose()
+          }}
+          disabled={status === 'pending'}
+        >
           <ListItemIcon>
             <LogoutRounded fontSize="small" />
           </ListItemIcon>
