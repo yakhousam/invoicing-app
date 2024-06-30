@@ -6,7 +6,6 @@ import router from './router'
 function App() {
   const auth = useAuth()
   const queryClient = useQueryClient()
-
   return (
     <RouterProvider
       router={router}

@@ -1,42 +1,41 @@
 import * as api from '@/api/auth'
 import { fetchCurrentUser } from '@/api/user'
 import { User } from '@/validations'
-import React, { useEffect } from 'react'
+import React from 'react'
 
 export type AuthContextType = {
   isAuthenticated: boolean
   user: User | null
-  logout: () => Promise<void>
   setUser: React.Dispatch<React.SetStateAction<User | null>>
-  isFetching: boolean
+  logout: () => Promise<void>
+  login: (username: string, password: string) => Promise<User>
+  getUser: () => Promise<User>
 }
 
 export const AuthContext = React.createContext<AuthContextType | null>(null)
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = React.useState<User | null>(null)
-  const [isFetching, setIsFetching] = React.useState(true)
 
   const isAuthenticated = Boolean(user)
 
-  const isMounted = React.useRef(false)
-
-  useEffect(() => {
-    if (isMounted.current) {
-      return
-    }
-    isMounted.current = true
-    fetchCurrentUser()
-      .then(setUser)
-      .catch(console.error)
-      .finally(() => setIsFetching(false))
-  }, [])
-
   const contextValue = {
-    isFetching,
     isAuthenticated,
     user,
     setUser,
+    getUser: async () => {
+      if (user !== null) {
+        return user
+      }
+      const _user = await fetchCurrentUser()
+      setUser(_user)
+      return _user
+    },
+    login: async (username: string, password: string) => {
+      const user = await api.login(username, password)
+      setUser(user)
+      return user
+    },
     logout: async () => {
       setUser(null)
       await api.logout()

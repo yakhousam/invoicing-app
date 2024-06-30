@@ -7,7 +7,7 @@ import LoginForm from './LoginForm'
 
 describe('LoginForm', () => {
   it('renders', () => {
-    render(<LoginForm onLogin={() => {}} />)
+    render(<LoginForm onLogin={async () => {}} />)
     expect(
       screen.getByRole('heading', { name: /sign in/i })
     ).toBeInTheDocument()

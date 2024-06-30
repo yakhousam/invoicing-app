@@ -10,11 +10,17 @@ export const Route = createFileRoute('/login')({
   validateSearch: z.object({
     redirect: z.string().optional()
   }),
-  beforeLoad: ({ context, search }) => {
-    if (context.auth.isAuthenticated) {
+  beforeLoad: async ({ context, search }) => {
+    let user = null
+    try {
+      user = await context.auth.getUser()
+      context.auth.isAuthenticated = true
+    } catch (error) {
+      console.error(error)
+    }
+    if (user) {
       throw redirect({
-        to: search.redirect || fallback,
-        search: { redirect: undefined }
+        to: search.redirect || fallback
       })
     }
   },
@@ -22,31 +28,23 @@ export const Route = createFileRoute('/login')({
 })
 
 function LoginPage() {
+  const auth = useAuth()
   const router = useRouter()
   const search = Route.useSearch()
-  const auth = useAuth()
   const onLogin = async (user: User) => {
-    auth.setUser(user)
-    // I need to update the context to set the user as authenticated before navigating
-
-    await router
-      .invalidate()
-      .then(() =>
-        router.update({
-          context: {
-            ...router.options.context,
-            auth: { ...auth, isAuthenticated: true, user }
-          }
-        })
-      )
-      .finally(() =>
-        router.navigate({
-          to: search.redirect || fallback
-        })
-      )
+    router.update({
+      context: {
+        auth: {
+          ...auth,
+          user,
+          isAuthenticated: true
+        }
+      }
+    })
+    await router.navigate({
+      to: search.redirect || fallback
+    })
   }
-
-  if (auth.isFetching || auth.isAuthenticated) return null
-
+  if (auth.isAuthenticated) return null
   return <LoginForm onLogin={onLogin} />
 }

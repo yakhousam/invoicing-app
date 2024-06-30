@@ -1,25 +1,23 @@
-import * as api from '@/api/auth'
 import LoadingButton from '@/components/LoadingButton'
 import RHFTextField from '@/components/RHF/RHFTextField'
+import { useAuth } from '@/hooks/useAuth'
 import { User } from '@/validations'
 import { Box, Container, CssBaseline, Typography } from '@mui/material'
-import { useRouter } from '@tanstack/react-router'
 import { FormProvider, useForm } from 'react-hook-form'
 
-const LoginForm = ({ onLogin }: { onLogin: (user: User) => void }) => {
-  const router = useRouter()
+const LoginForm = ({ onLogin }: { onLogin: (user: User) => Promise<void> }) => {
+  const auth = useAuth()
   const formMethods = useForm({
     defaultValues: {
       username: '',
       password: ''
     }
   })
-
   const {
     handleSubmit,
     setError,
     clearErrors,
-    formState: { isSubmitting, errors }
+    formState: { errors, isSubmitting }
   } = formMethods
 
   const onSubmit = async ({
@@ -30,8 +28,8 @@ const LoginForm = ({ onLogin }: { onLogin: (user: User) => void }) => {
     password: string
   }) => {
     try {
-      const user = await api.login(username, password)
-      onLogin(user)
+      const user = await auth.login(username, password)
+      await onLogin(user)
     } catch (error) {
       if (error instanceof Response && error.status === 401) {
         setError('root.error', {
@@ -44,6 +42,7 @@ const LoginForm = ({ onLogin }: { onLogin: (user: User) => void }) => {
       }
     }
   }
+
   return (
     <>
       <CssBaseline />
@@ -77,7 +76,7 @@ const LoginForm = ({ onLogin }: { onLogin: (user: User) => void }) => {
               <Box mt={2} />
               <LoadingButton
                 type="submit"
-                loading={isSubmitting || router.state.isLoading}
+                loading={isSubmitting}
                 fullWidth
                 variant="contained"
                 color="primary"
