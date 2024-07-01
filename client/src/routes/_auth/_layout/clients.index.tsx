@@ -5,6 +5,9 @@ import { Link as RouterLink, createFileRoute } from '@tanstack/react-router'
 import ClientsTable from '../../../components/client/Table'
 
 export const Route = createFileRoute('/_auth/_layout/clients/')({
+  beforeLoad: () => ({
+    title: 'Clients'
+  }),
   loader: ({ context }) => context.queryClient.ensureQueryData(clientsOptions),
   component: Clients
 })

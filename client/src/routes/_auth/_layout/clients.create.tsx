@@ -3,6 +3,9 @@ import { Box, Paper, Typography } from '@mui/material'
 import { createFileRoute } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/_auth/_layout/clients/create')({
+  beforeLoad: () => ({
+    title: 'Add New Client'
+  }),
   component: NewClient
 })
 

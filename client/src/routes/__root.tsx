@@ -7,6 +7,7 @@ import { TanStackRouterDevtools } from '@tanstack/router-devtools'
 interface RouteContext {
   queryClient: QueryClient
   auth: AuthContextType
+  title?: string
 }
 
 export const Route = createRootRouteWithContext<RouteContext>()({

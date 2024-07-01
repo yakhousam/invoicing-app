@@ -5,7 +5,7 @@ import Drawer, { DrawerHeader } from '@/components/Drawer'
 import DrawerNavigation from '@/components/DrawerNavigation'
 
 import { Box, CssBaseline } from '@mui/material'
-import { Outlet, createFileRoute, useRouter } from '@tanstack/react-router'
+import { Outlet, createFileRoute } from '@tanstack/react-router'
 import React from 'react'
 
 export const Route = createFileRoute('/_auth/_layout')({
@@ -15,8 +15,6 @@ export const Route = createFileRoute('/_auth/_layout')({
 const drawerWidth = 240
 
 function Layout() {
-  const router = useRouter()
-
   const [open, setOpen] = React.useState(true)
 
   const handleDrawerOpen = () => {
@@ -26,9 +24,6 @@ function Layout() {
   const handleDrawerClose = () => {
     setOpen(false)
   }
-
-  const pathList =
-    router.state.matches.at(-1)?.pathname.split('/').filter(Boolean) ?? []
 
   return (
     <Box sx={{ display: 'flex' }}>
@@ -51,7 +46,7 @@ function Layout() {
       </Drawer>
       <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
         <DrawerHeader />
-        <Breadcrumbs pathList={pathList} />
+        <Breadcrumbs />
         <Outlet />
       </Box>
     </Box>

@@ -1,11 +1,14 @@
 import { createFileRoute } from '@tanstack/react-router'
 
+import CreateInvoiceForm from '@/components/invoice/CreateInvoiceForm'
 import { clientsOptions } from '@/queries'
 import { Box, Paper, Typography } from '@mui/material'
-import CreateInvoiceForm from '../../../components/invoice/CreateInvoiceForm'
 
 export const Route = createFileRoute('/_auth/_layout/invoices/create')({
-  loader: ({ context }) => context.queryClient.ensureQueryData(clientsOptions),
+  beforeLoad: () => ({
+    title: 'Create Invoice'
+  }),
+  loader: ({ context }) => context.queryClient?.ensureQueryData(clientsOptions),
   component: CreateInvoice
 })
 

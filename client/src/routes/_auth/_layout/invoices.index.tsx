@@ -11,6 +11,9 @@ import {
 export const Route = createFileRoute('/_auth/_layout/invoices/')({
   validateSearch: (input: InvoicesSearchParams & SearchSchemaInput) =>
     invoicesSearchSchema.parse(input),
+  beforeLoad: () => ({
+    title: 'Invoices'
+  }),
 
   component: Invoices
 })
