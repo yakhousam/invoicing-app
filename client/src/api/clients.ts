@@ -15,3 +15,16 @@ export const createClient = async (client: CreateClient) => {
 
   return clientSchema.parse(newClient)
 }
+
+export const fetchClient = async (id: string) => {
+  const client = await fetchApi(API_URL.clients.getOne(id))
+  return clientSchema.parse(client)
+}
+
+export const updateClient = async (id: string, client: CreateClient) => {
+  const updatedClient = await fetchApi(API_URL.clients.updateOne(id), {
+    method: 'PUT',
+    body: JSON.stringify(client)
+  })
+  return clientSchema.parse(updatedClient)
+}

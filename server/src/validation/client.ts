@@ -20,6 +20,15 @@ export const createClientSchema = clientSchema.omit({
 
 export const clientArraySchema = z.array(clientSchema)
 
+export const updateClientSchema = clientSchema.omit({
+  _id: true,
+  userId: true,
+  createdAt: true,
+  updatedAt: true
+})
+
 export type Client = z.infer<typeof clientSchema>
 
 export type CreateClient = z.infer<typeof createClientSchema>
+
+export type UpdateClient = z.infer<typeof updateClientSchema>

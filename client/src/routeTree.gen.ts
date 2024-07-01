@@ -21,6 +21,7 @@ import { Route as AuthLayoutClientsIndexImport } from './routes/_auth/_layout/cl
 import { Route as AuthLayoutInvoicesCreateImport } from './routes/_auth/_layout/invoices.create'
 import { Route as AuthLayoutInvoicesIdImport } from './routes/_auth/_layout/invoices.$id'
 import { Route as AuthLayoutClientsCreateImport } from './routes/_auth/_layout/clients.create'
+import { Route as AuthLayoutClientsIdImport } from './routes/_auth/_layout/clients.$id'
 
 // Create/Update Routes
 
@@ -74,6 +75,11 @@ const AuthLayoutClientsCreateRoute = AuthLayoutClientsCreateImport.update({
   getParentRoute: () => AuthLayoutRoute,
 } as any)
 
+const AuthLayoutClientsIdRoute = AuthLayoutClientsIdImport.update({
+  path: '/clients/$id',
+  getParentRoute: () => AuthLayoutRoute,
+} as any)
+
 // Populate the FileRoutesByPath interface
 
 declare module '@tanstack/react-router' {
@@ -111,6 +117,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof AuthLayoutIndexImport
+      parentRoute: typeof AuthLayoutImport
+    }
+    '/_auth/_layout/clients/$id': {
+      id: '/_auth/_layout/clients/$id'
+      path: '/clients/$id'
+      fullPath: '/clients/$id'
+      preLoaderRoute: typeof AuthLayoutClientsIdImport
       parentRoute: typeof AuthLayoutImport
     }
     '/_auth/_layout/clients/create': {
@@ -158,6 +171,7 @@ export const routeTree = rootRoute.addChildren({
     AuthLayoutRoute: AuthLayoutRoute.addChildren({
       AuthLayoutSettingsRoute,
       AuthLayoutIndexRoute,
+      AuthLayoutClientsIdRoute,
       AuthLayoutClientsCreateRoute,
       AuthLayoutInvoicesIdRoute,
       AuthLayoutInvoicesCreateRoute,
@@ -195,6 +209,7 @@ export const routeTree = rootRoute.addChildren({
       "children": [
         "/_auth/_layout/settings",
         "/_auth/_layout/",
+        "/_auth/_layout/clients/$id",
         "/_auth/_layout/clients/create",
         "/_auth/_layout/invoices/$id",
         "/_auth/_layout/invoices/create",
@@ -208,6 +223,10 @@ export const routeTree = rootRoute.addChildren({
     },
     "/_auth/_layout/": {
       "filePath": "_auth/_layout/index.tsx",
+      "parent": "/_auth/_layout"
+    },
+    "/_auth/_layout/clients/$id": {
+      "filePath": "_auth/_layout/clients.$id.tsx",
       "parent": "/_auth/_layout"
     },
     "/_auth/_layout/clients/create": {

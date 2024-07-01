@@ -1,8 +1,8 @@
+import ClientsTable from '@/components/client/ClientsTable'
 import { clientsOptions } from '@/queries'
 import AddIcon from '@mui/icons-material/Add'
 import { Box, Button, Paper, Typography } from '@mui/material'
 import { Link as RouterLink, createFileRoute } from '@tanstack/react-router'
-import ClientsTable from '../../../components/client/Table'
 
 export const Route = createFileRoute('/_auth/_layout/clients/')({
   beforeLoad: () => ({

@@ -1,6 +1,7 @@
 import { fetchClients } from '@/api/clients'
 import { clientsOptions } from '@/queries'
 import { useSuspenseQuery } from '@tanstack/react-query'
+import { useNavigate } from '@tanstack/react-router'
 import {
   MaterialReactTable,
   useMaterialReactTable,
@@ -11,7 +12,7 @@ import { useMemo } from 'react'
 type Columns = Awaited<ReturnType<typeof fetchClients>>[0]
 
 const ClientsTable = () => {
-  //   const navigate = useNavigate()
+  const navigate = useNavigate()
   const { data, isError, isLoading } = useSuspenseQuery(clientsOptions)
   const columns = useMemo<MRT_ColumnDef<Columns>[]>(() => {
     return [
@@ -49,16 +50,16 @@ const ClientsTable = () => {
     },
     enableFilters: false,
     enableDensityToggle: false,
-    enableFullScreenToggle: false
-    // muiTableBodyRowProps: ({ row }) => ({
-    //   onClick: () => {
-    //     navigate({
-    //       to: '/invoices/$id',
-    //       params: { id: row.original._id }
-    //     })
-    //   },
-    //   sx: { cursor: 'pointer' }
-    // })
+    enableFullScreenToggle: false,
+    muiTableBodyRowProps: ({ row }) => ({
+      onClick: () => {
+        navigate({
+          to: '/clients/$id',
+          params: { id: row.original._id }
+        })
+      },
+      sx: { cursor: 'pointer' }
+    })
   })
 
   return <MaterialReactTable table={table} />
