@@ -5,21 +5,22 @@ import { clientByIdOptions } from '@/queries'
 import { UpdateClient, updateClientSchema } from '@/validations'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Stack } from '@mui/material'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { useLoaderData, useParams } from '@tanstack/react-router'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useParams } from '@tanstack/react-router'
 import { useSnackbar } from 'notistack'
 import { FormProvider, useForm } from 'react-hook-form'
 
 const ClientEdit = () => {
-  const data = useLoaderData({ strict: false })
   const queryClient = useQueryClient()
   const { enqueueSnackbar } = useSnackbar()
   const { id } = useParams({ from: '/_auth/_layout/clients/$id' })
 
+  const { data, isLoading } = useQuery(clientByIdOptions(id))
+
   const parsedClient = updateClientSchema.safeParse(data)
 
   const formMethods = useForm<UpdateClient>({
-    defaultValues: {
+    values: {
       name: parsedClient.data?.name || '',
       email: parsedClient.data?.email || '',
       address: parsedClient.data?.address || ''
@@ -72,6 +73,7 @@ const ClientEdit = () => {
             fullWidth
             label="Name"
             name="name"
+            loading={isLoading}
             autoFocus
           />
           <RHFTextField
@@ -80,6 +82,7 @@ const ClientEdit = () => {
             fullWidth
             label="Email"
             name="email"
+            loading={isLoading}
           />
           <RHFTextField
             variant="standard"
@@ -87,6 +90,7 @@ const ClientEdit = () => {
             fullWidth
             label="Address"
             name="address"
+            loading={isLoading}
           />
           <LoadingButtonSave
             type="submit"

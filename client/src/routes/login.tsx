@@ -31,9 +31,11 @@ function LoginPage() {
   const auth = useAuth()
   const router = useRouter()
   const search = Route.useSearch()
+  const routeContext = Route.useRouteContext()
   const onLogin = async (user: User) => {
     router.update({
       context: {
+        ...routeContext,
         auth: {
           ...auth,
           user,
@@ -41,10 +43,11 @@ function LoginPage() {
         }
       }
     })
+
     await router.navigate({
       to: search.redirect || fallback
     })
   }
-  if (auth.isAuthenticated) return null
+  if (routeContext.auth.isAuthenticated) return null
   return <LoginForm onLogin={onLogin} />
 }

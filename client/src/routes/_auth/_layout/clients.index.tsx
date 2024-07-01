@@ -1,14 +1,14 @@
 import ClientsTable from '@/components/client/ClientsTable'
-import { clientsOptions } from '@/queries'
 import AddIcon from '@mui/icons-material/Add'
 import { Box, Button, Paper, Typography } from '@mui/material'
 import { Link as RouterLink, createFileRoute } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/_auth/_layout/clients/')({
-  beforeLoad: () => ({
-    title: 'Clients'
-  }),
-  loader: ({ context }) => context.queryClient.ensureQueryData(clientsOptions),
+  beforeLoad: () => {
+    return {
+      title: 'Clients'
+    }
+  },
   component: Clients
 })
 

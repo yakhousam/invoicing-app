@@ -9,8 +9,11 @@ import {
 } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/_auth/_layout/invoices/')({
-  validateSearch: (input: InvoicesSearchParams & SearchSchemaInput) =>
-    invoicesSearchSchema.parse(input),
+  validateSearch: (input?: InvoicesSearchParams & SearchSchemaInput) => {
+    if (Object.keys(input || {}).length > 0) {
+      return invoicesSearchSchema.parse(input)
+    }
+  },
   beforeLoad: () => ({
     title: 'Invoices'
   }),
