@@ -1,7 +1,7 @@
 import LoadingButton from '@/components/LoadingButton'
 import RHFTextField from '@/components/RHF/RHFTextField'
 import { Box, Container, CssBaseline, Typography } from '@mui/material'
-import { useRouteContext } from '@tanstack/react-router'
+import { Link as RouterLink, useRouteContext } from '@tanstack/react-router'
 import { FormProvider, useForm } from 'react-hook-form'
 
 const LoginForm = ({ onLogin }: { onLogin: () => Promise<void> }) => {
@@ -92,6 +92,7 @@ const LoginForm = ({ onLogin }: { onLogin: () => Promise<void> }) => {
               </Typography>
             </Box>
           )}
+          <RouterLink to="/register">Register</RouterLink>
         </Box>
       </Container>
     </>

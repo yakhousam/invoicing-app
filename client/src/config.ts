@@ -6,6 +6,7 @@ export const baseUrl = `${url.protocol}//${url.host}`
 
 export const API_URL = {
   auth: {
+    register: `${apiUrl}/auth/register`,
     login: `${apiUrl}/auth/login`,
     logout: `${apiUrl}/auth/logout`
   },

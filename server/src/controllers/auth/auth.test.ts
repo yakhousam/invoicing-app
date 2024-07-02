@@ -12,7 +12,10 @@ describe('Auth Controller', () => {
     it('should register a new user', async () => {
       const mockUser = getNewUser()
       const req = {
-        body: mockUser
+        body: {
+          userName: mockUser.userName,
+          password: mockUser.password
+        }
       } as unknown as Request
 
       const res = buildRes()
@@ -31,7 +34,6 @@ describe('Auth Controller', () => {
         (res.json as jest.Mock).mock.calls[0][0]
       )
       expect(user.userName).toBe(mockUser.userName)
-      expect(user.email).toBe(mockUser.email)
       expect(user).not.toHaveProperty('password')
 
       expect(next).not.toHaveBeenCalled()
