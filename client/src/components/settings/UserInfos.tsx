@@ -1,23 +1,26 @@
 import * as api from '@/api/user'
 import { LoadingButtonSave } from '@/components/LoadingButton'
 import RHFTextField from '@/components/RHF/RHFTextField'
-import { UpdateUser, User, updateUserSchema } from '@/validations'
+import { userOptions } from '@/queries/user'
+import { UpdateUser, updateUserSchema } from '@/validations'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Stack, Typography } from '@mui/material'
-import { useMutation } from '@tanstack/react-query'
+import {
+  useMutation,
+  useQueryClient,
+  useSuspenseQuery
+} from '@tanstack/react-query'
 import { useSnackbar } from 'notistack'
 import { FormProvider, useForm } from 'react-hook-form'
 
-function UserInfos({
-  user,
-  onUpdateUser
-}: {
-  user: User
-  onUpdateUser: (user: User) => void
-}) {
+function UserInfos() {
+  const queryClient = useQueryClient()
+  const { data: user } = useSuspenseQuery(userOptions)
+
   const { enqueueSnackbar } = useSnackbar()
+
   const formMethods = useForm<UpdateUser>({
-    defaultValues: {
+    values: {
       userName: user?.userName || '',
       firstName: user?.firstName || '',
       lastName: user?.lastName || '',
@@ -34,9 +37,10 @@ function UserInfos({
     mutationFn: api.updateMyProfile,
     onSuccess: (data) => {
       enqueueSnackbar('Profile updated', { variant: 'success' })
-      onUpdateUser(data)
+      queryClient.setQueryData(userOptions.queryKey, data)
     },
     onError: async (error: Error | Response) => {
+      console.log('on error ', error)
       if (error instanceof Response && error.status === 409) {
         // const data = (await error.json()) as {
         //   error: 'DuplicateKeyError'

@@ -1,9 +1,7 @@
 import PasswordUpdate from '@/components/settings/PasswordUpdate'
 import Signature from '@/components/settings/Signature'
 import UserInfos from '@/components/settings/UserInfos'
-import { useAuth } from '@/hooks/useAuth'
-import useLogout from '@/hooks/useLogout'
-import { Box, Paper, Typography } from '@mui/material'
+import { Box, Paper } from '@mui/material'
 import { createFileRoute } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/_auth/_layout/settings')({
@@ -14,22 +12,18 @@ export const Route = createFileRoute('/_auth/_layout/settings')({
 })
 
 function Settings() {
-  const { user, setUser } = useAuth()
-  const { handleLogout } = useLogout()
-
-  if (!user) return <Typography variant="h4">Loading...</Typography>
   return (
     <>
       <Wrapper>
-        <UserInfos user={user} onUpdateUser={setUser} />
+        <UserInfos />
       </Wrapper>
       <Box sx={{ mt: 4 }} />
       <Wrapper>
-        <Signature user={user} onUpdateSignature={setUser} />
+        <Signature />
       </Wrapper>
       <Box sx={{ mt: 4 }} />
       <Wrapper>
-        <PasswordUpdate onUpdatePassword={handleLogout} />
+        <PasswordUpdate />
       </Wrapper>
     </>
   )

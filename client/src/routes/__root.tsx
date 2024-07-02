@@ -1,4 +1,4 @@
-import { AuthContextType } from '@/auth'
+import { Auth } from '@/auth'
 import { QueryClient } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import { createRootRouteWithContext, Outlet } from '@tanstack/react-router'
@@ -6,7 +6,7 @@ import { TanStackRouterDevtools } from '@tanstack/router-devtools'
 
 interface RouteContext {
   queryClient: QueryClient
-  auth: AuthContextType
+  auth: Auth
   title?: string
 }
 

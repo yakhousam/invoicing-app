@@ -1,4 +1,5 @@
 import InvoicesTable from '@/components/invoice/InvoicesTable'
+import { invoicesOptions } from '@/queries'
 import { InvoicesSearchParams, invoicesSearchSchema } from '@/validations'
 import AddIcon from '@mui/icons-material/Add'
 import { Box, Button, Paper, Typography } from '@mui/material'
@@ -13,11 +14,14 @@ export const Route = createFileRoute('/_auth/_layout/invoices/')({
     if (Object.keys(input || {}).length > 0) {
       return invoicesSearchSchema.parse(input)
     }
+    return {}
   },
+  loaderDeps: ({ search }) => search,
   beforeLoad: () => ({
     title: 'Invoices'
   }),
-
+  loader: ({ context, deps }) =>
+    context.queryClient.ensureQueryData(invoicesOptions(deps)),
   component: Invoices
 })
 

@@ -1,7 +1,6 @@
 import LoginForm from '@/components/login/LoginForm'
-import { useAuth } from '@/hooks/useAuth'
-import { User } from '@/validations'
-import { createFileRoute, redirect, useRouter } from '@tanstack/react-router'
+import { userOptions } from '@/queries/user'
+import { Navigate, createFileRoute, useRouter } from '@tanstack/react-router'
 import { z } from 'zod'
 
 const fallback = '/' as const
@@ -11,43 +10,47 @@ export const Route = createFileRoute('/login')({
     redirect: z.string().optional()
   }),
   beforeLoad: async ({ context, search }) => {
-    let user = null
+    if (search.redirect) {
+      return {
+        ...context,
+        auth: {
+          ...context.auth,
+          isAuthenticated: false
+        }
+      }
+    }
+
     try {
-      user = await context.auth.getUser()
-      context.auth.isAuthenticated = true
+      await context.queryClient.ensureQueryData(userOptions)
+      return {
+        ...context,
+        auth: {
+          ...context.auth,
+          isAuthenticated: true
+        }
+      }
     } catch (error) {
       console.error(error)
     }
-    if (user) {
-      throw redirect({
-        to: search.redirect || fallback
-      })
-    }
   },
+
   component: LoginPage
 })
 
 function LoginPage() {
-  const auth = useAuth()
   const router = useRouter()
   const search = Route.useSearch()
   const routeContext = Route.useRouteContext()
-  const onLogin = async (user: User) => {
-    router.update({
-      context: {
-        ...routeContext,
-        auth: {
-          ...auth,
-          user,
-          isAuthenticated: true
-        }
-      }
-    })
 
-    await router.navigate({
-      to: search.redirect || fallback
+  const onLogin = async () => {
+    await router.invalidate().finally(() => {
+      router.navigate({
+        to: search.redirect || fallback
+      })
     })
   }
-  if (routeContext.auth.isAuthenticated) return null
+  if (routeContext.auth.isAuthenticated) {
+    return <Navigate to={search.redirect || fallback} />
+  }
   return <LoginForm onLogin={onLogin} />
 }

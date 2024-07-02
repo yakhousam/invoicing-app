@@ -3,7 +3,7 @@ import { formatCurrency } from '@/helpers'
 import { invoicesOptions } from '@/queries'
 import { invoicesSearchSchema } from '@/validations'
 import { Chip, Typography } from '@mui/material'
-import { useQuery } from '@tanstack/react-query'
+import { useSuspenseQuery } from '@tanstack/react-query'
 import { useNavigate, useSearch } from '@tanstack/react-router'
 import dayjs from 'dayjs'
 import {
@@ -21,12 +21,14 @@ type Columns = Awaited<ReturnType<typeof fetchInvoices>>['invoices'][0]
 
 const InvoicesTable = () => {
   const navigate = useNavigate()
-  const looseSearch = useSearch({ strict: false })
-  const searchParams = invoicesSearchSchema.parse(looseSearch)
+  const search = useSearch({ from: '/_auth/_layout/invoices/' })
+  const searchParams = invoicesSearchSchema.parse(search)
 
-  const queryOptions = invoicesOptions(searchParams)
+  const queryOptions = invoicesOptions(
+    Object.keys(search).length > 0 ? invoicesSearchSchema.parse(search) : {}
+  )
 
-  const { data, isError, isLoading } = useQuery(queryOptions)
+  const { data, isError, isLoading } = useSuspenseQuery(queryOptions)
 
   const columnFilters = (
     ['clientName', 'status'] as const

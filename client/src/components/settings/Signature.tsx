@@ -2,25 +2,25 @@ import * as api from '@/api/user'
 import { LoadingButtonSave } from '@/components/LoadingButton'
 import { VisuallyHiddenInput } from '@/components/VisuallyHiddenInput'
 import { baseUrl } from '@/config'
-import { User } from '@/validations'
+import { userOptions } from '@/queries/user'
 import { Button, Grid, Stack, Typography } from '@mui/material'
-import { useMutation } from '@tanstack/react-query'
+import {
+  useMutation,
+  useQueryClient,
+  useSuspenseQuery
+} from '@tanstack/react-query'
 import { useSnackbar } from 'notistack'
 import { useForm } from 'react-hook-form'
 
-const Signature = ({
-  user,
-  onUpdateSignature
-}: {
-  user: User
-  onUpdateSignature: (user: User) => void
-}) => {
+const Signature = () => {
+  const queryClient = useQueryClient()
+  const { data: user } = useSuspenseQuery(userOptions)
+
   const { enqueueSnackbar } = useSnackbar()
   const {
     register,
     handleSubmit,
     watch,
-    reset,
     formState: { isLoading }
   } = useForm<{
     signature: FileList | undefined
@@ -45,10 +45,8 @@ const Signature = ({
   const mutation = useMutation({
     mutationFn: api.updateMySignature,
     onSuccess: (data) => {
-      console.log('on success', data)
       enqueueSnackbar('Signature updated', { variant: 'success' })
-      reset()
-      onUpdateSignature(data)
+      queryClient.setQueryData(userOptions.queryKey, data)
     },
     onError: async () => {
       enqueueSnackbar('Error updating signature', { variant: 'error' })

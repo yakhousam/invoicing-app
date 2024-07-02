@@ -1,4 +1,4 @@
-import { RouterPath } from '@/router'
+import { routeTree } from '@/routeTree.gen'
 import {
   LineAxis as LineAxisIcon,
   People as PeopleIcon,
@@ -12,8 +12,10 @@ import {
   ListItemText
 } from '@mui/material'
 import { useTheme } from '@mui/material/styles'
-import { Link as RouterLink } from '@tanstack/react-router'
+import { Link as RouterLink, RoutesByPath } from '@tanstack/react-router'
 import React from 'react'
+
+type RouterPath = keyof RoutesByPath<typeof routeTree>
 
 type Link = {
   id: number

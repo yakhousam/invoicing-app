@@ -28,14 +28,36 @@ function CreateInvoiceForm() {
 
   const mutation = useMutation({
     mutationFn: api.createInvoice,
-    onSuccess: () => {
+    onSuccess: (data) => {
       enqueueSnackbar('Invoice created', { variant: 'success' })
       methods.reset()
       // this is a hack to reset the date (time) field so it doesn't keep the previous value.
       // otherwise if you create a new invoice the date will be the same as the previous one when you don't refresh the page
       methods.setValue('invoiceDate', dayjs().toISOString())
-      queryClient.invalidateQueries({
-        queryKey: invoicesOptions().queryKey
+      queryClient.setQueryData(invoicesOptions().queryKey, (oldData) => {
+        if (!oldData) {
+          return {
+            invoices: [
+              {
+                ...data,
+                user: data.user.userName
+              }
+            ],
+            totalInvoices: 1
+          }
+        }
+
+        return {
+          ...oldData,
+          invoices: [
+            {
+              ...data,
+              user: data.user.userName
+            },
+            ...oldData.invoices
+          ],
+          totalInvoices: oldData.totalInvoices + 1
+        }
       })
     },
     onError: (error) => {

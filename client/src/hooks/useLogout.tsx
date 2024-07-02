@@ -1,19 +1,16 @@
-import { useAuth } from '@/hooks/useAuth'
-import { useRouter } from '@tanstack/react-router'
+import { useRouteContext } from '@tanstack/react-router'
 import React from 'react'
 
 const useLogout = () => {
-  const auth = useAuth()
-  const router = useRouter()
+  const { auth } = useRouteContext({ strict: false })
   const [status, setStatus] = React.useState<'idle' | 'pending' | 'error'>(
     'idle'
   )
   const handleLogout = async () => {
     try {
       setStatus('pending')
-      await auth.logout()
-      router.navigate({ to: '/login' })
-      setStatus('idle')
+      await auth?.logout()
+      window.location.href = `/login?redirect=${window.location.pathname}`
     } catch (error) {
       setStatus('error')
     }

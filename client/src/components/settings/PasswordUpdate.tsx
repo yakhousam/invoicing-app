@@ -1,6 +1,7 @@
 import * as api from '@/api/user'
 import { LoadingButtonSave } from '@/components/LoadingButton'
 import RHFTextField from '@/components/RHF/RHFTextField'
+import useLogout from '@/hooks/useLogout'
 import { UpdateUserPassword, updateUserPasswordSchema } from '@/validations'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Stack, Typography } from '@mui/material'
@@ -8,11 +9,8 @@ import { useMutation } from '@tanstack/react-query'
 import { useSnackbar } from 'notistack'
 import { FormProvider, useForm } from 'react-hook-form'
 
-const PasswordUpdate = ({
-  onUpdatePassword
-}: {
-  onUpdatePassword: () => void
-}) => {
+const PasswordUpdate = () => {
+  const { handleLogout } = useLogout()
   const { enqueueSnackbar } = useSnackbar()
 
   const formMethods = useForm<UpdateUserPassword>({
@@ -34,7 +32,7 @@ const PasswordUpdate = ({
     mutationFn: api.updateMyPassword,
     onSuccess: () => {
       enqueueSnackbar('Password updated successfully', { variant: 'success' })
-      onUpdatePassword()
+      handleLogout()
     },
     onError: (error: Error | Response) => {
       if (error instanceof Response && error.status) {

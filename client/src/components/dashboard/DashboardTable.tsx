@@ -1,6 +1,5 @@
 import { formatCurrency } from '@/helpers'
 import { invoicesOptions } from '@/queries'
-import { invoicesSearchSchema } from '@/validations'
 import {
   Chip,
   Table,
@@ -16,8 +15,7 @@ import { useNavigate } from '@tanstack/react-router'
 import dayjs from 'dayjs'
 
 const DashboardTable = () => {
-  const searchParams = invoicesSearchSchema.parse({})
-  const queryOptions = invoicesOptions(searchParams)
+  const queryOptions = invoicesOptions()
   const { data } = useQuery(queryOptions)
   const navigate = useNavigate()
   return (
