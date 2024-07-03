@@ -319,15 +319,6 @@ const getTotalsByMonth = async (
       }
     ])
 
-    if (totals.length === 0) {
-      res.status(200).json({
-        total: 0,
-        paid: 0,
-        unpaid: 0
-      })
-      return
-    }
-
     res.status(200).json(totals)
   } catch (error) {
     next(error)
