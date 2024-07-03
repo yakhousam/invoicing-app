@@ -20,6 +20,7 @@ import { useMemo } from 'react'
 type Columns = Awaited<ReturnType<typeof fetchInvoices>>['invoices'][0]
 
 const InvoicesTable = () => {
+  console.log('InvoicesTable')
   const navigate = useNavigate()
   const search = useSearch({ from: '/_auth/_layout/invoices/' })
   const searchParams = invoicesSearchSchema.parse(search)
@@ -37,6 +38,11 @@ const InvoicesTable = () => {
     return value ? [...acc, { id, value }] : acc
   }, [])
 
+  const pagination = {
+    pageIndex: searchParams.page,
+    pageSize: searchParams.limit
+  }
+
   function handleFilterChange(
     newColumnFilters: MRT_Updater<MRT_ColumnFiltersState>
   ) {
@@ -51,6 +57,7 @@ const InvoicesTable = () => {
     }, {})
 
     navigate({
+      to: '/invoices',
       search: invoicesSearchSchema.parse(search)
     })
   }
@@ -58,26 +65,28 @@ const InvoicesTable = () => {
   function handlePaginationChange(
     changePage: MRT_Updater<MRT_PaginationState>
   ) {
-    const pagination =
-      typeof changePage === 'function'
-        ? changePage({
-            pageIndex: searchParams.page,
-            pageSize: searchParams.limit
-          })
-        : changePage
-    navigate({
-      search: (prev) => ({
-        ...prev,
-        page: pagination.pageIndex,
-        limit: pagination.pageSize
+    const newPagination =
+      typeof changePage === 'function' ? changePage(pagination) : changePage
+    if (
+      newPagination.pageIndex !== searchParams.page ||
+      newPagination.pageSize !== searchParams.limit
+    ) {
+      navigate({
+        to: '/invoices',
+        search: (prev) => ({
+          ...prev,
+          page: newPagination.pageIndex,
+          limit: newPagination.pageSize
+        })
       })
-    })
+    }
   }
 
   function handleSortingChange(changeSorting: MRT_Updater<MRT_SortingState>) {
     const sorting =
       typeof changeSorting === 'function' ? changeSorting([]) : changeSorting
     navigate({
+      to: '/invoices',
       search: (prev) => ({
         ...prev,
         sortBy: sorting[0]?.id,
@@ -166,10 +175,7 @@ const InvoicesTable = () => {
       showSkeletons: isLoading,
       showAlertBanner: isError,
       columnFilters,
-      pagination: {
-        pageIndex: searchParams.page,
-        pageSize: searchParams.limit
-      },
+      pagination,
       sorting: [
         {
           id: searchParams.sortBy,
