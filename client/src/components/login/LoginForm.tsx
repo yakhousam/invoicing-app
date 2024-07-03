@@ -92,7 +92,12 @@ const LoginForm = ({ onLogin }: { onLogin: () => Promise<void> }) => {
               </Typography>
             </Box>
           )}
-          <RouterLink to="/register">Register</RouterLink>
+          <Box mt={2} />
+          <RouterLink to="/register">
+            <Typography variant="body2" color="primary">
+              {"Don't have an account? Sign Up"}
+            </Typography>
+          </RouterLink>
         </Box>
       </Container>
     </>

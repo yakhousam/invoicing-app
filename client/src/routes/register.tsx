@@ -10,7 +10,7 @@ function Register() {
   const onRegister = async () => {
     await router.invalidate().finally(() => {
       router.navigate({
-        to: '/'
+        to: '/settings'
       })
     })
   }

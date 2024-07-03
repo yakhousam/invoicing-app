@@ -4,13 +4,17 @@ import RHFTextField from '@/components/RHF/RHFTextField'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Box, Container, CssBaseline, Stack, Typography } from '@mui/material'
 import { Link as RouterLink } from '@tanstack/react-router'
+import { useSnackbar } from 'notistack'
 import { FormProvider, useForm } from 'react-hook-form'
 import { z } from 'zod'
 
 const registerFormSchema = z
   .object({
-    username: z.string().min(2).max(20),
-    password: z.string().min(6),
+    username: z
+      .string()
+      .min(2, 'Username must be at least 2 characters')
+      .max(20, 'Username must be at most 20 characters'),
+    password: z.string().min(6, 'Password must be at least 6 characters'),
     confirmPassword: z.string()
   })
   .refine((data) => data.password === data.confirmPassword, {
@@ -19,6 +23,7 @@ const registerFormSchema = z
   })
 
 const RegisterForm = ({ onRegister }: { onRegister: () => Promise<void> }) => {
+  const { enqueueSnackbar } = useSnackbar()
   const formMethods = useForm({
     defaultValues: {
       username: '',
@@ -31,9 +36,9 @@ const RegisterForm = ({ onRegister }: { onRegister: () => Promise<void> }) => {
   const {
     handleSubmit,
     clearErrors,
+    setError,
     formState: { errors, isSubmitting }
   } = formMethods
-  console.log('errors', errors)
 
   const onSubmit = async ({
     username,
@@ -47,6 +52,13 @@ const RegisterForm = ({ onRegister }: { onRegister: () => Promise<void> }) => {
       await onRegister()
     } catch (error) {
       console.error(error)
+      if (error instanceof Response && error.status === 400) {
+        setError('username', {
+          message: 'Username already exists'
+        })
+      } else {
+        enqueueSnackbar('Error creating client', { variant: 'error' })
+      }
     }
   }
 
@@ -101,8 +113,11 @@ const RegisterForm = ({ onRegister }: { onRegister: () => Promise<void> }) => {
               </Typography>
             </Box>
           )}
+          <Box mt={2} />
           <RouterLink to="/login">
-            {'Already have an account? Sign in'}
+            <Typography variant="body2" color="primary">
+              {'Already have an account? Sign in'}
+            </Typography>
           </RouterLink>
         </Box>
       </Container>
