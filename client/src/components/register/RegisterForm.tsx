@@ -11,7 +11,7 @@ const registerFormSchema = z
   .object({
     username: z.string().min(2).max(20),
     password: z.string().min(6),
-    confirmPassword: z.string().min(6)
+    confirmPassword: z.string()
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords don't match",
