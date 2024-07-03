@@ -40,6 +40,7 @@ if (!rootElement.innerHTML) {
       <QueryClientProvider client={queryClient}>
         <SnackbarProvider
           anchorOrigin={{ horizontal: 'right', vertical: 'top' }}
+          autoHideDuration={3000}
         >
           <RouterProvider router={router} />
         </SnackbarProvider>

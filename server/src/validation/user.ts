@@ -6,7 +6,7 @@ export const userSchema = z.object({
   userName: z.string().min(2),
   firstName: z.string().optional(),
   lastName: z.string().optional(),
-  email: z.string().email().optional(),
+  email: z.string().email().optional().or(z.literal('')),
   password: z.string().min(6),
   role: z
     .union([z.literal('admin'), z.literal('user')])

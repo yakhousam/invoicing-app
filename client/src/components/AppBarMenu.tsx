@@ -1,6 +1,8 @@
 import useLogout from '@/hooks/useLogout'
-import { AccountCircle, LogoutRounded, Settings } from '@mui/icons-material'
+import { userOptions } from '@/queries/user'
+import { LogoutRounded, Settings } from '@mui/icons-material'
 import {
+  Avatar,
   Divider,
   IconButton,
   ListItemIcon,
@@ -8,10 +10,12 @@ import {
   Menu,
   MenuItem
 } from '@mui/material'
+import { useSuspenseQuery } from '@tanstack/react-query'
 import { Link as RouterLink } from '@tanstack/react-router'
 import React from 'react'
 
 const AppBarMenu = () => {
+  const { data: user } = useSuspenseQuery(userOptions)
   const { handleLogout, status } = useLogout()
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null)
 
@@ -32,7 +36,7 @@ const AppBarMenu = () => {
         onClick={handleMenu}
         color="inherit"
       >
-        <AccountCircle fontSize="large" />
+        <Avatar sx={{ textTransform: 'uppercase' }}>{user?.userName[0]}</Avatar>
       </IconButton>
       <Menu
         id="menu-appbar"

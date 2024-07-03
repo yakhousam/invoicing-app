@@ -20,7 +20,6 @@ import { useMemo } from 'react'
 type Columns = Awaited<ReturnType<typeof fetchInvoices>>['invoices'][0]
 
 const InvoicesTable = () => {
-  console.log('InvoicesTable')
   const navigate = useNavigate()
   const search = useSearch({ from: '/_auth/_layout/invoices/' })
   const searchParams = invoicesSearchSchema.parse(search)
