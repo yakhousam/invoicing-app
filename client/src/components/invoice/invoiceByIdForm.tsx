@@ -5,10 +5,16 @@ import {
 } from '@/components/LoadingButton'
 import RHFSwitch from '@/components/RHF/RHFSwitch'
 import { formatCurrency } from '@/helpers'
-import { invoiceByIdOptions } from '@/queries'
+import { invoiceByIdOptions, invoicesOptions } from '@/queries'
 import { UpdateInvoice } from '@/validations'
 import {
   Box,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
   Grid,
   Table,
   TableBody,
@@ -26,6 +32,7 @@ import {
 import { useParams } from '@tanstack/react-router'
 import dayjs from 'dayjs'
 import { useSnackbar } from 'notistack'
+import React from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import DownloadInvoiceBtn from './DownloadInvoiceBtn'
 
@@ -34,6 +41,8 @@ const InvoiceByIdForm = ({
 }: {
   onDeleteInvoice: () => void
 }) => {
+  const [openDeleteDialog, setOpenDeleteDialog] = React.useState(false)
+
   const { id } = useParams({ from: '/_auth/_layout/invoices/$id' })
   const options = invoiceByIdOptions(id)
 
@@ -52,6 +61,24 @@ const InvoiceByIdForm = ({
     onSuccess: (data) => {
       enqueueSnackbar('Invoice updated', { variant: 'success' })
       queryClient.setQueryData(options.queryKey, data)
+      queryClient.setQueryData(invoicesOptions().queryKey, (oldData) => {
+        const updatedInvoice = {
+          ...data,
+          user: data.user.userName
+        }
+        if (oldData) {
+          return {
+            invoices: oldData.invoices.map((invoice) =>
+              invoice._id === data._id ? updatedInvoice : invoice
+            ),
+            totalInvoices: oldData.totalInvoices
+          }
+        }
+        return {
+          invoices: [updatedInvoice],
+          totalInvoices: 1
+        }
+      })
     },
     onError: () => {
       enqueueSnackbar('Error updating invoice', { variant: 'error' })
@@ -62,10 +89,16 @@ const InvoiceByIdForm = ({
     mutationFn: (id: string) => api.deleteInvoice(id),
     onSuccess: () => {
       enqueueSnackbar('Invoice deleted', { variant: 'success' })
-      queryClient.invalidateQueries({
-        queryKey: options.queryKey,
-        refetchType: 'none'
+      queryClient.setQueryData(invoicesOptions().queryKey, (oldData) => {
+        if (oldData) {
+          return {
+            invoices: oldData.invoices.filter((invoice) => invoice._id !== id),
+            totalInvoices: oldData.totalInvoices - 1
+          }
+        }
+        return oldData
       })
+
       onDeleteInvoice()
     },
     onError: (error) => {
@@ -81,6 +114,11 @@ const InvoiceByIdForm = ({
 
   const onSubmit = (data: UpdateInvoice) => {
     updateInvoice({ id, data })
+  }
+
+  const handleDeleteInvoice = () => {
+    setOpenDeleteDialog(false)
+    deleteInvoice(id)
   }
 
   const amountToCurrency = formatCurrency(data.currency)
@@ -219,12 +257,26 @@ const InvoiceByIdForm = ({
 
               <LoadingButtonDelete
                 loading={isPendingDeletion}
-                onClick={() => deleteInvoice(id)}
+                onClick={() => setOpenDeleteDialog(true)}
               />
             </Box>
           </Grid>
         </Grid>
       </FormProvider>
+      <Dialog open={openDeleteDialog}>
+        <DialogTitle>Delete Invoice</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Are you sure you want to delete this invoice?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenDeleteDialog(false)}>Cancel</Button>
+          <Button variant="contained" onClick={handleDeleteInvoice}>
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
     </>
   )
 }
