@@ -1,5 +1,7 @@
 import LoginForm from '@/components/login/LoginForm'
 import { userOptions } from '@/queries/user'
+import { User } from '@/validations'
+import { useQueryClient } from '@tanstack/react-query'
 import { Navigate, createFileRoute, useRouter } from '@tanstack/react-router'
 import { z } from 'zod'
 
@@ -38,11 +40,13 @@ export const Route = createFileRoute('/login')({
 })
 
 function LoginPage() {
+  const queryClient = useQueryClient()
   const router = useRouter()
   const search = Route.useSearch()
   const routeContext = Route.useRouteContext()
 
-  const onLogin = async () => {
+  const onLogin = async (user: User) => {
+    queryClient.setQueryData(userOptions.queryKey, user)
     await router.invalidate().finally(() => {
       router.navigate({
         to: search.redirect || fallback

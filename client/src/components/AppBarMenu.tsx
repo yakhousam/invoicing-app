@@ -16,6 +16,7 @@ import React from 'react'
 
 const AppBarMenu = () => {
   const { data: user } = useSuspenseQuery(userOptions)
+
   const { handleLogout, status } = useLogout()
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null)
 

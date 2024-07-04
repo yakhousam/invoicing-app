@@ -1,6 +1,7 @@
 import * as authApi from '@/api/auth'
 import LoadingButton from '@/components/LoadingButton'
 import RHFTextField from '@/components/RHF/RHFTextField'
+import { User } from '@/validations'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Box, Container, CssBaseline, Stack, Typography } from '@mui/material'
 import { Link as RouterLink } from '@tanstack/react-router'
@@ -22,7 +23,11 @@ const registerFormSchema = z
     path: ['confirmPassword']
   })
 
-const RegisterForm = ({ onRegister }: { onRegister: () => Promise<void> }) => {
+const RegisterForm = ({
+  onRegister
+}: {
+  onRegister: (user: User) => Promise<void>
+}) => {
   const { enqueueSnackbar } = useSnackbar()
   const formMethods = useForm({
     defaultValues: {
@@ -48,8 +53,8 @@ const RegisterForm = ({ onRegister }: { onRegister: () => Promise<void> }) => {
     password: string
   }) => {
     try {
-      await authApi.register(username, password)
-      await onRegister()
+      const user = await authApi.register(username, password)
+      await onRegister(user)
     } catch (error) {
       console.error(error)
       if (error instanceof Response && error.status === 400) {
@@ -94,6 +99,7 @@ const RegisterForm = ({ onRegister }: { onRegister: () => Promise<void> }) => {
                   name="confirmPassword"
                   label="Confirm Password"
                   type="password"
+                  autoComplete="new-password"
                 />
                 <LoadingButton
                   type="submit"

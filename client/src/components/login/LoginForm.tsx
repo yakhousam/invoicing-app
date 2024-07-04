@@ -1,10 +1,11 @@
 import LoadingButton from '@/components/LoadingButton'
 import RHFTextField from '@/components/RHF/RHFTextField'
+import { User } from '@/validations'
 import { Box, Container, CssBaseline, Typography } from '@mui/material'
 import { Link as RouterLink, useRouteContext } from '@tanstack/react-router'
 import { FormProvider, useForm } from 'react-hook-form'
 
-const LoginForm = ({ onLogin }: { onLogin: () => Promise<void> }) => {
+const LoginForm = ({ onLogin }: { onLogin: (user: User) => Promise<void> }) => {
   const { auth } = useRouteContext({ from: '/login' })
   const formMethods = useForm({
     defaultValues: {
@@ -27,8 +28,8 @@ const LoginForm = ({ onLogin }: { onLogin: () => Promise<void> }) => {
     password: string
   }) => {
     try {
-      await auth.login(username, password)
-      await onLogin()
+      const user = await auth.login(username, password)
+      await onLogin(user)
     } catch (error) {
       if (error instanceof Response && error.status === 401) {
         setError('root.error', {
