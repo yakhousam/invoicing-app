@@ -5,6 +5,9 @@ export const handlers = [
   http.post(API_URL.auth.login, async () => {
     return HttpResponse.json(generateUser())
   }),
+  http.post(API_URL.auth.register, async () => {
+    return HttpResponse.json(generateUser())
+  }),
   http.post(API_URL.clients.createOne, () => {
     return HttpResponse.json(generateClient())
   })

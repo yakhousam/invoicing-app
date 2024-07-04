@@ -5,8 +5,8 @@ export function generateUser(): Required<User> {
   return {
     _id: faker.database.mongodbObjectId(),
     userName: faker.internet.userName(),
-    firstName: faker.name.firstName(),
-    lastName: faker.name.lastName(),
+    firstName: faker.person.firstName(),
+    lastName: faker.person.lastName(),
     email: faker.internet.email(),
     role: 'user',
     createdAt: faker.date.recent().toISOString(),
