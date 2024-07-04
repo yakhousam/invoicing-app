@@ -84,6 +84,20 @@ const updateMyProfile = async (
     const updates = updateUserSchema.parse(req.body)
     const authenticatedUser = parseUserSchema.parse(req.user)
 
+    if (updates.userName !== undefined) {
+      const userWithSameUserName = await UserModel.findOne({
+        userName: updates.userName,
+        _id: { $ne: authenticatedUser._id }
+      })
+      if (userWithSameUserName !== null) {
+        res.status(409).json({
+          error: 'Conflict',
+          message: `User with username: ${updates.userName} already exists`
+        })
+        return
+      }
+    }
+
     const user = await UserModel.findOneAndUpdate<User>(
       {
         _id: authenticatedUser._id

@@ -72,12 +72,14 @@ const PasswordUpdate = () => {
               label="New password"
               name="newPassword"
               type="password"
+              autoComplete="new-password"
             />
             <RHFTextField
               variant="standard"
               label="Confirm new password"
               name="confirmNewPassword"
               type="password"
+              autoComplete="new-password"
             />
             <LoadingButtonSave
               loading={isSubmitting}

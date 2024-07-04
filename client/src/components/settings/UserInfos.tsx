@@ -30,6 +30,7 @@ function UserInfos() {
   })
   const {
     handleSubmit,
+    setError,
     formState: { isSubmitting, isDirty }
   } = formMethods
 
@@ -40,17 +41,11 @@ function UserInfos() {
       queryClient.setQueryData(userOptions.queryKey, data)
     },
     onError: async (error: Error | Response) => {
-      console.log('on error ', error)
       if (error instanceof Response && error.status === 409) {
-        // const data = (await error.json()) as {
-        //   error: 'DuplicateKeyError'
-        //   message: string
-        //   field: keyof CreateClient
-        //   value: string
-        // }
-        // setError(data.field, {
-        //   message: `a client with the same ${data.field} already exists: ${data.value}`
-        // })
+        const data = await error.json()
+        setError('userName', {
+          message: data.message
+        })
       } else {
         enqueueSnackbar('Error updating profile', { variant: 'error' })
       }
