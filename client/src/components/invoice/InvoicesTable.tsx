@@ -21,20 +21,20 @@ type Columns = Awaited<ReturnType<typeof fetchInvoices>>['invoices'][0]
 
 const InvoicesTable = () => {
   const navigate = useNavigate()
-  const search = useSearch({ from: '/_auth/_layout/invoices/' })
+  const search = useSearch({ strict: false })
   const searchParams = invoicesSearchSchema.parse(search)
 
-  const queryOptions = invoicesOptions(
-    Object.keys(search).length > 0 ? invoicesSearchSchema.parse(search) : {}
-  )
+  const queryOptions = invoicesOptions(searchParams)
 
   const { data, isError, isLoading } = useSuspenseQuery(queryOptions)
 
   const columnFilters = (
     ['clientName', 'status'] as const
   ).reduce<MRT_ColumnFiltersState>((acc, id) => {
-    const value = searchParams[id]
-    return value ? [...acc, { id, value }] : acc
+    if (searchParams[id] !== undefined) {
+      return [...acc, { id, value: searchParams[id] }]
+    }
+    return acc
   }, [])
 
   const pagination = {
@@ -54,10 +54,10 @@ const InvoicesTable = () => {
       const { id, value } = filter
       return { ...acc, [id]: value }
     }, {})
-
     navigate({
       to: '/invoices',
-      search: invoicesSearchSchema.parse(search)
+      search:
+        Object.keys(search).length > 0 ? invoicesSearchSchema.parse(search) : {}
     })
   }
 
