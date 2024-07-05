@@ -1,8 +1,10 @@
 import { auth } from '@/auth'
+import { routeTree } from '@/routeTree.gen'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import {
   Outlet,
   RouterProvider,
+  RoutesByPath,
   createMemoryHistory,
   createRootRoute,
   createRoute,
@@ -11,6 +13,8 @@ import {
 import { render } from '@testing-library/react'
 import { SnackbarProvider } from 'notistack'
 import { ReactNode } from 'react'
+
+type RouterPath = keyof RoutesByPath<typeof routeTree>
 
 const queryClient = new QueryClient()
 
@@ -21,7 +25,7 @@ export function renderWithContext({
   isAuthenticated = false
 }: {
   component: ReactNode
-  path?: string
+  path: RouterPath
   initialEntries?: string[]
   isAuthenticated?: boolean
 }) {
