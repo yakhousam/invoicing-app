@@ -9,6 +9,7 @@ import {
   createRouter
 } from '@tanstack/react-router'
 import { render } from '@testing-library/react'
+import { SnackbarProvider } from 'notistack'
 import { ReactNode } from 'react'
 
 const queryClient = new QueryClient()
@@ -33,7 +34,7 @@ export function renderWithContext({
     path,
     component: () => (
       <QueryClientProvider client={queryClient}>
-        {component}
+        <SnackbarProvider>{component}</SnackbarProvider>
       </QueryClientProvider>
     )
   })

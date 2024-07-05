@@ -56,13 +56,12 @@ const RegisterForm = ({
       const user = await authApi.register(username, password)
       await onRegister(user)
     } catch (error) {
-      console.error(error)
       if (error instanceof Response && error.status === 400) {
         setError('username', {
           message: 'Username already exists'
         })
       } else {
-        enqueueSnackbar('Error creating client', { variant: 'error' })
+        enqueueSnackbar('Error creating user', { variant: 'error' })
       }
     }
   }
