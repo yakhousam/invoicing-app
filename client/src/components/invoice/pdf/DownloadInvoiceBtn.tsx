@@ -3,7 +3,7 @@ import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf'
 import { Box, Button } from '@mui/material'
 import { PDFDownloadLink } from '@react-pdf/renderer'
 import dayjs from 'dayjs'
-import InvoiceByIdPdf from './InvoiceByIdPdf'
+import InvoiceByIdPdf from './InvoicePdf'
 
 const DownloadInvoiceBtn = (invoice: Invoice) => (
   <Box display="flex" justifyContent="flex-end">

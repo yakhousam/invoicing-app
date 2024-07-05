@@ -34,9 +34,9 @@ import dayjs from 'dayjs'
 import { useSnackbar } from 'notistack'
 import React from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
-import DownloadInvoiceBtn from './DownloadInvoiceBtn'
+import DownloadInvoiceBtn from './pdf/DownloadInvoiceBtn'
 
-const InvoiceByIdForm = ({
+const EditInvoiceForm = ({
   onDeleteInvoice
 }: {
   onDeleteInvoice: () => void
@@ -281,4 +281,4 @@ const InvoiceByIdForm = ({
   )
 }
 
-export default InvoiceByIdForm
+export default EditInvoiceForm

@@ -1,4 +1,4 @@
-import InvoiceByIdForm from '@/components/invoice/invoiceByIdForm'
+import EditInvoiceForm from '@/components/invoice/EditInvoiceForm'
 import { invoiceByIdOptions } from '@/queries'
 import { Box, Paper, Stack, Typography } from '@mui/material'
 import { createFileRoute, useRouter } from '@tanstack/react-router'
@@ -34,7 +34,7 @@ function Invoice() {
         }}
       >
         <Paper sx={{ p: 4 }}>
-          <InvoiceByIdForm onDeleteInvoice={onDeleteInvoice} />
+          <EditInvoiceForm onDeleteInvoice={onDeleteInvoice} />
         </Paper>
       </Box>
     </Stack>

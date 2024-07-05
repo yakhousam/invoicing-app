@@ -71,7 +71,7 @@ const styles = StyleSheet.create({
   }
 })
 
-const InvoiceByIdPdf = (invoice: Invoice) => {
+const InvoicePdf = (invoice: Invoice) => {
   const amountToCurrency = formatCurrency(invoice.currency)
   const signature = invoice.user.signatureUrl
     ? `${baseUrl}/${invoice.user.signatureUrl}`
@@ -242,4 +242,4 @@ const InvoiceByIdPdf = (invoice: Invoice) => {
   )
 }
 
-export default InvoiceByIdPdf
+export default InvoicePdf
