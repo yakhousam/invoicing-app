@@ -25,7 +25,7 @@ export function renderWithContext({
   isAuthenticated = false
 }: {
   component: ReactNode
-  path: RouterPath
+  path?: RouterPath
   initialEntries?: string[]
   isAuthenticated?: boolean
 }) {

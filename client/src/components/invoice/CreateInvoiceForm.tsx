@@ -171,7 +171,7 @@ function CreateInvoiceForm() {
           <Grid item xs={12} md={6}>
             <Box display="flex" justifyContent="flex-end">
               <Button
-                aria-label="add"
+                aria-label="add item"
                 color="primary"
                 variant="contained"
                 onClick={() =>
@@ -218,7 +218,7 @@ function CreateInvoiceForm() {
                     />
                     <IconButton
                       disabled={fields.length === 1}
-                      aria-label="delete"
+                      aria-label="delete item"
                       color="error"
                       onClick={() => remove(index)}
                     >
@@ -241,7 +241,11 @@ function CreateInvoiceForm() {
             <Typography variant="body1">Subtotal</Typography>
           </Grid>
           <Grid item xs={6}>
-            <Typography variant="body1" textAlign="right">
+            <Typography
+              aria-label="Sub total"
+              variant="body1"
+              textAlign="right"
+            >
               {amountToCurrency(subTotal)}
             </Typography>
           </Grid>
@@ -251,7 +255,11 @@ function CreateInvoiceForm() {
             </Typography>
           </Grid>
           <Grid item xs={6}>
-            <Typography variant="body1" textAlign="right">
+            <Typography
+              aria-label="Total tax"
+              variant="body1"
+              textAlign="right"
+            >
               {amountToCurrency(
                 (subTotal * (methods.watch('taxPercentage') || 0)) / 100
               )}
@@ -261,7 +269,11 @@ function CreateInvoiceForm() {
             <Typography variant="body1">Total</Typography>
           </Grid>
           <Grid item xs={6}>
-            <Typography variant="body1" textAlign="right">
+            <Typography
+              aria-label="Grand total"
+              variant="body1"
+              textAlign="right"
+            >
               {amountToCurrency(
                 subTotal +
                   (subTotal * (methods.watch('taxPercentage') || 0)) / 100
