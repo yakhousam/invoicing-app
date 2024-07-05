@@ -10,11 +10,8 @@ import {
 } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/_auth/_layout/invoices/')({
-  validateSearch: (input?: InvoicesSearchParams & SearchSchemaInput) => {
-    if (Object.keys(input || {}).length > 0) {
-      return invoicesSearchSchema.parse(input)
-    }
-    return {}
+  validateSearch: (input: InvoicesSearchParams & SearchSchemaInput) => {
+    return invoicesSearchSchema.parse(input)
   },
   loaderDeps: ({ search }) => search,
   beforeLoad: () => ({
