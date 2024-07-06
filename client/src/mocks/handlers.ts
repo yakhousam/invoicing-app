@@ -1,6 +1,6 @@
 import { API_URL } from '@/config'
 import { http, HttpResponse } from 'msw'
-import { generateClient, generateInvoices, generateUser } from './helpers'
+import { generateClient, generateInvoices, generateUser } from './generate'
 
 const authHandlers = [
   http.post(API_URL.auth.login, async () => {

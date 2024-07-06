@@ -1,17 +1,11 @@
 import { API_URL } from '@/config'
-import { generateClient } from '@/mocks/helpers'
+import { generateClient } from '@/mocks/generate'
 import { HttpResponse, http, server } from '@/mocks/node'
-import { NotistackWrapper, QueryClientWrapper } from '@/mocks/wrappers'
+import { Wrapper } from '@/mocks/wrappers'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it } from 'vitest'
 import ClientForm from './ClientForm'
-
-const Wrapper = ({ children }: { children: React.ReactNode }) => (
-  <QueryClientWrapper>
-    <NotistackWrapper>{children}</NotistackWrapper>
-  </QueryClientWrapper>
-)
 
 describe('ClientForm', () => {
   it('renders', () => {
