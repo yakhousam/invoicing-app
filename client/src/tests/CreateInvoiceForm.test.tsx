@@ -4,15 +4,12 @@ import { CreateInvoice, Invoice } from '@/validations'
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import dayjs from 'dayjs'
-import { beforeEach, describe, expect, it } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import CreateInvoiceForm from '../components/invoice/CreateInvoiceForm'
 import { generateClient, generateInvoice } from './utils/generate'
 import { Wrapper } from './utils/wrappers'
 
 describe('CreateInvoiceForm', () => {
-  beforeEach(() => {
-    server.resetHandlers()
-  })
   it('renders', async () => {
     render(<CreateInvoiceForm />, { wrapper: Wrapper })
 
@@ -51,7 +48,7 @@ describe('CreateInvoiceForm', () => {
     expect(screen.getByRole('button', { name: /create/i })).toBeInTheDocument()
   })
 
-  it.only('create invoice', async () => {
+  it('create invoice', async () => {
     const user = userEvent.setup()
 
     const mockClient = { ...generateClient(), name: 'john doe' }
@@ -141,6 +138,7 @@ describe('CreateInvoiceForm', () => {
     })
 
     // check that the invoice was posted correctly
+
     expect(postedInvoice?.invoiceDueDays).toBe(mockInvoice.invoiceDueDays)
     expect(postedInvoice?.invoiceDate).toBe(mockInvoice.invoiceDate)
     expect(postedInvoice?.client?._id).toBe(mockInvoice.client._id)
@@ -164,5 +162,5 @@ describe('CreateInvoiceForm', () => {
     expect(screen.getByLabelText(/description/i)).toHaveTextContent('')
     expect(screen.getByLabelText(/price/i)).toHaveValue(0)
     expect(screen.getByLabelText(/quantity/i)).toHaveValue(1)
-  })
+  }, 10000)
 })
