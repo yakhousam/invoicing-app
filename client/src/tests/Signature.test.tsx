@@ -1,12 +1,12 @@
-import { renderWithContext } from '@/mocks/utils'
 import { screen, waitFor } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 
-import Signature from './Signature'
+import Signature from '../components/settings/Signature'
+import { renderWithRouterContext } from './utils/wrappers'
 
 describe('Signature', () => {
   it('renders', async () => {
-    renderWithContext({
+    renderWithRouterContext({
       component: <Signature />
     })
 

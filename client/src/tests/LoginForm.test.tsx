@@ -1,15 +1,16 @@
 import { API_URL } from '@/config'
-import { HttpResponse, http, server } from '@/mocks/node'
-import { renderWithContext } from '@/mocks/utils'
+
+import { HttpResponse, http, server } from '@/tests/utils/node'
 import { screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
-import LoginForm from './LoginForm'
+import LoginForm from '../components/login/LoginForm'
+import { renderWithRouterContext } from './utils/wrappers'
 
 describe('LoginForm', () => {
   it('renders', async () => {
     const mockOnLogin = vi.fn()
-    renderWithContext({
+    renderWithRouterContext({
       component: <LoginForm onLogin={mockOnLogin} />,
       path: '/login'
     })
@@ -28,7 +29,7 @@ describe('LoginForm', () => {
   it('login user', async () => {
     const user = userEvent.setup()
     const mockOnLogin = vi.fn()
-    renderWithContext({
+    renderWithRouterContext({
       component: <LoginForm onLogin={mockOnLogin} />,
       path: '/login',
       initialEntries: ['/', '/login']
@@ -53,7 +54,7 @@ describe('LoginForm', () => {
       })
     )
     const mockOnLogin = vi.fn()
-    renderWithContext({
+    renderWithRouterContext({
       component: <LoginForm onLogin={mockOnLogin} />,
       path: '/login'
     })

@@ -1,6 +1,11 @@
 import { API_URL } from '@/config'
 import { http, HttpResponse } from 'msw'
-import { generateClient, generateInvoices, generateUser } from './generate'
+import {
+  generateClient,
+  generateInvoice,
+  generateInvoices,
+  generateUser
+} from './generate'
 
 const authHandlers = [
   http.post(API_URL.auth.login, async () => {
@@ -25,6 +30,9 @@ const invoiceHandlers = [
   http.get(API_URL.invoices.getMany, () => {
     const invoices = generateInvoices()
     return HttpResponse.json({ invoices, totalInvoices: invoices.length })
+  }),
+  http.post(API_URL.invoices.createOne, () => {
+    return HttpResponse.json(generateInvoice())
   })
 ]
 

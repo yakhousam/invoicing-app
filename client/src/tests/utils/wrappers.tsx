@@ -18,7 +18,14 @@ type RouterPath = keyof RoutesByPath<typeof routeTree>
 
 const queryClient = new QueryClient()
 
-export function renderWithContext({
+export const Wrapper = ({ children }: { children: React.ReactNode }) => (
+  <QueryClientProvider client={queryClient}>
+    <SnackbarProvider>{children}</SnackbarProvider>
+  </QueryClientProvider>
+)
+
+// eslint-disable-next-line react-refresh/only-export-components
+export const renderWithRouterContext = ({
   component,
   path = '/',
   initialEntries = [path],
@@ -28,7 +35,7 @@ export function renderWithContext({
   path?: RouterPath
   initialEntries?: string[]
   isAuthenticated?: boolean
-}) {
+}) => {
   const rootRoute = createRootRoute({
     component: Outlet
   })
@@ -36,11 +43,7 @@ export function renderWithContext({
   const componentRoute = createRoute({
     getParentRoute: () => rootRoute,
     path,
-    component: () => (
-      <QueryClientProvider client={queryClient}>
-        <SnackbarProvider>{component}</SnackbarProvider>
-      </QueryClientProvider>
-    )
+    component: () => <Wrapper>{component}</Wrapper>
   })
 
   const router = createRouter({

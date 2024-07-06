@@ -1,11 +1,11 @@
-import { renderWithContext } from '@/mocks/utils'
 import { screen, waitFor } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
-import UserInfos from './UserInfos'
+import UserInfos from '../components/settings/UserInfos'
+import { renderWithRouterContext } from './utils/wrappers'
 
 describe('UserInfo', () => {
   it('renders', async () => {
-    renderWithContext({
+    renderWithRouterContext({
       component: <UserInfos />
     })
 

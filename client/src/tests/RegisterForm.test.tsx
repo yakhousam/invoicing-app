@@ -1,15 +1,15 @@
 import { API_URL } from '@/config'
-import { HttpResponse, http, server } from '@/mocks/node'
-import { renderWithContext } from '@/mocks/utils'
+import { HttpResponse, http, server } from '@/tests/utils/node'
 import { screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
-import RegisterForm from './RegisterForm'
+import RegisterForm from '../components/register/RegisterForm'
+import { renderWithRouterContext } from './utils/wrappers'
 
 describe('RegisterForm', () => {
   it('renders', async () => {
     const mockOnRegister = vi.fn()
-    renderWithContext({
+    renderWithRouterContext({
       component: <RegisterForm onRegister={mockOnRegister} />,
       path: '/register'
     })
@@ -30,7 +30,7 @@ describe('RegisterForm', () => {
   it('register user', async () => {
     const user = userEvent.setup()
     const mockOnRegister = vi.fn()
-    renderWithContext({
+    renderWithRouterContext({
       component: <RegisterForm onRegister={mockOnRegister} />,
       path: '/register',
       initialEntries: ['/', '/register']
@@ -57,7 +57,7 @@ describe('RegisterForm', () => {
       })
     )
     const mockOnRegister = vi.fn()
-    renderWithContext({
+    renderWithRouterContext({
       component: <RegisterForm onRegister={mockOnRegister} />,
       path: '/register'
     })
@@ -81,7 +81,7 @@ describe('RegisterForm', () => {
   it('not register user with mismatched passwords', async () => {
     const user = userEvent.setup()
     const mockOnRegister = vi.fn()
-    renderWithContext({
+    renderWithRouterContext({
       component: <RegisterForm onRegister={mockOnRegister} />,
       path: '/register'
     })
@@ -105,7 +105,7 @@ describe('RegisterForm', () => {
   it('not register user with invalid password', async () => {
     const user = userEvent.setup()
     const mockOnRegister = vi.fn()
-    renderWithContext({
+    renderWithRouterContext({
       component: <RegisterForm onRegister={mockOnRegister} />,
       path: '/register'
     })
@@ -131,7 +131,7 @@ describe('RegisterForm', () => {
   it('not register user with invalid username', async () => {
     const user = userEvent.setup()
     const mockOnRegister = vi.fn()
-    renderWithContext({
+    renderWithRouterContext({
       component: <RegisterForm onRegister={mockOnRegister} />,
       path: '/register'
     })
@@ -177,7 +177,7 @@ describe('RegisterForm', () => {
       })
     )
     const mockOnRegister = vi.fn()
-    renderWithContext({
+    renderWithRouterContext({
       component: <RegisterForm onRegister={mockOnRegister} />,
       path: '/register'
     })

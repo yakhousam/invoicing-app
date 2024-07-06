@@ -1,11 +1,11 @@
 import { API_URL } from '@/config'
-import { generateClient } from '@/mocks/generate'
-import { HttpResponse, http, server } from '@/mocks/node'
-import { Wrapper } from '@/mocks/wrappers'
+import { generateClient } from '@/tests/utils/generate'
+import { HttpResponse, http, server } from '@/tests/utils/node'
+import { Wrapper } from '@/tests/utils/wrappers'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it } from 'vitest'
-import ClientForm from './ClientForm'
+import ClientForm from '../components/client/ClientForm'
 
 describe('ClientForm', () => {
   it('renders', () => {

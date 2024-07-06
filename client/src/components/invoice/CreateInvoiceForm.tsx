@@ -193,8 +193,8 @@ function CreateInvoiceForm() {
                 <Grid item xs={12} sm={7.5}>
                   <RHFTextField
                     name={`items.${index}.itemName`}
-                    label="Name"
-                    autoComplete="item name"
+                    label="Description"
+                    autoComplete="item-description"
                     variant="standard"
                   />
                 </Grid>
