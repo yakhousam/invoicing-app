@@ -163,4 +163,106 @@ describe('CreateInvoiceForm', () => {
     expect(screen.getByLabelText(/price/i)).toHaveValue(0)
     expect(screen.getByLabelText(/quantity/i)).toHaveValue(1)
   }, 10000)
+
+  it('shows error message when creating invoice fails', async () => {
+    const user = userEvent.setup()
+    const mockClient = { ...generateClient(), name: 'john doe' }
+    const errorMessage = 'failed to create invoice'
+    server.use(
+      http.get(API_URL.clients.getMany, () => {
+        const clients = [
+          ...Array.from({ length: 9 }, () => generateClient()),
+          mockClient
+        ]
+        return HttpResponse.json(clients)
+      }),
+      http.post(API_URL.invoices.createOne, () => {
+        return HttpResponse.json({ message: errorMessage }, { status: 400 })
+      })
+    )
+
+    render(<CreateInvoiceForm />, { wrapper: Wrapper })
+
+    await waitFor(() => {
+      expect(
+        screen.getByRole('combobox', {
+          name: /client/i
+        })
+      ).toBeInTheDocument()
+    })
+
+    await user.click(
+      screen.getByRole('combobox', {
+        name: /client/i
+      })
+    )
+    await user.click(await screen.findByText(mockClient.name))
+    await user.type(screen.getByLabelText(/description/i), 'React developer')
+    await user.type(screen.getByLabelText(/price/i), '100')
+
+    await user.click(screen.getByRole('button', { name: /create invoice/i }))
+
+    await waitFor(() => {
+      expect(screen.getByRole('alert')).toBeInTheDocument()
+      expect(screen.getByRole('alert')).toHaveTextContent(errorMessage)
+    })
+  }, 10000)
+
+  it('shows error message when creating invoice without client', async () => {
+    const user = userEvent.setup()
+
+    render(<CreateInvoiceForm />, { wrapper: Wrapper })
+
+    await waitFor(() => {
+      expect(
+        screen.getByRole('combobox', {
+          name: /client/i
+        })
+      ).toBeInTheDocument()
+    })
+
+    await user.type(screen.getByLabelText(/description/i), 'React developer')
+    await user.type(screen.getByLabelText(/price/i), '100')
+
+    await user.click(screen.getByRole('button', { name: /create invoice/i }))
+    expect(await screen.findByText(/client is required/i)).toBeInTheDocument()
+  })
+
+  it('shows error message when creating invoice without item', async () => {
+    const user = userEvent.setup()
+    const mockClient = { ...generateClient(), name: 'john doe' }
+    server.use(
+      http.get(API_URL.clients.getMany, () => {
+        const clients = [
+          ...Array.from({ length: 9 }, () => generateClient()),
+          mockClient
+        ]
+        return HttpResponse.json(clients)
+      })
+    )
+
+    render(<CreateInvoiceForm />, { wrapper: Wrapper })
+
+    await waitFor(() => {
+      expect(
+        screen.getByRole('combobox', {
+          name: /client/i
+        })
+      ).toBeInTheDocument()
+    })
+
+    await user.click(
+      screen.getByRole('combobox', {
+        name: /client/i
+      })
+    )
+    await user.click(await screen.findByText('john doe'))
+    await user.click(screen.getByRole('button', { name: /create invoice/i }))
+    expect(
+      await screen.findByText(/item description must be at least 1 character/i)
+    ).toBeInTheDocument()
+    expect(
+      await screen.findByText(/item price must be a positive number/i)
+    ).toBeInTheDocument()
+  }, 10000)
 })
