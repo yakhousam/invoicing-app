@@ -60,9 +60,15 @@ function CreateInvoiceForm() {
         }
       })
     },
-    onError: (error) => {
-      enqueueSnackbar(error.message, { variant: 'error' })
-      console.error(error)
+    onError: async (error) => {
+      let errorMessage = 'Something went wrong. Please try again later.'
+      if (error instanceof Response) {
+        const data = await error.json()
+        errorMessage = data.message
+      } else if (error.message !== undefined) {
+        errorMessage = error.message
+      }
+      enqueueSnackbar(errorMessage, { variant: 'error' })
     }
   })
   const methods = useForm<CreateInvoice>({
