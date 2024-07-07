@@ -7,8 +7,7 @@ export const invoicesOptions = (
 ) =>
   queryOptions({
     queryKey: ['invoices', search],
-    queryFn: () => fetchInvoices(search),
-    refetchOnMount: false
+    queryFn: () => fetchInvoices(search)
   })
 
 export const invoiceByIdOptions = (id: string) =>

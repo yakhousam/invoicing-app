@@ -61,24 +61,6 @@ const EditInvoiceForm = ({
     onSuccess: (data) => {
       enqueueSnackbar('Invoice updated', { variant: 'success' })
       queryClient.setQueryData(options.queryKey, data)
-      queryClient.setQueryData(invoicesOptions().queryKey, (oldData) => {
-        const updatedInvoice = {
-          ...data,
-          user: data.user.userName
-        }
-        if (oldData) {
-          return {
-            invoices: oldData.invoices.map((invoice) =>
-              invoice._id === data._id ? updatedInvoice : invoice
-            ),
-            totalInvoices: oldData.totalInvoices
-          }
-        }
-        return {
-          invoices: [updatedInvoice],
-          totalInvoices: 1
-        }
-      })
     },
     onError: () => {
       enqueueSnackbar('Error updating invoice', { variant: 'error' })

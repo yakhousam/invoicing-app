@@ -3,17 +3,13 @@ import RHFDatePicker from '@/components/RHF/RHFDatePicker'
 import RHFSelect from '@/components/RHF/RHFSelect'
 import RHFTextField from '@/components/RHF/RHFTextField'
 import { formatCurrency } from '@/helpers'
-import { clientsOptions, invoicesOptions } from '@/queries'
+import { clientsOptions } from '@/queries'
 import { CreateInvoice, Invoice, createInvoiceSchema } from '@/validations'
 import { zodResolver } from '@hookform/resolvers/zod'
 import AddCircleIcon from '@mui/icons-material/AddCircle'
 import DeleteIcon from '@mui/icons-material/Delete'
 import { Box, Button, Grid, IconButton, Stack, Typography } from '@mui/material'
-import {
-  useMutation,
-  useQueryClient,
-  useSuspenseQuery
-} from '@tanstack/react-query'
+import { useMutation, useSuspenseQuery } from '@tanstack/react-query'
 import dayjs from 'dayjs'
 import { useSnackbar } from 'notistack'
 import { FormProvider, useFieldArray, useForm } from 'react-hook-form'
@@ -22,43 +18,17 @@ const currencies: Array<Invoice['currency']> = ['USD', 'EUR', 'GBP']
 
 function CreateInvoiceForm() {
   const { enqueueSnackbar } = useSnackbar()
-  const queryClient = useQueryClient()
 
   const { data: clients } = useSuspenseQuery(clientsOptions)
 
   const mutation = useMutation({
     mutationFn: api.createInvoice,
-    onSuccess: (data) => {
+    onSuccess: () => {
       enqueueSnackbar('Invoice created', { variant: 'success' })
       methods.reset()
       // this is a hack to reset the date (time) field so it doesn't keep the previous value.
       // otherwise if you create a new invoice the date will be the same as the previous one when you don't refresh the page
       methods.setValue('invoiceDate', dayjs().toISOString())
-      queryClient.setQueryData(invoicesOptions().queryKey, (oldData) => {
-        if (!oldData) {
-          return {
-            invoices: [
-              {
-                ...data,
-                user: data.user.userName
-              }
-            ],
-            totalInvoices: 1
-          }
-        }
-
-        return {
-          ...oldData,
-          invoices: [
-            {
-              ...data,
-              user: data.user.userName
-            },
-            ...oldData.invoices
-          ],
-          totalInvoices: oldData.totalInvoices + 1
-        }
-      })
     },
     onError: async (error) => {
       let errorMessage = 'Something went wrong. Please try again later.'
