@@ -138,6 +138,7 @@ function CreateInvoiceForm() {
                 label: client.name
               }))}
               variant="standard"
+              helperText={errors.client?._id && 'Client is required'}
             />
           </Grid>
           <Grid item xs={12} md={6}>

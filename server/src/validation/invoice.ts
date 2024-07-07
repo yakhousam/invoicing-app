@@ -5,9 +5,13 @@ import { userSchema } from './user'
 
 const itemSchema = z.object({
   _id: objectIdToString,
-  itemName: z.string().min(1),
-  itemPrice: z.coerce.number().positive(),
-  itemQuantity: z.coerce.number().positive().optional().default(1)
+  itemName: z.string().min(1, 'item description must be at least 1 character'),
+  itemPrice: z.coerce.number().positive('item price must be a positive number'),
+  itemQuantity: z.coerce
+    .number()
+    .positive('item quantity must be a positive number')
+    .optional()
+    .default(1)
 })
 
 export const invoiceSchema = z.object({
