@@ -76,12 +76,19 @@ const InvoicePdf = (invoice: Invoice) => {
   const signature = invoice.user.signatureUrl
     ? `${baseUrl}/${invoice.user.signatureUrl}`
     : undefined
+
+  const fullName =
+    invoice.user.firstName || invoice.user.lastName
+      ? [invoice.user.firstName, invoice.user.lastName]
+          .filter(Boolean)
+          .join(' ')
+      : invoice.user.userName
   return (
     <>
       <Document>
         <Page size="A4" style={styles.page}>
           <View style={{ ...styles.flexRow, marginBottom: 80 }}>
-            <Text style={styles.header}>{invoice.user.userName}</Text>
+            <Text style={styles.header}>{fullName}</Text>
             <Text style={styles.header}>INVOICE</Text>
           </View>
           <View style={styles.flexRow}>
