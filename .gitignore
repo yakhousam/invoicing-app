@@ -134,3 +134,4 @@ zrestClient
 .vscode
 
 server/uploads/*
+uploads

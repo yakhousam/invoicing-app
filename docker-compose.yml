@@ -5,17 +5,19 @@ services:
     ports:
       - '8080:80'
     environment:
-      - VITE_APP_API_URL=http://localhost:3005/api/v1
+      - VITE_APP_API_URL=http://localhost:4005/api/v1
     depends_on:
       - server
 
   server:
     build: ./server
     ports:
-      - '3005:3005'
+      - '4005:4005'
     environment:
       - MONGODB_URI=mongodb://mongo:27017/invoicing-app
-      - PORT=3005
+      - PORT=4005
+    volumes:
+      - ./uploads:/app/uploads
     depends_on:
       - mongo
 
@@ -23,3 +25,8 @@ services:
     image: mongo
     ports:
       - '27018:27017'
+    volumes:
+      - invoicing_app_mongo_data:/data/db
+
+volumes:
+  invoicing_app_mongo_data:
