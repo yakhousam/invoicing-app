@@ -17,7 +17,7 @@ services:
       - MONGODB_URI=mongodb://mongo:27017/invoicing-app
       - PORT=4005
     volumes:
-      - ./uploads:/app/uploads
+      - uploads:/app/uploads
     depends_on:
       - mongo
 
@@ -26,7 +26,8 @@ services:
     ports:
       - '27018:27017'
     volumes:
-      - invoicing_app_mongo_data:/data/db
+      - mongo_data:/data/db
 
 volumes:
-  invoicing_app_mongo_data:
+  mongo_data:
+  uploads:
