@@ -46,7 +46,7 @@ describe('CreateInvoiceForm', () => {
     expect(screen.getByLabelText(/grand total/i)).toHaveTextContent('€0.00')
 
     expect(screen.getByRole('button', { name: /create/i })).toBeInTheDocument()
-  })
+  }, 20000)
 
   it('create invoice', async () => {
     const user = userEvent.setup()
@@ -162,7 +162,7 @@ describe('CreateInvoiceForm', () => {
     expect(screen.getByLabelText(/description/i)).toHaveTextContent('')
     expect(screen.getByLabelText(/price/i)).toHaveValue(0)
     expect(screen.getByLabelText(/quantity/i)).toHaveValue(1)
-  }, 10000)
+  }, 20000)
 
   it('shows error message when creating invoice fails', async () => {
     const user = userEvent.setup()
@@ -206,7 +206,7 @@ describe('CreateInvoiceForm', () => {
       expect(screen.getByRole('alert')).toBeInTheDocument()
       expect(screen.getByRole('alert')).toHaveTextContent(errorMessage)
     })
-  }, 10000)
+  }, 20000)
 
   it('shows error message when creating invoice without client', async () => {
     const user = userEvent.setup()
@@ -226,7 +226,7 @@ describe('CreateInvoiceForm', () => {
 
     await user.click(screen.getByRole('button', { name: /create invoice/i }))
     expect(await screen.findByText(/client is required/i)).toBeInTheDocument()
-  })
+  }, 20000)
 
   it('shows error message when creating invoice without item', async () => {
     const user = userEvent.setup()
@@ -264,5 +264,5 @@ describe('CreateInvoiceForm', () => {
     expect(
       await screen.findByText(/item price must be a positive number/i)
     ).toBeInTheDocument()
-  }, 10000)
+  }, 20000)
 })

@@ -7,7 +7,7 @@ export const objectIdSchema = z
     message: 'Invalid ObjectId'
   })
 
-export const objectIdToString = z.preprocess((val: any) => {
+export const objectIdToString = z.preprocess((val: unknown) => {
   if (val instanceof mongoose.Types.ObjectId) {
     return val.toString()
   }
@@ -15,7 +15,7 @@ export const objectIdToString = z.preprocess((val: any) => {
 }, z.string())
 
 export const dateToZodDate = z.preprocess(
-  (val: any) => {
+  (val: unknown) => {
     if (val instanceof Date) {
       return val.toISOString()
     }

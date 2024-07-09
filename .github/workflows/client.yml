@@ -1,0 +1,41 @@
+name: Client
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  client-lint-and-test:
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '20.10.0'
+
+      - name: Copy Server Validation Files
+        run: |
+          cp -R ./server/src/validation/* ./client/src/validations/
+
+      - name: Install Dependencies
+        run: |
+
+          cd client
+          npm ci
+
+      - name: Lint Client
+        run: |
+          cd client
+          npm run lint
+
+      - name: Test Client
+        run: |
+          cd client
+          npm test
