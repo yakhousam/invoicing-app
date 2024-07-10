@@ -4,7 +4,7 @@ import { Controller, useFormContext } from 'react-hook-form'
 interface RHFSelectProps extends React.ComponentProps<typeof TextField> {
   name: string
   label: string
-  options: { value: string; label: string }[]
+  options?: { value: string; label: string }[]
 }
 
 const RHFSelect = ({ name, label, options, ...delegated }: RHFSelectProps) => {

@@ -9,7 +9,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import AddCircleIcon from '@mui/icons-material/AddCircle'
 import DeleteIcon from '@mui/icons-material/Delete'
 import { Box, Button, Grid, IconButton, Stack, Typography } from '@mui/material'
-import { useMutation, useSuspenseQuery } from '@tanstack/react-query'
+import { useMutation, useQuery } from '@tanstack/react-query'
 import dayjs from 'dayjs'
 import { useSnackbar } from 'notistack'
 import { FormProvider, useFieldArray, useForm } from 'react-hook-form'
@@ -19,7 +19,7 @@ const currencies: Array<Invoice['currency']> = ['USD', 'EUR', 'GBP']
 function CreateInvoiceForm() {
   const { enqueueSnackbar } = useSnackbar()
 
-  const { data: clients } = useSuspenseQuery(clientsOptions)
+  const { data: clients } = useQuery(clientsOptions)
 
   const mutation = useMutation({
     mutationFn: api.createInvoice,
