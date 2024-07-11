@@ -95,3 +95,7 @@ To run tests for the client, navigate to the client directory and use the follow
 ```sh
 npm test
 ```
+
+## License
+
+This project is licensed under the MIT License. See the [LICENSE](./LICENSE) file for details.
