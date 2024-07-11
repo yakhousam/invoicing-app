@@ -15,7 +15,12 @@ import { useNavigate } from '@tanstack/react-router'
 import dayjs from 'dayjs'
 
 const DashboardTable = () => {
-  const queryOptions = invoicesOptions()
+  const queryOptions = invoicesOptions({
+    page: 0,
+    limit: 5,
+    sortBy: 'invoiceDate',
+    orderDirection: 'desc'
+  })
   const { data } = useQuery(queryOptions)
   const navigate = useNavigate()
   return (
