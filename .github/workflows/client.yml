@@ -45,9 +45,7 @@ jobs:
           npm run build
 
       - name: Install Playwright Browsers
-        run: /
-          cd client
-          npx playwright install --with-deps
+        run: npx playwright install --with-deps
 
       - name: Run Playwright Tests
         run: |
