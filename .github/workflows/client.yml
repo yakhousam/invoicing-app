@@ -26,7 +26,6 @@ jobs:
 
       - name: Install Dependencies
         run: |
-
           cd client
           npm ci
 
@@ -39,3 +38,18 @@ jobs:
         run: |
           cd client
           npm test
+
+      - name: Build client
+        run: |
+          cd client
+          npm run build
+
+      - name: Install Playwright Browsers
+        run: /
+          cd client
+          npx playwright install --with-deps
+
+      - name: Run Playwright Tests
+        run: |
+          cd client
+          npm run test:e2e:ci
