@@ -1,4 +1,11 @@
-import { Client, Invoice, InvoiceArray, User } from '@/validations'
+import {
+  Client,
+  Invoice,
+  InvoiceArray,
+  User,
+  invoicesSummary,
+  invoicesTotalsByMonth
+} from '@/validations'
 import { faker } from '@faker-js/faker'
 
 export function generateUser(): Required<User> {
@@ -25,6 +32,10 @@ export function generateClient(): Required<Client> {
     createdAt: faker.date.recent().toISOString(),
     updatedAt: faker.date.recent().toISOString()
   }
+}
+
+export function generateClients(): Required<Client[]> {
+  return Array.from({ length: 10 }, () => generateClient())
 }
 
 export function generateInvoice(): Required<Invoice> {
@@ -61,4 +72,27 @@ export function generateInvoices(): Required<InvoiceArray> {
     ...generateInvoice(),
     user: generateUser()._id
   }))
+}
+
+export function generateInvoicesTotalsByMonth(): invoicesTotalsByMonth {
+  return Array.from({ length: 10 }, () => ({
+    date: {
+      month: faker.number.int({ min: 1, max: 12 }),
+      year: faker.number.int({ min: 2010, max: 2020 })
+    },
+    total: faker.number.int({ min: 10, max: 10000 }),
+    paid: faker.number.int({ min: 1, max: 10 }),
+    unpaid: faker.number.int({ min: 1, max: 10 })
+  }))
+}
+
+export function generateInvoicesSummary(): invoicesSummary {
+  return [
+    {
+      currency: faker.helpers.arrayElement(['USD', 'EUR', 'GBP']),
+      total: faker.number.int({ min: 10, max: 10000 }),
+      paid: faker.number.int({ min: 1, max: 10000 }),
+      unpaid: faker.number.int({ min: 1, max: 10000 })
+    }
+  ]
 }

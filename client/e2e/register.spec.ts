@@ -1,14 +1,6 @@
-import { API_URL } from '@/config'
-import { generateUser } from '@/tests/utils/generate'
-import { expect, test } from '@playwright/test'
+import { expect, test } from './fixture/mockApi'
 
 test('it redirect to setting page after register', async ({ page }) => {
-  await page.route(API_URL.auth.register, async (route) => {
-    await route.fulfill({
-      json: generateUser()
-    })
-  })
-
   await page.goto('/register')
 
   await expect(page.getByRole('heading', { name: 'Register' })).toBeVisible()

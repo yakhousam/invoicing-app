@@ -65,6 +65,7 @@ const AppBarMenu = () => {
         </RouterLink>
         <Divider />
         <MenuItem
+          aria-label="logout"
           onClick={async () => {
             await handleLogout()
             handleClose()

@@ -102,3 +102,7 @@ export type CreateInvoice = z.input<typeof createInvoiceSchema>
 export type UpdateInvoice = z.infer<typeof updateInvoice>
 
 export type InvoicesSearchParams = z.input<typeof invoicesSearchSchema>
+
+export type invoicesSummary = z.infer<typeof invoicesSummarySchema>
+
+export type invoicesTotalsByMonth = z.infer<typeof invoicesTotalsByMonthSchema>
