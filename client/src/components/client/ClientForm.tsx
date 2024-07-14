@@ -29,7 +29,6 @@ function ClientForm() {
     onSuccess: () => {
       formMethods.reset()
       enqueueSnackbar('Client created', { variant: 'success' })
-      console.log('Client created', enqueueSnackbar.toString())
     },
     onError: async (error: Error | Response) => {
       if (error instanceof Response && error.status === 409) {
