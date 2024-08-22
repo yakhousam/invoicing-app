@@ -11,6 +11,28 @@ const create = async (
   try {
     const authenticatedUser = parseUserSchema.parse(req.user)
     const parsedClient = createClientSchema.parse(req.body)
+    if (parsedClient.email === '') {
+      parsedClient.email = undefined
+    }
+
+    if (parsedClient.email !== undefined) {
+      // check for duplicate email
+      const foundClient = await ClientModel.findOne({
+        email: parsedClient.email,
+        userId: authenticatedUser._id
+      })
+
+      if (foundClient !== null) {
+        res.status(409).json({
+          error: 'DuplicateKeyError',
+          message: 'Email already exists',
+          field: 'email',
+          value: parsedClient.email
+        })
+        return
+      }
+    }
+
     const client = new ClientModel({
       ...parsedClient,
       userId: authenticatedUser._id

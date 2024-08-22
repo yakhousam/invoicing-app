@@ -15,8 +15,8 @@ const ClientSchema = new Schema<ClientDocument>(
   { timestamps: true }
 )
 
-ClientSchema.index({ name: 1, userId: 1 }, { unique: true })
-ClientSchema.index({ email: 1, userId: 1 }, { unique: true, sparse: true })
+// ClientSchema.index({ name: 1, userId: 1 }, { unique: true })
+// ClientSchema.index({ email: 1, userId: 1 }, { unique: true, sparse: true })
 
 // only insert email if it is not empty string
 ClientSchema.pre('save', function (next) {
