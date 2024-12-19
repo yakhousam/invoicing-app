@@ -53,7 +53,9 @@ jobs:
             ${{ runner.os }}-playwright-
 
       - name: Install Playwright Browsers
-        run: npx playwright install --with-deps
+        run: |
+          cd client
+          npx playwright install --with-deps
 
       - name: Run Playwright Tests
         run: |
