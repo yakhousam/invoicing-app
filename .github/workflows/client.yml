@@ -10,6 +10,9 @@ on:
 jobs:
   client-lint-and-test:
     runs-on: ubuntu-22.04
+    defaults:
+      run:
+        working-directory: client
 
     steps:
       - name: Checkout code
@@ -25,24 +28,16 @@ jobs:
           cp -R ./server/src/validation/* ./client/src/validations/
 
       - name: Install Dependencies
-        run: |
-          cd client
-          npm ci
+        run: npm ci
 
       - name: Lint Client
-        run: |
-          cd client
-          npm run lint
+        run: npm run lint
 
       - name: Test Client
-        run: |
-          cd client
-          npm test
+        run: npm test
 
       - name: Build client
-        run: |
-          cd client
-          npm run build
+        run: npm run build
 
       - name: Cache Playwright Browsers
         uses: actions/cache@v3
@@ -53,11 +48,7 @@ jobs:
             ${{ runner.os }}-playwright-
 
       - name: Install Playwright Browsers
-        run: |
-          cd client
-          npx playwright install --with-deps
+        run: npx playwright install --with-deps
 
       - name: Run Playwright Tests
-        run: |
-          cd client
-          npm run test:e2e:ci
+        run: npm run test:e2e:ci
