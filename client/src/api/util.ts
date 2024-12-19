@@ -12,7 +12,7 @@ export const fetchApi = async (
     credentials: 'include' // Include auth cookie
   })
 
-  if (response.status === 401) {
+  if (response.status === 401 && window.location.pathname !== '/login') {
     window.location.href = `/login?redirect=${window.location.pathname}`
   }
 
